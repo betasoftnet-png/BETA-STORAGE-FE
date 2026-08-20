@@ -1,35 +1,15 @@
 import React from 'react';
-import { ArrowRight, Mail, LayoutGrid, Briefcase, HelpCircle, ShieldAlert } from 'lucide-react';
+import { Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-react';
 
 export default function AppCard({ app, onManage }) {
   const { id, name, category, allocatedMB, files, colorTheme } = app;
   
-  // Calculate total used size
+  // Calculate sizes
   const usedMB = files.reduce((acc, f) => acc + f.size, 0);
-  const usedMBFormatted = usedMB >= 1024 ? `${(usedMB / 1024).toFixed(1)} GB` : `${Math.round(usedMB)} MB`;
-  const allocatedGB = (allocatedMB / 1024).toFixed(0);
-  const allocatedMBFormatted = allocatedMB >= 1024 ? `${allocatedGB} GB` : `${allocatedMB} MB`;
-  
   const usedPercent = allocatedMB > 0 ? Math.round((usedMB / allocatedMB) * 100) : 0;
-  const availableMB = Math.max(0, allocatedMB - usedMB);
-  const availableMBFormatted = availableMB >= 1024 ? `${(availableMB / 1024).toFixed(1)} GB` : `${Math.round(availableMB)} MB`;
+  const freeMB = Math.max(0, allocatedMB - usedMB);
 
-  // Dynamic Health status
-  let healthStatus = 'HEALTHY';
-  let healthColor = 'var(--color-healthy)';
-  let healthBg = 'rgba(0, 230, 118, 0.1)';
-  
-  if (usedPercent >= 90) {
-    healthStatus = 'CRITICAL';
-    healthColor = 'var(--color-critical)';
-    healthBg = 'rgba(255, 61, 0, 0.1)';
-  } else if (usedPercent >= 75) {
-    healthStatus = 'WARNING';
-    healthColor = 'var(--color-warning)';
-    healthBg = 'rgba(255, 159, 0, 0.1)';
-  }
-
-  // App icons mapping
+  // App icon selection matching image
   const getIcon = () => {
     switch (id) {
       case 'bnx-mail':
@@ -44,83 +24,78 @@ export default function AppCard({ app, onManage }) {
   };
 
   return (
-    <div className="glass-card app-card" style={{ color: `rgb(${colorTheme})` }}>
-      <div className="app-header">
-        <div className="app-icon-title">
+    <div className="glass-card app-card">
+      {/* Top Header Row */}
+      <div className="app-card-top">
+        <div className="app-card-icon-title">
           <div 
-            className="app-icon" 
+            className="app-card-icon"
             style={{ 
-              backgroundColor: `rgba(${colorTheme}, 0.15)`, 
-              color: `rgb(${colorTheme})`,
-              border: `1px solid rgba(${colorTheme}, 0.3)`
+              backgroundColor: `rgba(${colorTheme}, 0.1)`, 
+              color: `rgb(${colorTheme})` 
             }}
           >
             {getIcon()}
           </div>
-          <div className="app-info">
-            <span className="app-name">{name}</span>
-            <span className="app-category">{category}</span>
+          <div className="app-card-details">
+            <span className="app-card-name">{name}</span>
+            <span className="app-card-desc">{category}</span>
           </div>
+        </div>
+        <span className="app-card-badge">
+          {(allocatedMB / 1024).toFixed(0)} GB Allocated
+        </span>
+      </div>
+
+      {/* Progress & Value stats */}
+      <div style={{ marginTop: '0.5rem' }}>
+        <div className="app-card-numbers">
+          <span style={{ color: `rgb(${colorTheme})` }}>{usedMB} MB Used</span>
+          <span style={{ color: 'var(--text-muted)' }}>{freeMB} MB Free</span>
+        </div>
+        
+        <div className="progress-container" style={{ marginBottom: '0.65rem' }}>
+          <div 
+            className="progress-bar" 
+            style={{ 
+              width: `${Math.min(100, usedPercent)}%`,
+              backgroundColor: `rgb(${colorTheme})`
+            }}
+          />
+        </div>
+
+        {/* Status indicator row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600 }}>
+          <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% Used</span>
+          <span className="app-card-health">
+            <span className="app-card-health-dot" />
+            Healthy
+          </span>
         </div>
       </div>
 
-      <div className="app-body">
-        <div>
-          <div className="app-storage-nums">
-            <span className="app-storage-value">{usedMBFormatted}</span>
-            <span className="app-storage-max">/ {allocatedMBFormatted}</span>
-          </div>
-          
-          <div className="progress-container" style={{ margin: '0.5rem 0' }}>
-            <div 
-              className="progress-bar" 
-              style={{ 
-                width: `${Math.min(100, usedPercent)}%`,
-                background: `rgb(${colorTheme})`,
-                boxShadow: `0 0 8px rgba(${colorTheme}, 0.3)`
-              }}
-            />
-          </div>
-
-          <div className="app-health-row">
-            <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% USED</span>
-            <span style={{ color: 'var(--text-muted)' }}>{availableMBFormatted} AVAILABLE</span>
-          </div>
-        </div>
-
-        <div style={{ 
-          borderTop: '1px solid var(--border-color)', 
-          paddingTop: '0.75rem', 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          alignItems: 'center' 
-        }}>
-          <div 
-            className="app-health-badge"
-            style={{
-              color: healthColor,
-              backgroundColor: healthBg,
-              border: `1px solid ${healthColor}20`,
-              padding: '0.25rem 0.5rem',
-              borderRadius: '4px',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem'
-            }}
-          >
-            <span className="app-health-dot" style={{ backgroundColor: healthColor }} />
-            {healthStatus}
-          </div>
-
-          <button 
-            className="app-action-link" 
-            onClick={onManage}
-            style={{ background: 'none', border: 'none', font: 'inherit', padding: 0 }}
-          >
-            Manage <ArrowRight size={14} />
-          </button>
-        </div>
+      {/* Footer controls */}
+      <div className="app-card-footer">
+        <span 
+          className="app-card-link" 
+          onClick={onManage}
+          style={{ color: `rgb(${colorTheme})` }}
+        >
+          View Details
+        </span>
+        <button 
+          onClick={onManage}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: `rgb(${colorTheme})`, 
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center'
+          }}
+        >
+          <ArrowRight size={14} />
+        </button>
       </div>
     </div>
   );

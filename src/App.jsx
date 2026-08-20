@@ -1,72 +1,80 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder, 
+  Search, Trash2, Bell, Settings, Server, RefreshCw, Check 
+} from 'lucide-react';
 import Header from './components/Header';
 import StorageOverview from './components/StorageOverview';
 import AppCard from './components/AppCard';
-import AllocationTree from './components/AllocationTree';
 import StorageInsights from './components/StorageInsights';
 import ActivityFeed from './components/ActivityFeed';
-import AppDrawer from './components/AppDrawer';
-import AdminSettings from './components/AdminSettings';
 
-// Helper to load localStorage state or return defaults
+// Load or return reference default state
 const getInitialState = () => {
-  const localData = localStorage.getItem('beta_storage_state');
+  const localData = localStorage.getItem('beta_storage_state_v2');
   if (localData) {
     try {
       return JSON.parse(localData);
     } catch (e) {
-      console.error('Failed to parse local storage state, using defaults.', e);
+      console.error('Failed to parse state, using defaults.', e);
     }
   }
 
-  // Reference Default values
+  // File structure tailored to match Category values exactly:
+  // Documents (Database, Document) = 120 + 100 + 400 = 620 MB
+  // Images (Images) = 50 + 430 = 480 MB
+  // Attachments (Attachment) = 250 + 30 + 80 = 360 MB
+  // Videos (Videos) = 220 MB
+  // Others (Logs, Others) = 120 MB
   return {
     totalPoolMB: 5120, // 5.0 GB
     apps: [
       {
         id: 'bnx-mail',
-        name: 'BNX MAIL',
-        category: 'MAIL PLATFORM',
-        allocatedMB: 1024, // 1 GB
-        colorTheme: '0, 242, 254', // Neon Cyan
+        name: 'BNX Mail',
+        category: 'Mail & Communication',
+        allocatedMB: 1024,
+        colorTheme: '37, 99, 235', // Blue rgb
         files: [
-          { id: 'bnx-f1', name: 'attachment_archives.zip', size: 250, type: 'Attachment', time: '2 hours ago' },
-          { id: 'bnx-f2', name: 'incoming_mailbox.db', size: 120, type: 'Database', time: '5 hours ago' },
-          { id: 'bnx-f3', name: 'temp_cache_data.tmp', size: 50, type: 'Document', time: '1 day ago' }
+          { id: 'bnx-f1', name: 'Project_Proposal.pdf', size: 250, type: 'Attachment', time: '2h ago' },
+          { id: 'bnx-f2', name: 'Mailbox_Backup.db', size: 120, type: 'Database', time: '5h ago' },
+          { id: 'bnx-f3', name: 'Profile_Picture.png', size: 50, type: 'Images', time: '1d ago' }
         ]
       },
       {
         id: 'cliks',
-        name: 'CLIKS',
-        category: 'WORKSPACE PLATFORM',
-        allocatedMB: 1024, // 1 GB
-        colorTheme: '127, 0, 255', // Purple
+        name: 'Cliks',
+        category: 'Workplace Collaboration',
+        allocatedMB: 1024,
+        colorTheme: '13, 148, 136', // Teal rgb
         files: [
-          { id: 'cl-f1', name: 'workspace_records.db', size: 450, type: 'Database', time: '1 hour ago' },
-          { id: 'cl-f2', name: 'session_records.log', size: 150, type: 'Logs', time: '12 mins ago' },
-          { id: 'cl-f3', name: 'user_uploaded_sheet.xlsx', size: 80, type: 'Document', time: '2 days ago' }
+          { id: 'cl-f1', name: 'Design_System.fig', size: 430, type: 'Images', time: '12m ago' },
+          { id: 'cl-f2', name: 'Session_Logs.log', size: 120, type: 'Logs', time: '1h ago' },
+          { id: 'cl-f3', name: 'Workspace_Data.db', size: 100, type: 'Database', time: '2d ago' },
+          { id: 'cl-f4', name: 'temp_scratch.txt', size: 30, type: 'Attachment', time: '3d ago' }
         ]
       },
       {
         id: 'cliks-business',
-        name: 'CLIKS BUSINESS',
-        category: 'BUSINESS PLATFORM',
-        allocatedMB: 1024, // 1 GB
-        colorTheme: '0, 230, 118', // Emerald Green
+        name: 'Cliks Business',
+        category: 'Business Management',
+        allocatedMB: 1024,
+        colorTheme: '139, 92, 246', // Purple rgb
         files: [
-          { id: 'clb-f1', name: 'corporate_contracts.pdf', size: 380, type: 'Document', time: '24 mins ago' },
-          { id: 'clb-f2', name: 'financial_ledger.db', size: 220, type: 'Database', time: '3 hours ago' },
-          { id: 'clb-f3', name: 'marketing_banner.mp4', size: 100, type: 'Media', time: '4 hours ago' }
+          { id: 'clb-f1', name: 'Quarterly_Report.xlsx', size: 400, type: 'Document', time: '24m ago' },
+          { id: 'clb-f2', name: 'Promo_Video.mp4', size: 220, type: 'Videos', time: '4h ago' },
+          { id: 'clb-f3', name: 'Client_Invoice.pdf', size: 80, type: 'Attachment', time: '3h ago' }
         ]
       }
     ],
     activities: [
-      { appName: 'BNX Mail', description: 'Attachment uploaded', diff: '+12 MB', colorTheme: '0, 242, 254', time: '2 min ago' },
-      { appName: 'CLIKS', description: 'File uploaded', diff: '+8 MB', colorTheme: '127, 0, 255', time: '12 min ago' },
-      { appName: 'CLIKS Business', description: 'Document uploaded', diff: '+15 MB', colorTheme: '0, 230, 118', time: '24 min ago' },
-      { appName: 'BNX Mail', description: 'Storage released', diff: '-32 MB', colorTheme: '0, 242, 254', time: '1 hour ago' }
+      { appName: 'BNX Mail', description: 'Attachment uploaded: Project_Proposal.pdf', diff: '+12 MB', colorTheme: '37, 99, 235', time: '2m ago' },
+      { appName: 'Cliks', description: 'File uploaded: Design_System.fig', diff: '+8 MB', colorTheme: '13, 148, 136', time: '12m ago' },
+      { appName: 'Cliks Business', description: 'Document uploaded: Quarterly_Report.xlsx', diff: '+15 MB', colorTheme: '139, 92, 246', time: '24m ago' },
+      { appName: 'BNX Mail', description: 'Deleted files from Trash', diff: '-32 MB', colorTheme: '37, 99, 235', time: '1h ago' }
     ],
-    notifications: []
+    notifications: [],
+    lastUpdatedTime: 'Just now'
   };
 };
 
@@ -74,169 +82,40 @@ export default function App() {
   const [state, setState] = useState(getInitialState);
   const [selectedAppId, setSelectedAppId] = useState(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Sync to local storage
   useEffect(() => {
-    localStorage.setItem('beta_storage_state', JSON.stringify(state));
+    localStorage.setItem('beta_storage_state_v2', JSON.stringify(state));
   }, [state]);
 
-  // Periodic automatic activity simulator to make UI feel alive
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Simulate minor cleanup or background actions 20% of the time
-      if (Math.random() > 0.8) {
-        const randomAppIndex = Math.floor(Math.random() * state.apps.length);
-        const targetApp = state.apps[randomAppIndex];
-        
-        // Random actions
-        const isUpload = Math.random() > 0.5;
-        if (isUpload) {
-          // Sync upload
-          const uploadSize = Math.floor(Math.random() * 8) + 2; // 2 - 10 MB
-          const newFile = {
-            id: `sim-${Date.now()}`,
-            name: `bg_sync_${Date.now().toString().slice(-4)}.tmp`,
-            size: uploadSize,
-            type: 'Document',
-            time: 'Just now'
-          };
-          
-          // Check limits
-          const appUsed = targetApp.files.reduce((sum, f) => sum + f.size, 0);
-          if (appUsed + uploadSize <= targetApp.allocatedMB) {
-            setState(prev => {
-              const updatedApps = prev.apps.map(a => {
-                if (a.id === targetApp.id) {
-                  return { ...a, files: [newFile, ...a.files] };
-                }
-                return a;
-              });
+  const handleRefreshState = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setState(prev => ({
+        ...prev,
+        lastUpdatedTime: 'Just now'
+      }));
+    }, 800);
+  };
 
-              const newActivity = {
-                appName: targetApp.name,
-                description: 'Background Sync completed',
-                diff: `+${uploadSize} MB`,
-                colorTheme: targetApp.colorTheme,
-                time: 'Just now'
-              };
-
-              return {
-                ...prev,
-                apps: updatedApps,
-                activities: [newActivity, ...prev.activities.slice(0, 9)]
-              };
-            });
-          }
-        } else {
-          // Log compression release
-          const logsFiles = targetApp.files.filter(f => f.type === 'Logs');
-          if (logsFiles.length > 0) {
-            const fileToCompress = logsFiles[Math.floor(Math.random() * logsFiles.length)];
-            const releaseSize = Math.round(fileToCompress.size * 0.3); // free up 30%
-            
-            if (releaseSize > 1) {
-              setState(prev => {
-                const updatedApps = prev.apps.map(a => {
-                  if (a.id === targetApp.id) {
-                    return {
-                      ...a,
-                      files: a.files.map(f => {
-                        if (f.id === fileToCompress.id) {
-                          return { ...f, size: Math.max(1, f.size - releaseSize), name: f.name.replace('.log', '_compressed.log') };
-                        }
-                        return f;
-                      })
-                    };
-                  }
-                  return a;
-                });
-
-                const newActivity = {
-                  appName: targetApp.name,
-                  description: `SysLogs optimized`,
-                  diff: `-${releaseSize} MB`,
-                  colorTheme: targetApp.colorTheme,
-                  time: 'Just now'
-                };
-
-                return {
-                  ...prev,
-                  apps: updatedApps,
-                  activities: [newActivity, ...prev.activities.slice(0, 9)]
-                };
-              });
-            }
-          }
-        }
-      }
-    }, 25000); // Trigger check every 25 seconds
-
-    return () => clearInterval(interval);
-  }, [state.apps]);
-
-  // Check app utilization thresholds and append warning notifications
-  useEffect(() => {
-    const newNotifications = [];
-    state.apps.forEach(app => {
-      const appUsed = app.files.reduce((sum, f) => sum + f.size, 0);
-      const usedPercent = app.allocatedMB > 0 ? (appUsed / app.allocatedMB) * 100 : 0;
-      
-      if (usedPercent >= 90) {
-        newNotifications.push({
-          type: 'critical',
-          message: `${app.name} is running out of space! (${usedPercent.toFixed(0)}% used)`,
-          time: 'Just now'
-        });
-      } else if (usedPercent >= 80) {
-        newNotifications.push({
-          type: 'warning',
-          message: `${app.name} storage allocation exceeds threshold (${usedPercent.toFixed(0)}% used)`,
-          time: 'Just now'
-        });
-      }
-    });
-
-    // Check overall pool utilization
-    const totalUsed = state.apps.reduce((sum, app) => sum + app.files.reduce((acc, f) => acc + f.size, 0), 0);
-    const poolPercent = state.totalPoolMB > 0 ? (totalUsed / state.totalPoolMB) * 100 : 0;
-    if (poolPercent >= 85) {
-      newNotifications.push({
-        type: 'critical',
-        message: `Beta Storage Pool capacity critical (${poolPercent.toFixed(0)}% used)`,
-        time: 'Just now'
-      });
-    }
-
-    // Set warnings if they differ
-    if (JSON.stringify(newNotifications.map(n => n.message)) !== JSON.stringify(state.notifications.map(n => n.message))) {
-      setState(prev => ({ ...prev, notifications: newNotifications }));
-    }
-  }, [state.apps, state.totalPoolMB]);
-
-  // Derived variables
+  // derived variables
   const totalUsedStorageMB = state.apps.reduce((acc, app) => {
     return acc + app.files.reduce((sum, f) => sum + f.size, 0);
   }, 0);
 
-  // Overall ecosystem health determination
+  // System Health
   let systemHealth = 'healthy';
-  const highCapacityApps = state.apps.filter(app => {
-    const appUsed = app.files.reduce((sum, f) => sum + f.size, 0);
-    return app.allocatedMB > 0 && (appUsed / app.allocatedMB) >= 0.9;
+  const hasCritical = state.apps.some(app => {
+    const used = app.files.reduce((sum, f) => sum + f.size, 0);
+    return app.allocatedMB > 0 && (used / app.allocatedMB) >= 0.9;
   });
-  const warnCapacityApps = state.apps.filter(app => {
-    const appUsed = app.files.reduce((sum, f) => sum + f.size, 0);
-    const ratio = appUsed / app.allocatedMB;
-    return app.allocatedMB > 0 && ratio >= 0.75 && ratio < 0.9;
-  });
-
-  if (highCapacityApps.length > 0 || (totalUsedStorageMB / state.totalPoolMB) >= 0.85) {
+  if (hasCritical || (totalUsedStorageMB / state.totalPoolMB) >= 0.85) {
     systemHealth = 'critical';
-  } else if (warnCapacityApps.length > 0 || (totalUsedStorageMB / state.totalPoolMB) >= 0.7) {
-    systemHealth = 'warning';
   }
 
-  // Operations
+  // Callbacks
   const handleUploadFile = (appId, name, size, type) => {
     const timestamp = 'Just now';
     const newFile = {
@@ -251,56 +130,51 @@ export default function App() {
       const targetApp = prev.apps.find(a => a.id === appId);
       const updatedApps = prev.apps.map(a => {
         if (a.id === appId) {
-          return {
-            ...a,
-            files: [newFile, ...a.files]
-          };
+          return { ...a, files: [newFile, ...a.files] };
         }
         return a;
       });
 
       const newLog = {
         appName: targetApp.name,
-        description: `${type} uploaded`,
+        description: `${type} uploaded: ${name}`,
         diff: `+${Math.round(size)} MB`,
         colorTheme: targetApp.colorTheme,
-        time: timestamp
+        time: 'Just now'
       };
 
       return {
         ...prev,
         apps: updatedApps,
-        activities: [newLog, ...prev.activities.slice(0, 9)]
+        activities: [newLog, ...prev.activities.slice(0, 9)],
+        lastUpdatedTime: 'Just now'
       };
     });
   };
 
   const handleDeleteFile = (appId, fileId, fileName, fileSize) => {
-    const timestamp = 'Just now';
     setState(prev => {
       const targetApp = prev.apps.find(a => a.id === appId);
       const updatedApps = prev.apps.map(a => {
         if (a.id === appId) {
-          return {
-            ...a,
-            files: a.files.filter(f => f.id !== fileId)
-          };
+          return { ...a, files: a.files.filter(f => f.id !== fileId) };
         }
         return a;
       });
 
       const newLog = {
         appName: targetApp.name,
-        description: `Storage released`,
+        description: `Deleted files: ${fileName}`,
         diff: `-${Math.round(fileSize)} MB`,
         colorTheme: targetApp.colorTheme,
-        time: timestamp
+        time: 'Just now'
       };
 
       return {
         ...prev,
         apps: updatedApps,
-        activities: [newLog, ...prev.activities.slice(0, 9)]
+        activities: [newLog, ...prev.activities.slice(0, 9)],
+        lastUpdatedTime: 'Just now'
       };
     });
   };
@@ -321,12 +195,7 @@ export default function App() {
 
       return {
         ...prev,
-        apps: prev.apps.map(a => {
-          if (a.id === appId) {
-            return { ...a, allocatedMB: valMB };
-          }
-          return a;
-        }),
+        apps: prev.apps.map(a => (a.id === appId ? { ...a, allocatedMB: valMB } : a)),
         activities: [newLog, ...prev.activities.slice(0, 9)]
       };
     });
@@ -340,7 +209,7 @@ export default function App() {
         appName: 'SYSTEM',
         description: `Total pool storage expanded`,
         diff: `+${diffGB} GB`,
-        colorTheme: '255, 255, 255',
+        colorTheme: '148, 163, 184',
         time: 'Just now'
       };
 
@@ -356,7 +225,7 @@ export default function App() {
     setState(prev => {
       const newLog = {
         appName: newApp.name,
-        description: `Registered inside Ecosystem`,
+        description: `Registered app: ${newApp.name}`,
         diff: `+${(newApp.allocatedMB / 1024).toFixed(0)} GB`,
         colorTheme: newApp.colorTheme,
         time: 'Just now'
@@ -372,7 +241,6 @@ export default function App() {
 
   const handleTriggerCleanup = (appId) => {
     const targetApp = state.apps.find(a => a.id === appId);
-    // Find files matching "temp" or "cache" or ".tmp"
     const tempFiles = targetApp.files.filter(f => 
       f.name.toLowerCase().includes('temp') || 
       f.name.toLowerCase().includes('cache') ||
@@ -380,7 +248,7 @@ export default function App() {
     );
 
     if (tempFiles.length === 0) {
-      alert(`No temporary files or caches identified in ${targetApp.name}.`);
+      alert(`No temporary files found in ${targetApp.name}.`);
       return;
     }
 
@@ -389,17 +257,14 @@ export default function App() {
     setState(prev => {
       const updatedApps = prev.apps.map(a => {
         if (a.id === appId) {
-          return {
-            ...a,
-            files: a.files.filter(f => !tempFiles.some(tf => tf.id === f.id))
-          };
+          return { ...a, files: a.files.filter(f => !tempFiles.some(tf => tf.id === f.id)) };
         }
         return a;
       });
 
       const newLog = {
         appName: targetApp.name,
-        description: `Purged ${tempFiles.length} cache files`,
+        description: `Purged cache files`,
         diff: `-${totalReleased} MB`,
         colorTheme: targetApp.colorTheme,
         time: 'Just now'
@@ -411,8 +276,7 @@ export default function App() {
         activities: [newLog, ...prev.activities.slice(0, 9)]
       };
     });
-
-    alert(`Cleanup policy completed. Released ${totalReleased} MB from cache.`);
+    alert(`Cleaned ${totalReleased} MB from cache.`);
   };
 
   const handleCompressLogs = (appId) => {
@@ -420,7 +284,7 @@ export default function App() {
     const logsFiles = targetApp.files.filter(f => f.type === 'Logs');
 
     if (logsFiles.length === 0) {
-      alert(`No log files identified in ${targetApp.name}.`);
+      alert(`No logs files found in ${targetApp.name}.`);
       return;
     }
 
@@ -433,13 +297,9 @@ export default function App() {
             ...a,
             files: a.files.map(f => {
               if (f.type === 'Logs') {
-                const newSize = Math.max(1, Math.round(f.size * 0.5)); // half size
+                const newSize = Math.max(1, Math.round(f.size * 0.5));
                 totalReleased += (f.size - newSize);
-                return { 
-                  ...f, 
-                  size: newSize,
-                  name: f.name.includes('_compressed') ? f.name : f.name.replace('.log', '_compressed.log') 
-                };
+                return { ...f, size: newSize, name: f.name.includes('_compressed') ? f.name : f.name.replace('.log', '_compressed.log') };
               }
               return f;
             })
@@ -450,7 +310,7 @@ export default function App() {
 
       const newLog = {
         appName: targetApp.name,
-        description: `Compressed syslogs (50% reduction)`,
+        description: `Compressed logs`,
         diff: `-${totalReleased} MB`,
         colorTheme: targetApp.colorTheme,
         time: 'Just now'
@@ -462,108 +322,154 @@ export default function App() {
         activities: [newLog, ...prev.activities.slice(0, 9)]
       };
     });
-
-    alert(`Compression complete. Reclaimed ${totalReleased} MB.`);
+    alert(`Compressed logs. Reclaimed ${totalReleased} MB.`);
   };
 
   const clearNotifications = () => {
     setState(prev => ({ ...prev, notifications: [] }));
   };
 
-  // Find active app for drawer
   const activeApp = state.apps.find(a => a.id === selectedAppId);
 
   return (
-    <div className="dashboard-container">
-      {/* Background aurora lights */}
-      <div className="aurora-emitter-1" />
-      <div className="aurora-emitter-2" />
-
-      {/* Header */}
-      <Header 
-        systemHealth={systemHealth} 
-        notifications={state.notifications}
-        clearNotifications={clearNotifications}
-        openAdminSettings={() => setIsAdminOpen(true)}
-      />
-
-      {/* Main Grid: Overview + Activity */}
-      <div className="dashboard-grid">
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <StorageOverview 
-            totalPoolMB={state.totalPoolMB} 
-            usedStorageMB={totalUsedStorageMB} 
-          />
-        </div>
-        
+    <div className="dashboard-layout">
+      {/* Left Sidebar */}
+      <aside className="sidebar">
         <div>
-          <ActivityFeed 
-            activities={state.activities} 
-            onViewActivity={() => setIsAdminOpen(true)}
-          />
+          <div className="brand-section">
+            <div className="logo-container">
+              <Cloud size={28} fill="currentColor" />
+            </div>
+            <div>
+              <h1>BETA</h1>
+              <p>STORAGE ECOSYSTEM</p>
+            </div>
+          </div>
+
+          <nav className="sidebar-navigation">
+            <div className="menu-group">
+              <span className="menu-item active">
+                <Home size={16} /> Overview
+              </span>
+            </div>
+
+            <div className="menu-group">
+              <span className="menu-label">APPLICATIONS</span>
+              {state.apps.map(app => (
+                <span 
+                  key={app.id} 
+                  className="menu-item" 
+                >
+                  {app.id === 'bnx-mail' ? (
+                    <Mail size={16} />
+                  ) : app.id === 'cliks' ? (
+                    <Layers size={16} />
+                  ) : (
+                    <Briefcase size={16} />
+                  )}
+                  {app.name}
+                </span>
+              ))}
+            </div>
+
+            <div className="menu-group">
+              <span className="menu-label">STORAGE MANAGEMENT</span>
+              <span className="menu-item"><BarChart3 size={16} /> Storage Usage</span>
+              <span className="menu-item"><Folder size={16} /> File Categories</span>
+              <span className="menu-item"><Search size={16} /> Large Files</span>
+              <span className="menu-item"><Trash2 size={16} /> Recycle Bin</span>
+            </div>
+
+            <div className="menu-group">
+              <span className="menu-label">SYSTEM</span>
+              <span className="menu-item" style={{ justifyContent: 'space-between' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Bell size={16} /> Alerts
+                </span>
+              </span>
+              <span className="menu-item">
+                <Settings size={16} /> Settings
+              </span>
+            </div>
+          </nav>
         </div>
-      </div>
 
-      {/* Apps Section Title */}
-      <div className="card-title" style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>
-        BETA APPLICATIONS
-      </div>
-      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem', marginTop: '-0.75rem' }}>
-        Storage allocation across the BETA ecosystem
-      </p>
+        {/* Sidebar bottom server rack card */}
+        <div className="sidebar-promo-card">
+          <div className="promo-icon">
+            <Server size={18} />
+          </div>
+          <h4>STORAGE POOL</h4>
+          <div className="promo-value">
+            {(state.totalPoolMB / 1024).toFixed(0)} GB
+          </div>
+          <div className="promo-sub">Total Ecosystem Capacity</div>
+          
+          <div className="progress-container" style={{ height: '6px', border: 'none' }}>
+            <div 
+              className="progress-bar" 
+              style={{ 
+                width: `${(totalUsedStorageMB / state.totalPoolMB) * 100}%`,
+                backgroundColor: 'var(--accent-blue)' 
+              }}
+            />
+          </div>
+          
+          <div className="promo-progress-labels">
+            <span>{(totalUsedStorageMB / 1024).toFixed(1)} GB Used</span>
+            <span>{((state.totalPoolMB - totalUsedStorageMB) / 1024).toFixed(1)} GB Available</span>
+          </div>
+        </div>
+      </aside>
 
-      {/* Applications Cards Grid */}
-      <div className="apps-grid">
-        {state.apps.map(app => (
-          <AppCard 
-            key={app.id} 
-            app={app} 
-            onManage={() => setSelectedAppId(app.id)} 
-          />
-        ))}
-      </div>
-
-      {/* Interactive Allocation Tree Section */}
-      <AllocationTree 
-        totalPoolMB={state.totalPoolMB} 
-        apps={state.apps}
-        onSelectApp={(appId) => setSelectedAppId(appId)}
-        onAddApp={() => {
-          setIsAdminOpen(true);
-        }}
-      />
-
-      {/* Analytics Insights */}
-      <StorageInsights 
-        totalPoolMB={state.totalPoolMB} 
-        usedStorageMB={totalUsedStorageMB} 
-        appsCount={state.apps.length} 
-        maxAppsCount={Math.floor(state.totalPoolMB / 1024)} 
-      />
-
-      {/* App sandbox drawer */}
-      {activeApp && (
-        <AppDrawer 
-          app={activeApp} 
-          onClose={() => setSelectedAppId(null)}
-          onUploadFile={handleUploadFile}
-          onDeleteFile={handleDeleteFile}
-          onTriggerCleanup={handleTriggerCleanup}
-          onCompressLogs={handleCompressLogs}
+      {/* Main Content Area */}
+      <main className="main-content">
+        {/* Header */}
+        <Header 
+          lastUpdated={state.lastUpdatedTime}
+          isRefreshing={isRefreshing}
+          onRefresh={handleRefreshState}
         />
-      )}
 
-      {/* Configuration admin modal */}
-      {isAdminOpen && (
-        <AdminSettings 
-          totalPoolMB={state.totalPoolMB}
+        {/* Total Ecosystem Storage wide card banner */}
+        <StorageOverview 
+          totalPoolMB={state.totalPoolMB} 
+          usedStorageMB={totalUsedStorageMB} 
+        />
+
+        {/* Application Storage Cards Grid section */}
+        <div className="section-header">
+          <h3>Application Storage</h3>
+          <p>Each application has 1 GB allocated storage</p>
+        </div>
+
+        <div className="apps-grid">
+          {state.apps.map(app => (
+            <AppCard 
+              key={app.id} 
+              app={app} 
+              onManage={() => {}} 
+            />
+          ))}
+        </div>
+
+        {/* Insights Row (Storage Distribution, Category Breakdown, Status Security) */}
+        <StorageInsights 
+          totalPoolMB={state.totalPoolMB} 
+          usedStorageMB={totalUsedStorageMB} 
           apps={state.apps}
-          onClose={() => setIsAdminOpen(false)}
-          onResizePool={handleResizePool}
-          onUpdateAllocation={handleUpdateAllocation}
-          onAddNewApp={handleAddNewApp}
         />
-      )}
+
+        {/* Recent Activity Table Ledger */}
+        <ActivityFeed 
+          activities={state.activities} 
+          onViewActivity={() => {}}
+        />
+      </main>
+
+      {/* Drawer sandbox panels Removed */}
+
+      {/* Admin Settings Modal Removed */}
     </div>
   );
 }
