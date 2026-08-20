@@ -13,7 +13,7 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
   const strokeDashoffset = circumference - (usedPercent / 100) * circumference;
 
   return (
-    <div className="glass-card overview-card" style={{ marginBottom: '2rem' }}>
+    <div className="glass-card overview-card" style={{ marginBottom: '1.5rem' }}>
       {/* Left Spec (Used capacity focus) */}
       <div className="overview-left">
         <div className="label">Total Ecosystem Storage</div>

@@ -393,33 +393,6 @@ export default function App() {
             </div>
           </nav>
         </div>
-
-        {/* Sidebar bottom server rack card */}
-        <div className="sidebar-promo-card">
-          <div className="promo-icon">
-            <Server size={18} />
-          </div>
-          <h4>STORAGE POOL</h4>
-          <div className="promo-value">
-            {(state.totalPoolMB / 1024).toFixed(0)} GB
-          </div>
-          <div className="promo-sub">Total Ecosystem Capacity</div>
-          
-          <div className="progress-container" style={{ height: '6px', border: 'none' }}>
-            <div 
-              className="progress-bar" 
-              style={{ 
-                width: `${(totalUsedStorageMB / state.totalPoolMB) * 100}%`,
-                backgroundColor: 'var(--accent-blue)' 
-              }}
-            />
-          </div>
-          
-          <div className="promo-progress-labels">
-            <span>{(totalUsedStorageMB / 1024).toFixed(1)} GB Used</span>
-            <span>{((state.totalPoolMB - totalUsedStorageMB) / 1024).toFixed(1)} GB Available</span>
-          </div>
-        </div>
       </aside>
 
       {/* Main Content Area */}
