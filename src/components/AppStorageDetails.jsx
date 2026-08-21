@@ -2,7 +2,7 @@ import React from 'react';
 import {
   ChevronRight, RefreshCw, Mail, Paperclip, Trash2,
   Send, FileText, Folder, Info, ChevronLeft, HelpCircle,
-  LayoutGrid, Briefcase
+  LayoutGrid, Briefcase, Scale, Receipt, CreditCard, Users, Image
 } from 'lucide-react';
 
 export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh }) {
@@ -68,18 +68,20 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
       });
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     } else {
-      // cliks-business / others
+      // cliks-business
       const catMap = {
-        Documents: { size: 0, color: '#8b5cf6', icon: <FileText size={16} /> },
-        Media: { size: 0, color: '#ef4444', icon: <Briefcase size={16} /> },
-        Attachments: { size: 0, color: '#10b981', icon: <Paperclip size={16} /> },
-        Other: { size: 0, color: '#94a3b8', icon: <Folder size={16} /> }
+        'Audit & Tax (FIN-PRO)': { size: 0, color: '#2563eb', icon: <Scale size={16} /> },
+        'Sales & Purchases': { size: 0, color: '#10b981', icon: <Receipt size={16} /> },
+        'Expenses': { size: 0, color: '#8b5cf6', icon: <CreditCard size={16} /> },
+        'HR & Payroll': { size: 0, color: '#f59e0b', icon: <Users size={16} /> },
+        'Inventory & Media': { size: 0, color: '#0ea5e9', icon: <Image size={16} /> }
       };
       files.forEach(f => {
-        if (f.type === 'Document') catMap.Documents.size += f.size;
-        else if (f.type === 'Videos') catMap.Media.size += f.size;
-        else if (f.type === 'Attachment') catMap.Attachments.size += f.size;
-        else catMap.Other.size += f.size;
+        if (f.type === 'Audit & Tax (FIN-PRO)') catMap['Audit & Tax (FIN-PRO)'].size += f.size;
+        else if (f.type === 'Sales & Purchases') catMap['Sales & Purchases'].size += f.size;
+        else if (f.type === 'Expenses') catMap['Expenses'].size += f.size;
+        else if (f.type === 'HR & Payroll') catMap['HR & Payroll'].size += f.size;
+        else if (f.type === 'Inventory & Media') catMap['Inventory & Media'].size += f.size;
       });
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     }

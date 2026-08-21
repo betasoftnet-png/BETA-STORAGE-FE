@@ -64,9 +64,11 @@ const getInitialState = () => {
         allocatedMB: 1024,
         colorTheme: '139, 92, 246', // Purple rgb
         files: [
-          { id: 'clb-f1', name: 'Quarterly_Report.xlsx', size: 400, type: 'Document', time: '24m ago' },
-          { id: 'clb-f2', name: 'Promo_Video.mp4', size: 220, type: 'Videos', time: '4h ago' },
-          { id: 'clb-f3', name: 'Client_Invoice.pdf', size: 80, type: 'Attachment', time: '3h ago' }
+          { id: 'clb-f1', name: 'FIN_PRO_Audit_Report.pdf', size: 410, type: 'Audit & Tax (FIN-PRO)', time: '10m ago' },
+          { id: 'clb-f2', name: 'Vendor_Invoices_Q3.xlsx', size: 256, type: 'Sales & Purchases', time: '1h ago' },
+          { id: 'clb-f3', name: 'Receipt_Scans_Archive.zip', size: 154, type: 'Expenses', time: '3h ago' },
+          { id: 'clb-f4', name: 'ID_Documents_Payslips.pdf', size: 102, type: 'HR & Payroll', time: '5h ago' },
+          { id: 'clb-f5', name: 'Product_Photos_Barcodes.zip', size: 102, type: 'Inventory & Media', time: '1d ago' }
         ]
       }
     ],
