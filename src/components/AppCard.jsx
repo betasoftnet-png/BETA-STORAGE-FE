@@ -3,7 +3,7 @@ import { Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-reac
 
 export default function AppCard({ app, onManage }) {
   const { id, name, category, allocatedMB, files, colorTheme } = app;
-  
+
   // Calculate sizes
   const usedMB = files.reduce((acc, f) => acc + f.size, 0);
   const usedPercent = allocatedMB > 0 ? Math.round((usedMB / allocatedMB) * 100) : 0;
@@ -28,11 +28,11 @@ export default function AppCard({ app, onManage }) {
       {/* Top Header Row */}
       <div className="app-card-top">
         <div className="app-card-icon-title">
-          <div 
+          <div
             className="app-card-icon"
-            style={{ 
-              backgroundColor: `rgba(${colorTheme}, 0.1)`, 
-              color: `rgb(${colorTheme})` 
+            style={{
+              backgroundColor: `rgba(${colorTheme}, 0.1)`,
+              color: `rgb(${colorTheme})`
             }}
           >
             {getIcon()}
@@ -53,11 +53,11 @@ export default function AppCard({ app, onManage }) {
           <span style={{ color: `rgb(${colorTheme})` }}>{usedMB} MB Used</span>
           <span style={{ color: 'var(--text-muted)' }}>{freeMB} MB Free</span>
         </div>
-        
+
         <div className="progress-container" style={{ marginBottom: '0.65rem' }}>
-          <div 
-            className="progress-bar" 
-            style={{ 
+          <div
+            className="progress-bar"
+            style={{
               width: `${Math.min(100, usedPercent)}%`,
               backgroundColor: `rgb(${colorTheme})`
             }}
@@ -76,19 +76,19 @@ export default function AppCard({ app, onManage }) {
 
       {/* Footer controls */}
       <div className="app-card-footer">
-        <span 
-          className="app-card-link" 
+        <span
+          className="app-card-link"
           onClick={onManage}
           style={{ color: `rgb(${colorTheme})` }}
         >
           View Details
         </span>
-        <button 
+        <button
           onClick={onManage}
-          style={{ 
-            background: 'none', 
-            border: 'none', 
-            color: `rgb(${colorTheme})`, 
+          style={{
+            background: 'none',
+            border: 'none',
+            color: `rgb(${colorTheme})`,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center'

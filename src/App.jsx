@@ -338,7 +338,7 @@ export default function App() {
         <div>
           <div className="brand-section">
             <div className="logo-container">
-              <img src="/logo.png" alt="BETA Logo" style={{ width: '38px', height: '38px', objectFit: 'contain' }} />
+              <img src="/logo.png" alt="BETA Logo" style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
             </div>
             <div>
               <h1>BETA</h1>

@@ -5,7 +5,7 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
   const totalUsedGB = (usedStorageMB / 1024).toFixed(1);
   const totalCapacityGB = (totalPoolMB / 1024).toFixed(0);
   const availableGB = ((totalPoolMB - usedStorageMB) / 1024).toFixed(1);
-  
+
   // 1. Storage Distribution Data
   const appStats = apps.map(app => {
     const used = app.files.reduce((sum, f) => sum + f.size, 0);
@@ -79,14 +79,14 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
               <svg width="90" height="90" viewBox="0 0 60 60" style={{ transform: 'rotate(-90deg)' }}>
                 {/* Background base */}
                 <circle cx="30" cy="30" r={r} fill="none" stroke="#f1f5f9" strokeWidth="6" />
-                
+
                 {/* Render segments */}
                 {appStats.map((app, index) => {
                   const strokeLength = (app.percent / 100) * circumference;
                   const strokeOffset = circumference - strokeLength;
                   const dashOffset = -(accumulatedPercent / 100) * circumference;
                   accumulatedPercent += app.percent;
-                  
+
                   return (
                     <circle
                       key={index}
@@ -154,8 +154,8 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
                   <span className="category-row-value">{cat.size} MB ({cat.percent}%)</span>
                 </div>
                 <div className="progress-container" style={{ height: '4px' }}>
-                  <div 
-                    className="progress-bar" 
+                  <div
+                    className="progress-bar"
                     style={{ width: `${cat.percent}%`, backgroundColor: cat.color }}
                   />
                 </div>
