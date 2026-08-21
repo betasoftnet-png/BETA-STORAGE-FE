@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder, 
-  Search, Trash2, Bell, Settings, Server, RefreshCw, Check 
+import {
+  Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder,
+  Search, Trash2, Bell, Settings, Server, RefreshCw, Check
 } from 'lucide-react';
 import Header from './components/Header';
 import StorageOverview from './components/StorageOverview';
@@ -184,7 +184,7 @@ export default function App() {
       const targetApp = prev.apps.find(a => a.id === appId);
       const diffGB = ((valMB - targetApp.allocatedMB) / 1024).toFixed(0);
       const direction = valMB > targetApp.allocatedMB ? 'expanded' : 'shrunk';
-      
+
       const newLog = {
         appName: targetApp.name,
         description: `Limit ${direction} by ${Math.abs(diffGB)} GB`,
@@ -204,7 +204,7 @@ export default function App() {
   const handleResizePool = (poolMB) => {
     setState(prev => {
       const diffGB = ((poolMB - prev.totalPoolMB) / 1024).toFixed(0);
-      
+
       const newLog = {
         appName: 'SYSTEM',
         description: `Total pool storage expanded`,
@@ -241,8 +241,8 @@ export default function App() {
 
   const handleTriggerCleanup = (appId) => {
     const targetApp = state.apps.find(a => a.id === appId);
-    const tempFiles = targetApp.files.filter(f => 
-      f.name.toLowerCase().includes('temp') || 
+    const tempFiles = targetApp.files.filter(f =>
+      f.name.toLowerCase().includes('temp') ||
       f.name.toLowerCase().includes('cache') ||
       f.name.endsWith('.tmp')
     );
@@ -356,9 +356,9 @@ export default function App() {
             <div className="menu-group">
               <span className="menu-label">APPLICATIONS</span>
               {state.apps.map(app => (
-                <span 
-                  key={app.id} 
-                  className="menu-item" 
+                <span
+                  key={app.id}
+                  className="menu-item"
                 >
                   {app.id === 'bnx-mail' ? (
                     <img src="/bnx_mail_logo.png" alt="BNX Mail" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
@@ -400,16 +400,16 @@ export default function App() {
       {/* Main Content Area */}
       <main className="main-content">
         {/* Header */}
-        <Header 
+        <Header
           lastUpdated={state.lastUpdatedTime}
           isRefreshing={isRefreshing}
           onRefresh={handleRefreshState}
         />
 
         {/* Total Ecosystem Storage wide card banner */}
-        <StorageOverview 
-          totalPoolMB={state.totalPoolMB} 
-          usedStorageMB={totalUsedStorageMB} 
+        <StorageOverview
+          totalPoolMB={state.totalPoolMB}
+          usedStorageMB={totalUsedStorageMB}
         />
 
         {/* Application Storage Cards Grid section */}
@@ -420,25 +420,25 @@ export default function App() {
 
         <div className="apps-grid">
           {state.apps.map(app => (
-            <AppCard 
-              key={app.id} 
-              app={app} 
-              onManage={() => {}} 
+            <AppCard
+              key={app.id}
+              app={app}
+              onManage={() => { }}
             />
           ))}
         </div>
 
         {/* Insights Row (Storage Distribution, Category Breakdown, Status Security) */}
-        <StorageInsights 
-          totalPoolMB={state.totalPoolMB} 
-          usedStorageMB={totalUsedStorageMB} 
+        <StorageInsights
+          totalPoolMB={state.totalPoolMB}
+          usedStorageMB={totalUsedStorageMB}
           apps={state.apps}
         />
 
         {/* Recent Activity Table Ledger */}
-        <ActivityFeed 
-          activities={state.activities} 
-          onViewActivity={() => {}}
+        <ActivityFeed
+          activities={state.activities}
+          onViewActivity={() => { }}
         />
       </main>
 
