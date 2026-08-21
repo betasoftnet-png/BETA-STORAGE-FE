@@ -338,7 +338,7 @@ export default function App() {
         <div>
           <div className="brand-section">
             <div className="logo-container">
-              <Cloud size={28} fill="currentColor" />
+              <img src="/logo.png" alt="BETA Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
             </div>
             <div>
               <h1>BETA</h1>

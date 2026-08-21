@@ -25,17 +25,17 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
       <div className="overview-center" style={{ position: 'relative', width: '130px', height: '130px' }}>
         <svg width="120" height="120" className="donut-chart-svg">
           {/* Track */}
-          <circle 
-            cx="60" 
-            cy="60" 
-            r={radius} 
-            className="donut-track" 
+          <circle
+            cx="60"
+            cy="60"
+            r={radius}
+            className="donut-track"
           />
           {/* Segment */}
-          <circle 
-            cx="60" 
-            cy="60" 
-            r={radius} 
+          <circle
+            cx="60"
+            cy="60"
+            r={radius}
             className="donut-segment"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
@@ -78,7 +78,7 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
         <svg width="150" height="60" viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
           {/* Cloud Outline */}
           <path d="M115 40C115 33.7 109.9 28.6 103.5 28.6C103 28.6 102.5 28.7 102 28.8C99.1 21.6 92 16.5 83.7 16.5C74 16.5 65.9 23.1 64.1 32C63.1 31.8 61.9 31.6 60.8 31.6C53.1 31.6 47 37.7 47 45.4C47 53.1 53.1 59.2 60.8 59.2H103.5H115C121.4 59.2 126.5 54.1 126.5 47.7C126.5 42 121.4 40.5 115 40Z" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="1.2" strokeLinejoin="round" />
-          
+
           {/* Server Rack Box inside illustration */}
           <rect x="85" y="32" width="30" height="24" rx="3" fill="#ffffff" stroke="#93c5fd" strokeWidth="1.2" />
           <line x1="89" y1="38" x2="111" y2="38" stroke="#bfdbfe" strokeWidth="1.5" strokeLinecap="round" />
