@@ -8,6 +8,9 @@ import StorageOverview from './components/StorageOverview';
 import AppCard from './components/AppCard';
 import StorageInsights from './components/StorageInsights';
 import ActivityFeed from './components/ActivityFeed';
+import AppStorageDetails from './components/AppStorageDetails';
+import AppDrawer from './components/AppDrawer';
+import AdminSettings from './components/AdminSettings';
 
 // Load or return reference default state
 const getInitialState = () => {
@@ -83,6 +86,7 @@ export default function App() {
   const [selectedAppId, setSelectedAppId] = useState(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Sync to local storage
   useEffect(() => {
@@ -348,7 +352,14 @@ export default function App() {
 
           <nav className="sidebar-navigation">
             <div className="menu-group">
-              <span className="menu-item active">
+              <span
+                className={`menu-item ${selectedAppId === null ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedAppId(null);
+                  setIsDrawerOpen(false);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 <Home size={16} /> Overview
               </span>
             </div>
@@ -358,7 +369,12 @@ export default function App() {
               {state.apps.map(app => (
                 <span
                   key={app.id}
-                  className="menu-item"
+                  className={`menu-item ${selectedAppId === app.id ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedAppId(app.id);
+                    setIsDrawerOpen(false);
+                  }}
+                  style={{ cursor: 'pointer' }}
                 >
                   {app.id === 'bnx-mail' ? (
                     <img src="/bnx_mail_logo.png" alt="BNX Mail" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
@@ -389,7 +405,7 @@ export default function App() {
                   <Bell size={16} /> Alerts
                 </span>
               </span>
-              <span className="menu-item">
+              <span className="menu-item" onClick={() => setIsAdminOpen(true)} style={{ cursor: 'pointer' }}>
                 <Settings size={16} /> Settings
               </span>
             </div>
@@ -399,52 +415,91 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* Header */}
-        <Header
-          lastUpdated={state.lastUpdatedTime}
-          isRefreshing={isRefreshing}
-          onRefresh={handleRefreshState}
-        />
-
-        {/* Total Ecosystem Storage wide card banner */}
-        <StorageOverview
-          totalPoolMB={state.totalPoolMB}
-          usedStorageMB={totalUsedStorageMB}
-        />
-
-        {/* Application Storage Cards Grid section */}
-        <div className="section-header">
-          <h3>Application Storage</h3>
-          <p>Each application has 1 GB allocated storage</p>
-        </div>
-
-        <div className="apps-grid">
-          {state.apps.map(app => (
-            <AppCard
-              key={app.id}
-              app={app}
-              onManage={() => { }}
+        {selectedAppId ? (
+          <AppStorageDetails
+            app={activeApp}
+            onBack={() => {
+              setSelectedAppId(null);
+              setIsDrawerOpen(false);
+            }}
+            onManage={() => setIsDrawerOpen(true)}
+            lastUpdated={state.lastUpdatedTime}
+            isRefreshing={isRefreshing}
+            onRefresh={handleRefreshState}
+          />
+        ) : (
+          <>
+            {/* Header */}
+            <Header
+              lastUpdated={state.lastUpdatedTime}
+              isRefreshing={isRefreshing}
+              onRefresh={handleRefreshState}
             />
-          ))}
-        </div>
 
-        {/* Insights Row (Storage Distribution, Category Breakdown, Status Security) */}
-        <StorageInsights
-          totalPoolMB={state.totalPoolMB}
-          usedStorageMB={totalUsedStorageMB}
-          apps={state.apps}
-        />
+            {/* Total Ecosystem Storage wide card banner */}
+            <StorageOverview
+              totalPoolMB={state.totalPoolMB}
+              usedStorageMB={totalUsedStorageMB}
+            />
 
-        {/* Recent Activity Table Ledger */}
-        <ActivityFeed
-          activities={state.activities}
-          onViewActivity={() => { }}
-        />
+            {/* Application Storage Cards Grid section */}
+            <div className="section-header">
+              <h3>Application Storage</h3>
+              <p>Each application has 1 GB allocated storage</p>
+            </div>
+
+            <div className="apps-grid">
+              {state.apps.map(app => (
+                <AppCard
+                  key={app.id}
+                  app={app}
+                  onManage={() => {
+                    setSelectedAppId(app.id);
+                    setIsDrawerOpen(false);
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Insights Row (Storage Distribution, Category Breakdown, Status Security) */}
+            <StorageInsights
+              totalPoolMB={state.totalPoolMB}
+              usedStorageMB={totalUsedStorageMB}
+              apps={state.apps}
+            />
+
+            {/* Recent Activity Table Ledger */}
+            <ActivityFeed
+              activities={state.activities}
+              onViewActivity={() => { }}
+            />
+          </>
+        )}
       </main>
 
-      {/* Drawer sandbox panels Removed */}
+      {/* Drawer sandbox panels */}
+      {(activeApp && isDrawerOpen) && (
+        <AppDrawer
+          app={activeApp}
+          onClose={() => setIsDrawerOpen(false)}
+          onUploadFile={handleUploadFile}
+          onDeleteFile={handleDeleteFile}
+          onTriggerCleanup={handleTriggerCleanup}
+          onCompressLogs={handleCompressLogs}
+        />
+      )}
 
-      {/* Admin Settings Modal Removed */}
+      {/* Admin Settings Modal */}
+      {isAdminOpen && (
+        <AdminSettings
+          totalPoolMB={state.totalPoolMB}
+          apps={state.apps}
+          onClose={() => setIsAdminOpen(false)}
+          onResizePool={handleResizePool}
+          onUpdateAllocation={handleUpdateAllocation}
+          onAddNewApp={handleAddNewApp}
+        />
+      )}
     </div>
   );
 }
