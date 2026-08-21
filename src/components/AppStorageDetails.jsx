@@ -37,12 +37,12 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
   const getCategoryBreakdown = () => {
     if (id === 'bnx-mail') {
       const catMap = {
-        Emails: { size: 0, color: '#2563eb', icon: <Mail size={16} /> },
-        Attachments: { size: 0, color: '#10b981', icon: <Paperclip size={16} /> },
-        Trash: { size: 0, color: '#8b5cf6', icon: <Trash2 size={16} /> },
-        Sent: { size: 0, color: '#ef4444', icon: <Send size={16} /> },
-        Drafts: { size: 0, color: '#f59e0b', icon: <FileText size={16} /> },
-        Other: { size: 0, color: '#94a3b8', icon: <Folder size={16} /> }
+        Emails: { size: 0, color: '#2563eb', icon: <Mail size={16} />, desc: 'Mail database archives' },
+        Attachments: { size: 0, color: '#10b981', icon: <Paperclip size={16} />, desc: 'PDFs, ZIPs, Document attachments' },
+        Trash: { size: 0, color: '#8b5cf6', icon: <Trash2 size={16} />, desc: 'Spam, deleted items' },
+        Sent: { size: 0, color: '#ef4444', icon: <Send size={16} />, desc: 'Sent mail documents' },
+        Drafts: { size: 0, color: '#f59e0b', icon: <FileText size={16} />, desc: 'Unsent drafts' },
+        Other: { size: 0, color: '#94a3b8', icon: <Folder size={16} />, desc: 'Miscellaneous application files' }
       };
       files.forEach(f => {
         if (f.type === 'Database' || f.type === 'Email') catMap.Emails.size += f.size;
@@ -55,10 +55,10 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     } else if (id === 'cliks') {
       const catMap = {
-        Designs: { size: 0, color: '#139488', icon: <LayoutGrid size={16} /> },
-        Logs: { size: 0, color: '#94a3b8', icon: <FileText size={16} /> },
-        Workspace: { size: 0, color: '#2563eb', icon: <Folder size={16} /> },
-        Other: { size: 0, color: '#f59e0b', icon: <HelpCircle size={16} /> }
+        Designs: { size: 0, color: '#139488', icon: <LayoutGrid size={16} />, desc: 'Figma files, mockups' },
+        Logs: { size: 0, color: '#94a3b8', icon: <FileText size={16} />, desc: 'Server transaction logs' },
+        Workspace: { size: 0, color: '#2563eb', icon: <Folder size={16} />, desc: 'Active workspace databases' },
+        Other: { size: 0, color: '#f59e0b', icon: <HelpCircle size={16} />, desc: 'Temp and cache files' }
       };
       files.forEach(f => {
         if (f.type === 'Images') catMap.Designs.size += f.size;
@@ -70,11 +70,11 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
     } else {
       // cliks-business
       const catMap = {
-        'Audit & Tax (FIN-PRO)': { size: 0, color: '#2563eb', icon: <Scale size={16} /> },
-        'Sales & Purchases': { size: 0, color: '#10b981', icon: <Receipt size={16} /> },
-        'Expenses': { size: 0, color: '#8b5cf6', icon: <CreditCard size={16} /> },
-        'HR & Payroll': { size: 0, color: '#f59e0b', icon: <Users size={16} /> },
-        'Inventory & Media': { size: 0, color: '#0ea5e9', icon: <Image size={16} /> }
+        'Audit & Tax (FIN-PRO)': { size: 0, color: '#2563eb', icon: <Scale size={16} />, desc: 'PDFs, XLS, Signed Certificates' },
+        'Sales & Purchases': { size: 0, color: '#10b981', icon: <Receipt size={16} />, desc: 'PDF Invoices, Vendor Bills' },
+        'Expenses': { size: 0, color: '#8b5cf6', icon: <CreditCard size={16} />, desc: 'Receipt Scans, Images' },
+        'HR & Payroll': { size: 0, color: '#f59e0b', icon: <Users size={16} />, desc: 'ID Documents, Payslip PDFs' },
+        'Inventory & Media': { size: 0, color: '#0ea5e9', icon: <Image size={16} />, desc: 'Product Photos, Barcodes' }
       };
       files.forEach(f => {
         if (f.type === 'Audit & Tax (FIN-PRO)') catMap['Audit & Tax (FIN-PRO)'].size += f.size;
@@ -183,15 +183,62 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
       <div className="glass-card category-breakdown-card">
         <div className="category-header-row">
           <h3>Storage by Category</h3>
-          <div className="category-header-labels">
-            <span>Used</span>
-            <span>% of {allocatedText}</span>
-          </div>
+          {id !== 'cliks-business' && (
+            <div className="category-header-labels">
+              <span>Used</span>
+              <span>% of {allocatedText}</span>
+            </div>
+          )}
         </div>
 
         <div className="category-list-wrapper">
           {categories.map((cat, idx) => {
             const catPercent = allocatedMB > 0 ? Math.round((cat.size / allocatedMB) * 100) : 0;
+
+            if (id === 'cliks-business') {
+              return (
+                <div className="category-row-item" key={idx} style={{ justifyContent: 'space-between', padding: '0.75rem 0' }}>
+                  {/* Left: Dot icon + Category Name */}
+                  <div className="category-title-section" style={{ width: 'auto', flexGrow: 1 }}>
+                    <span
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: cat.color,
+                        display: 'inline-block',
+                        marginRight: '12px'
+                      }}
+                    />
+                    <span className="category-name-lbl" style={{ fontSize: '0.9rem' }}>{cat.name}</span>
+                  </div>
+
+                  {/* Middle: Percentage badge */}
+                  <div style={{ width: '120px', display: 'flex', justifyContent: 'center' }}>
+                    <span
+                      style={{
+                        backgroundColor: `${cat.color}15`,
+                        color: cat.color,
+                        padding: '4px 12px',
+                        borderRadius: '12px',
+                        fontSize: '0.8rem',
+                        fontWeight: '700',
+                        textAlign: 'center',
+                        minWidth: '55px'
+                      }}
+                    >
+                      {catPercent}%
+                    </span>
+                  </div>
+
+                  {/* Right: Description Text */}
+                  <div style={{ width: '250px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem', fontWeight: '500' }}>
+                    {cat.desc}
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <div className="category-row-item" key={idx}>
                 {/* Left side category title & icon */}

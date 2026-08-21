@@ -39,9 +39,15 @@ const getInitialState = () => {
         allocatedMB: 1024,
         colorTheme: '37, 99, 235', // Blue rgb
         files: [
-          { id: 'bnx-f1', name: 'Project_Proposal.pdf', size: 250, type: 'Attachment', time: '2h ago' },
-          { id: 'bnx-f2', name: 'Mailbox_Backup.db', size: 120, type: 'Database', time: '5h ago' },
-          { id: 'bnx-f3', name: 'Profile_Picture.png', size: 50, type: 'Images', time: '1d ago' }
+          { id: 'bnx-f1', name: 'Inbox_Archive.db', size: 150, type: 'Database', time: '5h ago' },
+          { id: 'bnx-f2', name: 'Archived_Threads.db', size: 60, type: 'Database', time: '1d ago' },
+          { id: 'bnx-f3', name: 'Project_Brief.pdf', size: 80, type: 'Attachment', time: '2h ago' },
+          { id: 'bnx-f4', name: 'Design_Specs.docx', size: 40, type: 'Attachment', time: '4h ago' },
+          { id: 'bnx-f5', name: 'deleted_newsletter.tmp', size: 30, type: 'Trash', time: '3d ago' },
+          { id: 'bnx-f6', name: 'spam_report.log', size: 10, type: 'Trash', time: '4d ago' },
+          { id: 'bnx-f7', name: 'sent_invoice_archive.zip', size: 30, type: 'Sent', time: '1h ago' },
+          { id: 'bnx-f8', name: 'draft_reply_v1.txt', size: 12, type: 'Draft', time: '10m ago' },
+          { id: 'bnx-f9', name: 'preferences.json', size: 8, type: 'Other', time: '1w ago' }
         ]
       },
       {
