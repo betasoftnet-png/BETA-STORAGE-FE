@@ -59,6 +59,8 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
     };
   });
 
+
+
   return (
     <div style={{ marginBottom: '2rem' }}>
       <div className="insights-grid">
