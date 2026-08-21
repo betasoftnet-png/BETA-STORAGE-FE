@@ -13,11 +13,11 @@ export default function AppCard({ app, onManage }) {
   const getIcon = () => {
     switch (id) {
       case 'bnx-mail':
-        return <Mail size={18} />;
+        return <img src="/bnx_mail_logo.png" alt="BNX Mail" style={{ width: '22px', height: '22px', objectFit: 'contain' }} />;
       case 'cliks':
-        return <LayoutGrid size={18} />;
+        return <img src="/cliks_logo.png" alt="Cliks" style={{ width: '22px', height: '22px', objectFit: 'contain' }} />;
       case 'cliks-business':
-        return <Briefcase size={18} />;
+        return <img src="/cliks_business_logo.png" alt="Cliks Business" style={{ width: '22px', height: '22px', objectFit: 'contain' }} />;
       default:
         return <HelpCircle size={18} />;
     }

@@ -6,11 +6,11 @@ export default function ActivityFeed({ activities, onViewActivity }) {
   const getAppIcon = (name) => {
     const lower = name.toLowerCase();
     if (lower.includes('mail')) {
-      return <Mail size={12} />;
+      return <img src="/bnx_mail_logo.png" alt="BNX Mail" style={{ width: '14px', height: '14px', objectFit: 'contain' }} />;
     } else if (lower.includes('business')) {
-      return <Briefcase size={12} />;
+      return <img src="/cliks_business_logo.png" alt="Cliks Business" style={{ width: '14px', height: '14px', objectFit: 'contain' }} />;
     } else if (lower.includes('cliks')) {
-      return <LayoutGrid size={12} />;
+      return <img src="/cliks_logo.png" alt="Cliks" style={{ width: '14px', height: '14px', objectFit: 'contain' }} />;
     }
     return <HelpCircle size={12} />;
   };

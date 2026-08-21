@@ -361,9 +361,11 @@ export default function App() {
                   className="menu-item" 
                 >
                   {app.id === 'bnx-mail' ? (
-                    <Mail size={16} />
+                    <img src="/bnx_mail_logo.png" alt="BNX Mail" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
                   ) : app.id === 'cliks' ? (
-                    <Layers size={16} />
+                    <img src="/cliks_logo.png" alt="Cliks" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
+                  ) : app.id === 'cliks-business' ? (
+                    <img src="/cliks_business_logo.png" alt="Cliks Business" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
                   ) : (
                     <Briefcase size={16} />
                   )}
