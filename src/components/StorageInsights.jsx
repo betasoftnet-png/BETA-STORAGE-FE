@@ -34,14 +34,17 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
 
   apps.forEach(app => {
     app.files.forEach(file => {
-      if (file.type === 'Database' || file.type === 'Document') {
-        categoryMap.Documents.size += file.size;
-      } else if (file.type === 'Images') {
+      const type = file.type ? file.type.toLowerCase() : '';
+      const name = file.name.toLowerCase();
+
+      if (type.includes('image') || type.includes('media') || name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.fig')) {
         categoryMap.Images.size += file.size;
-      } else if (file.type === 'Attachment') {
-        categoryMap.Attachments.size += file.size;
-      } else if (file.type === 'Videos') {
+      } else if (type.includes('video') || name.endsWith('.mp4') || name.endsWith('.mov')) {
         categoryMap.Videos.size += file.size;
+      } else if (name.endsWith('.pdf') || type.includes('pdf') || type.includes('attachment')) {
+        categoryMap.Attachments.size += file.size;
+      } else if (type.includes('document') || type.includes('audit') || type.includes('tax') || type.includes('sales') || type.includes('purchase') || type.includes('payroll') || name.endsWith('.xlsx') || name.endsWith('.xls') || name.endsWith('.docx') || name.endsWith('.doc')) {
+        categoryMap.Documents.size += file.size;
       } else {
         categoryMap.Others.size += file.size;
       }
