@@ -95,7 +95,7 @@ export default function FileCategoriesView({ totalPoolMB, apps, onBack }) {
 
     categories = clbCategories.map(cat => {
       const size = categorySizes[cat.name];
-      const percent = activeApp.allocatedMB > 0 ? Math.round((size / activeApp.allocatedMB) * 100) : 0;
+      const percent = appUsedMB > 0 ? ((size / appUsedMB) * 100).toFixed(1) : '0.0';
       return {
         ...cat,
         size,
