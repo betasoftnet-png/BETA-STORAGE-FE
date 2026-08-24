@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
 import {
   Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder,
-  Search, Trash2, Bell, Settings, Server, RefreshCw, Check
+  Search, Trash2, Bell, Settings, Server, RefreshCw, Check, Menu
 } from 'lucide-react';
 import Header from './components/Header';
 import StorageOverview from './components/StorageOverview';
@@ -103,11 +103,17 @@ function AppContent() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Sync to local storage
   useEffect(() => {
     localStorage.setItem('beta_storage_state_v5', JSON.stringify(state));
   }, [state]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleRefreshState = () => {
     setIsRefreshing(true);
@@ -357,8 +363,24 @@ function AppContent() {
 
   return (
     <div className="dashboard-layout">
+      {/* Mobile Top Bar */}
+      <div className="mobile-header-bar">
+        <button className="hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <Menu size={20} />
+        </button>
+        <div className="mobile-brand">
+          <img src="/logo.png" alt="BETA" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+          <span>BETA ECOSYSTEM</span>
+        </div>
+        <div style={{ width: '20px' }} /> {/* alignment balance */}
+      </div>
+
+      {isMobileMenuOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
       {/* Left Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div>
           <div className="brand-section">
             <div className="logo-container">
