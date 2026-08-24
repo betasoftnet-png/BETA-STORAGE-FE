@@ -45,12 +45,22 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
         Other: { size: 0, color: '#94a3b8', icon: <Folder size={16} />, desc: 'Miscellaneous application files' }
       };
       files.forEach(f => {
-        if (f.type === 'Database' || f.type === 'Email') catMap.Emails.size += f.size;
-        else if (f.type === 'Attachment') catMap.Attachments.size += f.size;
-        else if (f.type === 'Trash') catMap.Trash.size += f.size;
-        else if (f.type === 'Sent') catMap.Sent.size += f.size;
-        else if (f.type === 'Draft') catMap.Drafts.size += f.size;
-        else catMap.Other.size += f.size;
+        const name = f.name.toLowerCase();
+        const type = f.type ? f.type.toLowerCase() : '';
+        
+        if (type === 'database' || type === 'email' || name.endsWith('.db')) {
+          catMap.Emails.size += f.size;
+        } else if (type === 'attachment' || name.endsWith('.pdf') || name.endsWith('.zip') || name.endsWith('.xlsx') || type === 'documents') {
+          catMap.Attachments.size += f.size;
+        } else if (type === 'trash' || name.includes('trash') || name.includes('deleted')) {
+          catMap.Trash.size += f.size;
+        } else if (type === 'sent' || name.includes('sent')) {
+          catMap.Sent.size += f.size;
+        } else if (type === 'draft' || name.includes('draft') || name.includes('voice') || name.endsWith('.wav') || name.endsWith('.mp3')) {
+          catMap.Drafts.size += f.size;
+        } else {
+          catMap.Other.size += f.size;
+        }
       });
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     } else if (id === 'cliks') {

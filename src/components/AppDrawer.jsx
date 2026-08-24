@@ -6,7 +6,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
   const [searchTerm, setSearchTerm] = useState('');
   const [fileName, setFileName] = useState('');
   const [fileSize, setFileSize] = useState(15);
-  const [fileType, setFileType] = useState('Document');
+  const [fileType, setFileType] = useState(id === 'cliks-business' ? 'Audit & Tax (FIN-PRO)' : 'Document');
   const [uploadError, setUploadError] = useState('');
 
   // Calculate used storage
@@ -54,7 +54,13 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
       setUploadError(`Failed: Adding this file would exceed the app's allocation limit of ${formatSize(allocatedMB)}.`);
       return;
     }
-    onUploadFile(id, presetName, presetSize, presetType);
+    let finalType = presetType;
+    if (id === 'cliks-business') {
+      if (presetType === 'Logs') finalType = 'Expenses';
+      else if (presetType === 'Database') finalType = 'Audit & Tax (FIN-PRO)';
+      else if (presetType === 'Attachment') finalType = 'Sales & Purchases';
+    }
+    onUploadFile(id, presetName, presetSize, finalType);
   };
 
   return (
@@ -133,16 +139,28 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
               </div>
               <div className="form-group" style={{ margin: 0 }}>
                 <label>File Type</label>
-                <select 
+                 <select 
                   className="form-control"
                   value={fileType}
                   onChange={(e) => setFileType(e.target.value)}
                 >
-                  <option value="Document">Document</option>
-                  <option value="Database">Database Backup</option>
-                  <option value="Logs">Logs / System Records</option>
-                  <option value="Attachment">Attachment File</option>
-                  <option value="Media">Media Content</option>
+                  {id === 'cliks-business' ? (
+                    <>
+                      <option value="Audit & Tax (FIN-PRO)">Audit & Tax (FIN-PRO)</option>
+                      <option value="Sales & Purchases">Sales & Purchases</option>
+                      <option value="Expenses">Expenses</option>
+                      <option value="HR & Payroll">HR & Payroll</option>
+                      <option value="Inventory & Media">Inventory & Media</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="Document">Document</option>
+                      <option value="Database">Database Backup</option>
+                      <option value="Logs">Logs / System Records</option>
+                      <option value="Attachment">Attachment File</option>
+                      <option value="Media">Media Content</option>
+                    </>
+                  )}
                 </select>
               </div>
             </div>
