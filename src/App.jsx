@@ -12,11 +12,12 @@ import ActivityFeed from './components/ActivityFeed';
 import AppStorageDetails from './components/AppStorageDetails';
 import AppDrawer from './components/AppDrawer';
 import StorageUsageView from './components/StorageUsageView';
+import FileCategoriesView from './components/FileCategoriesView';
 // import AdminSettings from './components/AdminSettings';
 
 // Load or return reference default state
 const getInitialState = () => {
-  const localData = localStorage.getItem('beta_storage_state_v3');
+  const localData = localStorage.getItem('beta_storage_state_v5');
   if (localData) {
     try {
       return JSON.parse(localData);
@@ -41,15 +42,12 @@ const getInitialState = () => {
         allocatedMB: 1024,
         colorTheme: '37, 99, 235', // Blue rgb
         files: [
-          { id: 'bnx-f1', name: 'Inbox_Archive.db', size: 1000, type: 'Database', time: '5h ago' },
-          { id: 'bnx-f2', name: 'Archived_Threads.db', size: 500, type: 'Database', time: '1d ago' },
-          { id: 'bnx-f3', name: 'Project_Brief.pdf', size: 150, type: 'Attachment', time: '2h ago' },
-          { id: 'bnx-f4', name: 'Design_Specs.docx', size: 100, type: 'Attachment', time: '4h ago' },
-          { id: 'bnx-f5', name: 'deleted_newsletter.tmp', size: 30, type: 'Trash', time: '3d ago' },
-          { id: 'bnx-f6', name: 'spam_report.log', size: 10, type: 'Trash', time: '4d ago' },
-          { id: 'bnx-f7', name: 'sent_invoice_archive.zip', size: 30, type: 'Sent', time: '1h ago' },
-          { id: 'bnx-f8', name: 'draft_reply_v1.txt', size: 15, type: 'Draft', time: '10m ago' },
-          { id: 'bnx-f9', name: 'preferences.json', size: 8, type: 'Other', time: '1w ago' }
+          { id: 'bnx-f1', name: 'Inbox_Archive.db', size: 420, type: 'Database', time: '5h ago' },
+          { id: 'bnx-f2', name: 'Project_Brief.pdf', size: 350, type: 'Attachment', time: '2h ago' },
+          { id: 'bnx-f3', name: 'header_background.jpg', size: 180, type: 'Images', time: '1d ago' },
+          { id: 'bnx-f4', name: 'intro_tutorial.mp4', size: 20, type: 'Videos', time: '4h ago' },
+          { id: 'bnx-f5', name: 'voicemail_clip.mp3', size: 30, type: 'Audio', time: '3d ago' },
+          { id: 'bnx-f6', name: 'sent_invoice_archive.zip', size: 350, type: 'Sent', time: '1h ago' }
         ]
       },
       {
@@ -59,10 +57,12 @@ const getInitialState = () => {
         allocatedMB: 1024,
         colorTheme: '13, 148, 136', // Teal rgb
         files: [
-          { id: 'cl-f1', name: 'Design_System.fig', size: 300, type: 'Images', time: '12m ago' },
-          { id: 'cl-f2', name: 'Session_Logs.log', size: 100, type: 'Logs', time: '1h ago' },
-          { id: 'cl-f3', name: 'Workspace_Data.db', size: 70, type: 'Database', time: '2d ago' },
-          { id: 'cl-f4', name: 'temp_scratch.txt', size: 30, type: 'Attachment', time: '3d ago' }
+          { id: 'cl-f1', name: 'notes.txt', size: 140, type: 'Attachment', time: '3d ago' },
+          { id: 'cl-f2', name: 'meeting_pdf.pdf', size: 70, type: 'Attachment', time: '2d ago' },
+          { id: 'cl-f3', name: 'cliks_logo.png', size: 140, type: 'Images', time: '12m ago' },
+          { id: 'cl-f4', name: 'presentation_recording.mp4', size: 50, type: 'Videos', time: '1h ago' },
+          { id: 'cl-f5', name: 'meeting_audio.mp3', size: 25, type: 'Audio', time: '5h ago' },
+          { id: 'cl-f6', name: 'logs_archive.zip', size: 145, type: 'Logs', time: '4h ago' }
         ]
       },
       {
@@ -72,11 +72,11 @@ const getInitialState = () => {
         allocatedMB: 1024,
         colorTheme: '139, 92, 246', // Purple rgb
         files: [
-          { id: 'clb-f1', name: 'FIN_PRO_Audit_Report.pdf', size: 400, type: 'Audit & Tax (FIN-PRO)', time: '10m ago' },
-          { id: 'clb-f2', name: 'Vendor_Invoices_Q3.xlsx', size: 250, type: 'Sales & Purchases', time: '1h ago' },
-          { id: 'clb-f3', name: 'Receipt_Scans_Archive.zip', size: 150, type: 'Expenses', time: '3h ago' },
-          { id: 'clb-f4', name: 'ID_Documents_Payslips.pdf', size: 60, type: 'HR & Payroll', time: '5h ago' },
-          { id: 'clb-f5', name: 'Product_Photos_Barcodes.zip', size: 40, type: 'Inventory & Media', time: '1d ago' }
+          { id: 'clb-f1', name: 'Vendor_Invoices_Q3.xlsx', size: 256, type: 'Sales & Purchases', time: '1h ago' },
+          { id: 'clb-f2', name: 'FIN_PRO_Audit_Report.pdf', size: 92, type: 'Audit & Tax (FIN-PRO)', time: '10m ago' },
+          { id: 'clb-f3', name: 'product_photo_1.jpg', size: 300, type: 'Inventory & Media', time: '1d ago' },
+          { id: 'clb-f4', name: 'barcodes_metadata.json', size: 130, type: 'Inventory & Media', time: '2d ago' },
+          { id: 'clb-f5', name: 'Receipt_Scans_Archive.zip', size: 143, type: 'Expenses', time: '3h ago' }
         ]
       }
     ],
@@ -106,7 +106,7 @@ function AppContent() {
 
   // Sync to local storage
   useEffect(() => {
-    localStorage.setItem('beta_storage_state_v3', JSON.stringify(state));
+    localStorage.setItem('beta_storage_state_v5', JSON.stringify(state));
   }, [state]);
 
   const handleRefreshState = () => {
@@ -351,7 +351,7 @@ function AppContent() {
 
   const activeApp = state.apps.find(a => a.id === selectedAppId);
   const allSameAllocation = state.apps.length > 0 && state.apps.every(app => app.allocatedMB === state.apps[0].allocatedMB);
-  const allocationText = allSameAllocation 
+  const allocationText = allSameAllocation
     ? `Each application has ${(state.apps[0].allocatedMB / 1024).toFixed(0)} GB allocated storage`
     : 'Track allocated storage limits across applications';
 
@@ -422,8 +422,17 @@ function AppContent() {
               >
                 <BarChart3 size={16} /> Storage Usage
               </span>
-              <span className="menu-item"><Folder size={16} /> File Categories</span>
-              <span className="menu-item"><Search size={16} /> Large Files</span>
+              <span
+                className={`menu-item ${location.pathname === '/file-categories' ? 'active' : ''}`}
+                onClick={() => {
+                  navigate('/file-categories');
+                  setIsDrawerOpen(false);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <Folder size={16} /> File Categories
+              </span>
+              {/* <span className="menu-item"><Search size={16} /> Large Files</span> */}
               <span className="menu-item"><Trash2 size={16} /> Recycle Bin</span>
             </div>
 
@@ -446,6 +455,15 @@ function AppContent() {
       <main className="main-content">
         {location.pathname === '/storage-usage' ? (
           <StorageUsageView
+            totalPoolMB={state.totalPoolMB}
+            apps={state.apps}
+            onBack={() => {
+              navigate('/');
+              setIsDrawerOpen(false);
+            }}
+          />
+        ) : location.pathname === '/file-categories' ? (
+          <FileCategoriesView
             totalPoolMB={state.totalPoolMB}
             apps={state.apps}
             onBack={() => {

@@ -40,8 +40,8 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
   ];
 
   // SVG dimensions & drawing constants
-  const radius = 50;
-  const circumference = 2 * Math.PI * radius; // ~314.159
+  const radius = 55;
+  const circumference = 2 * Math.PI * radius; // ~345.58
   let accumulatedPercent = 0;
 
   return (
@@ -122,9 +122,9 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
             </div>
           </div>
 
-          <div style={{ marginTop: '2rem', width: '100%', display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          {/* <div style={{ marginTop: '2rem', width: '100%', display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             <span>* Hover over sections to focus</span>
-          </div>
+          </div> */}
         </div>
 
         {/* Right Side: Professional Legend and Detailed Stats */}

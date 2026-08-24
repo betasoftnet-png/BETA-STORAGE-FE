@@ -181,14 +181,34 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
 
       {/* 4. Categorized Breakdown Card */}
       <div className="glass-card category-breakdown-card">
-        <div className="category-header-row">
-          <h3>Storage by Category</h3>
-          {id !== 'cliks-business' && (
-            <div className="category-header-labels">
-              <span>Used</span>
-              <span>% of {allocatedText}</span>
-            </div>
-          )}
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1.2fr 1.2fr 24px',
+          alignItems: 'center',
+          borderBottom: '1px solid var(--border-color)',
+          paddingBottom: '1rem',
+          marginBottom: '1.25rem'
+        }}>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
+            Storage by Category
+          </h3>
+          <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04rem', textAlign: 'center' }}>
+            Used
+          </span>
+          <span style={{
+            fontSize: '0.75rem',
+            fontWeight: '700',
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.04rem',
+            textAlign: id === 'cliks-business' ? 'left' : 'right',
+            paddingLeft: id === 'cliks-business' ? '1rem' : '0',
+            paddingRight: id === 'cliks-business' ? '0' : '1rem'
+          }}>
+            {id === 'cliks-business' ? 'Description' : `% of ${allocatedText}`}
+          </span>
+          <div /> {/* empty chevron column */}
         </div>
 
         <div className="category-list-wrapper">
@@ -197,9 +217,20 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
 
             if (id === 'cliks-business') {
               return (
-                <div className="category-row-item" key={idx} style={{ justifyContent: 'space-between', padding: '0.75rem 0' }}>
+                <div
+                  className="category-row-item"
+                  key={idx}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1.2fr 1.2fr 24px',
+                    alignItems: 'center',
+                    padding: '0.75rem 0',
+                    borderBottom: '1px solid var(--border-light)',
+                    gap: 0
+                  }}
+                >
                   {/* Left: Dot icon + Category Name */}
-                  <div className="category-title-section" style={{ width: 'auto', flexGrow: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <span
                       style={{
                         width: '8px',
@@ -207,14 +238,14 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                         borderRadius: '50%',
                         backgroundColor: cat.color,
                         display: 'inline-block',
-                        marginRight: '12px'
+                        flexShrink: 0
                       }}
                     />
                     <span className="category-name-lbl" style={{ fontSize: '0.9rem' }}>{cat.name}</span>
                   </div>
 
                   {/* Middle: Percentage badge */}
-                  <div style={{ width: '120px', display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <span
                       style={{
                         backgroundColor: `${cat.color}15`,
@@ -232,42 +263,50 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                   </div>
 
                   {/* Right: Description Text */}
-                  <div style={{ width: '250px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem', fontWeight: '500' }}>
+                  <div style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: '500', paddingLeft: '1rem' }}>
                     {cat.desc}
                   </div>
+
+                  {/* Empty column */}
+                  <div />
                 </div>
               );
             }
 
             return (
-              <div className="category-row-item" key={idx}>
+              <div
+                className="category-row-item"
+                key={idx}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1.2fr 1.2fr 24px',
+                  alignItems: 'center',
+                  padding: '0.75rem 0',
+                  borderBottom: '1px solid var(--border-light)',
+                  gap: 0
+                }}
+              >
                 {/* Left side category title & icon */}
-                <div className="category-title-section">
+                <div className="category-title-section" style={{ width: 'auto', flexShrink: 0 }}>
                   <div className="category-icon-box" style={{ backgroundColor: `${cat.color}15`, color: cat.color }}>
                     {cat.icon}
                   </div>
                   <span className="category-name-lbl">{cat.name}</span>
                 </div>
 
-                {/* Progress bar fill */}
-                <div className="category-progress-container">
-                  <div className="progress-container" style={{ height: '6px', borderRadius: '3px' }}>
-                    <div
-                      className="progress-bar"
-                      style={{
-                        width: `${catPercent}%`,
-                        backgroundColor: cat.color,
-                        borderRadius: '3px'
-                      }}
-                    />
-                  </div>
-                </div>
+                {/* Used MB */}
+                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)', textAlign: 'center' }}>
+                  {Math.round(cat.size)} MB
+                </span>
 
-                {/* Right side metrics & chevron */}
-                <div className="category-value-section">
-                  <span className="val-mb">{Math.round(cat.size)} MB</span>
-                  <span className="val-pct">{catPercent}%</span>
-                  <ChevronRight size={16} className="chevron-link" />
+                {/* Percentage */}
+                <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-muted)', textAlign: 'right', paddingRight: '1rem' }}>
+                  {catPercent}%
+                </span>
+
+                {/* Chevron */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <ChevronRight size={16} className="chevron-link" style={{ color: 'var(--text-dim)' }} />
                 </div>
               </div>
             );
