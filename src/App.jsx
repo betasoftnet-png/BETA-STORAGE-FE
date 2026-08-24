@@ -13,7 +13,7 @@ import AppStorageDetails from './components/AppStorageDetails';
 import AppDrawer from './components/AppDrawer';
 import StorageUsageView from './components/StorageUsageView';
 import FileCategoriesView from './components/FileCategoriesView';
-// import AdminSettings from './components/AdminSettings';
+import RecycleBinView from './components/RecycleBinView';
 
 // Load or return reference default state
 const getInitialState = () => {
@@ -87,7 +87,63 @@ const getInitialState = () => {
       { appName: 'BNX Mail', description: 'Deleted files from Trash', diff: '-32 MB', colorTheme: '37, 99, 235', time: '1h ago' }
     ],
     notifications: [],
-    lastUpdatedTime: 'Just now'
+    lastUpdatedTime: 'Just now',
+    deletedFiles: [
+      // BNX Mail: 14 deleted items, totaling 82 MB
+      { id: 'del-1', name: 'invoice.pdf', size: 4.2, app: 'bnx-mail', appName: 'BNX Mail', type: 'PDF', icon: '📄', deletedTime: 'Deleted today', daysRemaining: 29, color: '#2563eb' },
+      { id: 'del-2', name: 'customer_feedback_call.mp3', size: 12.0, app: 'bnx-mail', appName: 'BNX Mail', type: 'Audio', icon: '🎵', deletedTime: 'Deleted Aug 20', daysRemaining: 24, color: '#2563eb' },
+      { id: 'del-3', name: 'notes_todo.txt', size: 1.5, app: 'bnx-mail', appName: 'BNX Mail', type: 'Text', icon: '📄', deletedTime: 'Deleted Aug 10', daysRemaining: 14, color: '#2563eb' },
+      { id: 'del-4', name: 'contract_draft_final.docx', size: 14.0, app: 'bnx-mail', appName: 'BNX Mail', type: 'Document', icon: '📄', deletedTime: 'Deleted Aug 05', daysRemaining: 9, color: '#2563eb' },
+      { id: 'del-5', name: 'annual_audit_draft.pdf', size: 50.3, app: 'bnx-mail', appName: 'BNX Mail', type: 'PDF', icon: '📄', deletedTime: 'Deleted Jul 28', daysRemaining: 2, color: '#2563eb' },
+      ...Array.from({ length: 9 }, (_, i) => ({
+        id: `del-bnx-gen-${i}`,
+        name: `archive_part_${i + 1}.zip`,
+        size: 0.0,
+        app: 'bnx-mail',
+        appName: 'BNX Mail',
+        type: 'Archive',
+        icon: '📦',
+        deletedTime: 'Deleted Jul 25',
+        daysRemaining: 5,
+        color: '#2563eb'
+      })),
+
+      // Cliks Business: 16 deleted items, totaling 113 MB
+      { id: 'del-6', name: 'sales.xlsx', size: 18.6, app: 'cliks-business', appName: 'Cliks Business', type: 'Spreadsheet', icon: '📊', deletedTime: 'Deleted yesterday', daysRemaining: 28, color: '#8b5cf6' },
+      { id: 'del-7', name: 'Q2_Marketing_Plan.pptx', size: 14.5, app: 'cliks-business', appName: 'Cliks Business', type: 'Presentation', icon: '📊', deletedTime: 'Deleted Aug 21', daysRemaining: 25, color: '#8b5cf6' },
+      { id: 'del-8', name: 'product_demo_v2.mp4', size: 42.0, app: 'cliks-business', appName: 'Cliks Business', type: 'Video', icon: '🎬', deletedTime: 'Deleted Aug 18', daysRemaining: 22, color: '#8b5cf6' },
+      { id: 'del-9', name: 'database_backup.sql', size: 35.8, app: 'cliks-business', appName: 'Cliks Business', type: 'Database', icon: '📄', deletedTime: 'Deleted Aug 16', daysRemaining: 20, color: '#8b5cf6' },
+      ...Array.from({ length: 12 }, (_, i) => ({
+        id: `del-clb-gen-${i}`,
+        name: `invoice_scan_${i + 1}.png`,
+        size: 0.175,
+        app: 'cliks-business',
+        appName: 'Cliks Business',
+        type: 'Image',
+        icon: '🖼',
+        deletedTime: 'Deleted Jul 20',
+        daysRemaining: 15,
+        color: '#8b5cf6'
+      })),
+
+      // Cliks: 8 deleted items, totaling 50 MB
+      { id: 'del-10', name: 'project.png', size: 8.4, app: 'cliks', appName: 'Cliks', type: 'Image', icon: '🖼', deletedTime: 'Deleted Aug 22', daysRemaining: 26, color: '#0d9488' },
+      { id: 'del-11', name: 'index_layout.fig', size: 8.0, app: 'cliks', appName: 'Cliks', type: 'Design', icon: '🖼', deletedTime: 'Deleted Aug 12', daysRemaining: 16, color: '#0d9488' },
+      { id: 'del-12', name: 'audio_attachment.wav', size: 6.4, app: 'cliks', appName: 'Cliks', type: 'Audio', icon: '🎵', deletedTime: 'Deleted Aug 02', daysRemaining: 6, color: '#0d9488' },
+      { id: 'del-13', name: 'brand_colors.png', size: 23.6, app: 'cliks', appName: 'Cliks', type: 'Image', icon: '🖼', deletedTime: 'Deleted Jul 27', daysRemaining: 1, color: '#0d9488' },
+      ...Array.from({ length: 4 }, (_, i) => ({
+        id: `del-cl-gen-${i}`,
+        name: `temp_file_${i + 1}.log`,
+        size: 0.9,
+        app: 'cliks',
+        appName: 'Cliks',
+        type: 'Text',
+        icon: '📄',
+        deletedTime: 'Deleted Jul 15',
+        daysRemaining: 12,
+        color: '#0d9488'
+      }))
+    ]
   };
 };
 
@@ -181,12 +237,26 @@ function AppContent() {
   const handleDeleteFile = (appId, fileId, fileName, fileSize) => {
     setState(prev => {
       const targetApp = prev.apps.find(a => a.id === appId);
+      const fileToDelete = targetApp.files.find(f => f.id === fileId);
       const updatedApps = prev.apps.map(a => {
         if (a.id === appId) {
           return { ...a, files: a.files.filter(f => f.id !== fileId) };
         }
         return a;
       });
+
+      const newDeletedFile = {
+        id: fileId,
+        name: fileName,
+        size: fileSize,
+        app: appId,
+        appName: targetApp.name,
+        type: fileToDelete ? fileToDelete.type : 'Other',
+        icon: '📄',
+        deletedTime: 'Deleted today',
+        daysRemaining: 30,
+        color: appId === 'bnx-mail' ? '#2563eb' : appId === 'cliks-business' ? '#8b5cf6' : '#0d9488'
+      };
 
       const newLog = {
         appName: targetApp.name,
@@ -199,6 +269,59 @@ function AppContent() {
       return {
         ...prev,
         apps: updatedApps,
+        activities: [newLog, ...prev.activities.slice(0, 9)],
+        deletedFiles: [newDeletedFile, ...(prev.deletedFiles || [])],
+        lastUpdatedTime: 'Just now'
+      };
+    });
+  };
+
+  const handleRestoreFile = (file) => {
+    setState(prev => {
+      const updatedApps = prev.apps.map(a => {
+        if (a.id === file.app) {
+          const restoredFile = {
+            id: file.id,
+            name: file.name,
+            size: file.size,
+            type: file.type || 'Other',
+            time: 'Just now'
+          };
+          return { ...a, files: [restoredFile, ...a.files] };
+        }
+        return a;
+      });
+
+      const newLog = {
+        appName: file.appName,
+        description: `Restored files: ${file.name}`,
+        diff: `+${Math.round(file.size)} MB`,
+        colorTheme: file.app === 'bnx-mail' ? '37, 99, 235' : file.app === 'cliks-business' ? '139, 92, 246' : '13, 148, 136',
+        time: 'Just now'
+      };
+
+      return {
+        ...prev,
+        apps: updatedApps,
+        deletedFiles: (prev.deletedFiles || []).filter(f => f.id !== file.id),
+        activities: [newLog, ...prev.activities.slice(0, 9)],
+        lastUpdatedTime: 'Just now'
+      };
+    });
+  };
+
+  const handlePermanentDeleteFile = (file) => {
+    setState(prev => {
+      const newLog = {
+        appName: file.appName,
+        description: `Permanently deleted: ${file.name}`,
+        diff: `0 MB`,
+        colorTheme: '100, 116, 139',
+        time: 'Just now'
+      };
+      return {
+        ...prev,
+        deletedFiles: (prev.deletedFiles || []).filter(f => f.id !== file.id),
         activities: [newLog, ...prev.activities.slice(0, 9)],
         lastUpdatedTime: 'Just now'
       };
@@ -454,8 +577,16 @@ function AppContent() {
               >
                 <Folder size={16} /> File Categories
               </span>
-              {/* <span className="menu-item"><Search size={16} /> Large Files</span> */}
-              <span className="menu-item"><Trash2 size={16} /> Recycle Bin</span>
+              <span
+                className={`menu-item ${location.pathname === '/recycle-bin' ? 'active' : ''}`}
+                onClick={() => {
+                  navigate('/recycle-bin');
+                  setIsDrawerOpen(false);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <Trash2 size={16} /> Recycle Bin
+              </span>
             </div>
 
             <div className="menu-group">
@@ -488,6 +619,18 @@ function AppContent() {
           <FileCategoriesView
             totalPoolMB={state.totalPoolMB}
             apps={state.apps}
+            onBack={() => {
+              navigate('/');
+              setIsDrawerOpen(false);
+            }}
+          />
+        ) : location.pathname === '/recycle-bin' ? (
+          <RecycleBinView
+            totalPoolMB={state.totalPoolMB}
+            apps={state.apps}
+            deletedFiles={state.deletedFiles || []}
+            onRestoreFile={handleRestoreFile}
+            onPermanentDeleteFile={handlePermanentDeleteFile}
             onBack={() => {
               navigate('/');
               setIsDrawerOpen(false);
