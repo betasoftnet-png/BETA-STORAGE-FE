@@ -203,8 +203,8 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
             }}
           >
             <div>
-              <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: 'rgba(37, 99, 235, 0.08)', display: 'flex', alignItems: 'center', justify: 'center', color: '#2563eb', fontSize: '1.1rem', marginBottom: '0.75rem' }}>
-                ✉
+              <div style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                <img src="/bnx_mail_logo.png" alt="BNX Mail" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
               </div>
               <h4 style={{ fontSize: '1rem', fontWeight: '750', color: '#0f172a', margin: '0 0 0.25rem 0' }}>BNX Mail</h4>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>
@@ -236,8 +236,8 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
             }}
           >
             <div>
-              <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: 'rgba(139, 92, 246, 0.08)', display: 'flex', alignItems: 'center', justify: 'center', color: '#8b5cf6', fontSize: '1.1rem', marginBottom: '0.75rem' }}>
-                ◈
+              <div style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                <img src="/cliks_business_logo.png" alt="Cliks Business" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
               </div>
               <h4 style={{ fontSize: '1rem', fontWeight: '750', color: '#0f172a', margin: '0 0 0.25rem 0' }}>Cliks Business</h4>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>
@@ -269,8 +269,8 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
             }}
           >
             <div>
-              <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: 'rgba(13, 148, 136, 0.08)', display: 'flex', alignItems: 'center', justify: 'center', color: '#0d9488', fontSize: '1.1rem', marginBottom: '0.75rem' }}>
-                ◆
+              <div style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                <img src="/cliks_logo.png" alt="Cliks" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
               </div>
               <h4 style={{ fontSize: '1rem', fontWeight: '750', color: '#0f172a', margin: '0 0 0.25rem 0' }}>Cliks</h4>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>
