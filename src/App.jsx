@@ -11,11 +11,12 @@ import StorageInsights from './components/StorageInsights';
 import ActivityFeed from './components/ActivityFeed';
 import AppStorageDetails from './components/AppStorageDetails';
 import AppDrawer from './components/AppDrawer';
+import StorageUsageView from './components/StorageUsageView';
 // import AdminSettings from './components/AdminSettings';
 
 // Load or return reference default state
 const getInitialState = () => {
-  const localData = localStorage.getItem('beta_storage_state_v2');
+  const localData = localStorage.getItem('beta_storage_state_v3');
   if (localData) {
     try {
       return JSON.parse(localData);
@@ -40,14 +41,14 @@ const getInitialState = () => {
         allocatedMB: 1024,
         colorTheme: '37, 99, 235', // Blue rgb
         files: [
-          { id: 'bnx-f1', name: 'Inbox_Archive.db', size: 150, type: 'Database', time: '5h ago' },
-          { id: 'bnx-f2', name: 'Archived_Threads.db', size: 60, type: 'Database', time: '1d ago' },
-          { id: 'bnx-f3', name: 'Project_Brief.pdf', size: 80, type: 'Attachment', time: '2h ago' },
-          { id: 'bnx-f4', name: 'Design_Specs.docx', size: 40, type: 'Attachment', time: '4h ago' },
+          { id: 'bnx-f1', name: 'Inbox_Archive.db', size: 1000, type: 'Database', time: '5h ago' },
+          { id: 'bnx-f2', name: 'Archived_Threads.db', size: 500, type: 'Database', time: '1d ago' },
+          { id: 'bnx-f3', name: 'Project_Brief.pdf', size: 150, type: 'Attachment', time: '2h ago' },
+          { id: 'bnx-f4', name: 'Design_Specs.docx', size: 100, type: 'Attachment', time: '4h ago' },
           { id: 'bnx-f5', name: 'deleted_newsletter.tmp', size: 30, type: 'Trash', time: '3d ago' },
           { id: 'bnx-f6', name: 'spam_report.log', size: 10, type: 'Trash', time: '4d ago' },
           { id: 'bnx-f7', name: 'sent_invoice_archive.zip', size: 30, type: 'Sent', time: '1h ago' },
-          { id: 'bnx-f8', name: 'draft_reply_v1.txt', size: 12, type: 'Draft', time: '10m ago' },
+          { id: 'bnx-f8', name: 'draft_reply_v1.txt', size: 15, type: 'Draft', time: '10m ago' },
           { id: 'bnx-f9', name: 'preferences.json', size: 8, type: 'Other', time: '1w ago' }
         ]
       },
@@ -58,9 +59,9 @@ const getInitialState = () => {
         allocatedMB: 1024,
         colorTheme: '13, 148, 136', // Teal rgb
         files: [
-          { id: 'cl-f1', name: 'Design_System.fig', size: 430, type: 'Images', time: '12m ago' },
-          { id: 'cl-f2', name: 'Session_Logs.log', size: 120, type: 'Logs', time: '1h ago' },
-          { id: 'cl-f3', name: 'Workspace_Data.db', size: 100, type: 'Database', time: '2d ago' },
+          { id: 'cl-f1', name: 'Design_System.fig', size: 300, type: 'Images', time: '12m ago' },
+          { id: 'cl-f2', name: 'Session_Logs.log', size: 100, type: 'Logs', time: '1h ago' },
+          { id: 'cl-f3', name: 'Workspace_Data.db', size: 70, type: 'Database', time: '2d ago' },
           { id: 'cl-f4', name: 'temp_scratch.txt', size: 30, type: 'Attachment', time: '3d ago' }
         ]
       },
@@ -71,11 +72,11 @@ const getInitialState = () => {
         allocatedMB: 1024,
         colorTheme: '139, 92, 246', // Purple rgb
         files: [
-          { id: 'clb-f1', name: 'FIN_PRO_Audit_Report.pdf', size: 410, type: 'Audit & Tax (FIN-PRO)', time: '10m ago' },
-          { id: 'clb-f2', name: 'Vendor_Invoices_Q3.xlsx', size: 256, type: 'Sales & Purchases', time: '1h ago' },
-          { id: 'clb-f3', name: 'Receipt_Scans_Archive.zip', size: 154, type: 'Expenses', time: '3h ago' },
-          { id: 'clb-f4', name: 'ID_Documents_Payslips.pdf', size: 102, type: 'HR & Payroll', time: '5h ago' },
-          { id: 'clb-f5', name: 'Product_Photos_Barcodes.zip', size: 102, type: 'Inventory & Media', time: '1d ago' }
+          { id: 'clb-f1', name: 'FIN_PRO_Audit_Report.pdf', size: 400, type: 'Audit & Tax (FIN-PRO)', time: '10m ago' },
+          { id: 'clb-f2', name: 'Vendor_Invoices_Q3.xlsx', size: 250, type: 'Sales & Purchases', time: '1h ago' },
+          { id: 'clb-f3', name: 'Receipt_Scans_Archive.zip', size: 150, type: 'Expenses', time: '3h ago' },
+          { id: 'clb-f4', name: 'ID_Documents_Payslips.pdf', size: 60, type: 'HR & Payroll', time: '5h ago' },
+          { id: 'clb-f5', name: 'Product_Photos_Barcodes.zip', size: 40, type: 'Inventory & Media', time: '1d ago' }
         ]
       }
     ],
@@ -105,7 +106,7 @@ function AppContent() {
 
   // Sync to local storage
   useEffect(() => {
-    localStorage.setItem('beta_storage_state_v2', JSON.stringify(state));
+    localStorage.setItem('beta_storage_state_v3', JSON.stringify(state));
   }, [state]);
 
   const handleRefreshState = () => {
@@ -411,7 +412,16 @@ function AppContent() {
 
             <div className="menu-group">
               <span className="menu-label">STORAGE MANAGEMENT</span>
-              <span className="menu-item"><BarChart3 size={16} /> Storage Usage</span>
+              <span
+                className={`menu-item ${location.pathname === '/storage-usage' ? 'active' : ''}`}
+                onClick={() => {
+                  navigate('/storage-usage');
+                  setIsDrawerOpen(false);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <BarChart3 size={16} /> Storage Usage
+              </span>
               <span className="menu-item"><Folder size={16} /> File Categories</span>
               <span className="menu-item"><Search size={16} /> Large Files</span>
               <span className="menu-item"><Trash2 size={16} /> Recycle Bin</span>
@@ -434,7 +444,16 @@ function AppContent() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {selectedAppId && activeApp ? (
+        {location.pathname === '/storage-usage' ? (
+          <StorageUsageView
+            totalPoolMB={state.totalPoolMB}
+            apps={state.apps}
+            onBack={() => {
+              navigate('/');
+              setIsDrawerOpen(false);
+            }}
+          />
+        ) : selectedAppId && activeApp ? (
           <AppStorageDetails
             app={activeApp}
             onBack={() => {
