@@ -23,6 +23,11 @@ export default function AppCard({ app, onManage }) {
     }
   };
 
+  const isCritical = usedPercent >= 90;
+  const isWarning = usedPercent >= 75 && usedPercent < 90;
+  const healthStatus = isCritical ? 'Critical' : isWarning ? 'Warning' : 'Healthy';
+  const healthColor = isCritical ? 'var(--color-critical)' : isWarning ? 'var(--color-warning)' : 'var(--color-healthy)';
+
   return (
     <div className="glass-card app-card">
       {/* Top Header Row */}
@@ -67,9 +72,9 @@ export default function AppCard({ app, onManage }) {
         {/* Status indicator row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600 }}>
           <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% Used</span>
-          <span className="app-card-health">
-            <span className="app-card-health-dot" />
-            Healthy
+          <span className="app-card-health" style={{ color: healthColor }}>
+            <span className="app-card-health-dot" style={{ backgroundColor: healthColor }} />
+            {healthStatus}
           </span>
         </div>
       </div>

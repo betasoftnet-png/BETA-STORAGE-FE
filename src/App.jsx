@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
 import {
   Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder,
   Search, Trash2, Bell, Settings, Server, RefreshCw, Check
@@ -10,7 +11,7 @@ import StorageInsights from './components/StorageInsights';
 import ActivityFeed from './components/ActivityFeed';
 import AppStorageDetails from './components/AppStorageDetails';
 import AppDrawer from './components/AppDrawer';
-import AdminSettings from './components/AdminSettings';
+// import AdminSettings from './components/AdminSettings';
 
 // Load or return reference default state
 const getInitialState = () => {
@@ -89,9 +90,15 @@ const getInitialState = () => {
   };
 };
 
-export default function App() {
+function AppContent() {
   const [state, setState] = useState(getInitialState);
-  const [selectedAppId, setSelectedAppId] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract selectedAppId from URL pathname: e.g. /storage/bnx-mail -> bnx-mail
+  const match = location.pathname.match(/^\/storage\/([^/]+)$/);
+  const selectedAppId = match ? match[1] : null;
+
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -342,6 +349,10 @@ export default function App() {
   };
 
   const activeApp = state.apps.find(a => a.id === selectedAppId);
+  const allSameAllocation = state.apps.length > 0 && state.apps.every(app => app.allocatedMB === state.apps[0].allocatedMB);
+  const allocationText = allSameAllocation 
+    ? `Each application has ${(state.apps[0].allocatedMB / 1024).toFixed(0)} GB allocated storage`
+    : 'Track allocated storage limits across applications';
 
   return (
     <div className="dashboard-layout">
@@ -363,7 +374,7 @@ export default function App() {
               <span
                 className={`menu-item ${selectedAppId === null ? 'active' : ''}`}
                 onClick={() => {
-                  setSelectedAppId(null);
+                  navigate('/');
                   setIsDrawerOpen(false);
                 }}
                 style={{ cursor: 'pointer' }}
@@ -379,7 +390,7 @@ export default function App() {
                   key={app.id}
                   className={`menu-item ${selectedAppId === app.id ? 'active' : ''}`}
                   onClick={() => {
-                    setSelectedAppId(app.id);
+                    navigate(`/storage/${app.id}`);
                     setIsDrawerOpen(false);
                   }}
                   style={{ cursor: 'pointer' }}
@@ -413,7 +424,7 @@ export default function App() {
                   <Bell size={16} /> Alerts
                 </span>
               </span>
-              <span className="menu-item" onClick={() => setIsAdminOpen(true)} style={{ cursor: 'pointer' }}>
+              <span className="menu-item" style={{ cursor: 'default' }}>
                 <Settings size={16} /> Settings
               </span>
             </div>
@@ -423,11 +434,11 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {selectedAppId ? (
+        {selectedAppId && activeApp ? (
           <AppStorageDetails
             app={activeApp}
             onBack={() => {
-              setSelectedAppId(null);
+              navigate('/');
               setIsDrawerOpen(false);
             }}
             onManage={() => setIsDrawerOpen(true)}
@@ -453,7 +464,7 @@ export default function App() {
             {/* Application Storage Cards Grid section */}
             <div className="section-header">
               <h3>Application Storage</h3>
-              <p>Each application has 1 GB allocated storage</p>
+              <p>{allocationText}</p>
             </div>
 
             <div className="apps-grid">
@@ -462,7 +473,7 @@ export default function App() {
                   key={app.id}
                   app={app}
                   onManage={() => {
-                    setSelectedAppId(app.id);
+                    navigate(`/storage/${app.id}`);
                     setIsDrawerOpen(false);
                   }}
                 />
@@ -497,7 +508,8 @@ export default function App() {
         />
       )}
 
-      {/* Admin Settings Modal */}
+      {/* Admin Settings Modal (Disabled) */}
+      {/*
       {isAdminOpen && (
         <AdminSettings
           totalPoolMB={state.totalPoolMB}
@@ -508,6 +520,15 @@ export default function App() {
           onAddNewApp={handleAddNewApp}
         />
       )}
+      */}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
