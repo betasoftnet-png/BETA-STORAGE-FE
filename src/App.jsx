@@ -14,6 +14,7 @@ import AppDrawer from './components/AppDrawer';
 import StorageUsageView from './components/StorageUsageView';
 import FileCategoriesView from './components/FileCategoriesView';
 import RecycleBinView from './components/RecycleBinView';
+import SettingsView from './components/SettingsView';
 import Login from './components/Login';
 
 // Load or return reference default state
@@ -193,6 +194,18 @@ function AppContent() {
   useEffect(() => {
     localStorage.setItem('beta_storage_state_v5', JSON.stringify(state));
   }, [state]);
+
+  // Initialize theme from localStorage on load
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('settings_theme') || 'System';
+    if (savedTheme === 'Dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (savedTheme === 'Light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -612,16 +625,6 @@ function AppContent() {
                 <BarChart3 size={16} /> Storage Usage
               </span>
               <span
-                className={`menu-item ${location.pathname === '/file-categories' ? 'active' : ''}`}
-                onClick={() => {
-                  navigate('/file-categories');
-                  setIsDrawerOpen(false);
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                <Folder size={16} /> File Categories
-              </span>
-              <span
                 className={`menu-item ${location.pathname === '/recycle-bin' ? 'active' : ''}`}
                 onClick={() => {
                   navigate('/recycle-bin');
@@ -640,7 +643,14 @@ function AppContent() {
                   <Bell size={16} /> Alerts
                 </span>
               </span>
-              <span className="menu-item" style={{ cursor: 'default' }}>
+              <span
+                className={`menu-item ${location.pathname === '/settings' ? 'active' : ''}`}
+                onClick={() => {
+                  navigate('/settings');
+                  setIsDrawerOpen(false);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 <Settings size={16} /> Settings
               </span>
             </div>
@@ -688,6 +698,17 @@ function AppContent() {
               deletedFiles={state.deletedFiles || []}
               onRestoreFile={handleRestoreFile}
               onPermanentDeleteFile={handlePermanentDeleteFile}
+              onBack={() => {
+                navigate('/');
+                setIsDrawerOpen(false);
+              }}
+            />
+          ) : location.pathname === '/settings' ? (
+            <SettingsView
+              totalPoolMB={state.totalPoolMB}
+              apps={state.apps}
+              onResizePool={handleResizePool}
+              onUpdateAllocation={handleUpdateAllocation}
               onBack={() => {
                 navigate('/');
                 setIsDrawerOpen(false);
