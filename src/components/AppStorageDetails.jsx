@@ -47,7 +47,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
       files.forEach(f => {
         const name = f.name.toLowerCase();
         const type = f.type ? f.type.toLowerCase() : '';
-        
+
         if (type === 'database' || type === 'email' || name.endsWith('.db')) {
           catMap.Emails.size += f.size;
         } else if (type === 'attachment' || name.endsWith('.pdf') || name.endsWith('.zip') || name.endsWith('.xlsx') || type === 'documents') {
@@ -65,16 +65,25 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     } else if (id === 'cliks') {
       const catMap = {
-        Designs: { size: 0, color: '#139488', icon: <LayoutGrid size={16} />, desc: 'Figma files, mockups' },
-        Logs: { size: 0, color: '#94a3b8', icon: <FileText size={16} />, desc: 'Server transaction logs' },
-        Workspace: { size: 0, color: '#2563eb', icon: <Folder size={16} />, desc: 'Active workspace databases' },
-        Other: { size: 0, color: '#f59e0b', icon: <HelpCircle size={16} />, desc: 'Temp and cache files' }
+        'Books & Accounting': { size: 0, color: '#2563eb', icon: <LayoutGrid size={16} />, share: '35%', types: 'Sales Invoices, Purchase Bills, Money Trackers', desc: 'Sales Invoices, Purchase Bills, Money Trackers' },
+        'Finance & Investments': { size: 0, color: '#10b981', icon: <FileText size={16} />, share: '25%', types: 'Wallet Statements, Bank Accounts, Portfolio Docs', desc: 'Wallet Statements, Bank Accounts, Portfolio Docs' },
+        'Tax & Deductions': { size: 0, color: '#8b5cf6', icon: <Folder size={16} />, share: '20%', types: 'ITR Worksheets, Form 16, Audit Files', desc: 'ITR Worksheets, Form 16, Audit Files' },
+        'People & Reminders': { size: 0, color: '#f59e0b', icon: <Users size={16} />, share: '10%', types: 'Contact Records, Reminders, Debt Statements', desc: 'Contact Records, Reminders, Debt Statements' },
+        'Social & Media': { size: 0, color: '#0ea5e9', icon: <Image size={16} />, share: '10%', types: 'Profile Photos, Media Posts, Trading Attachments', desc: 'Profile Photos, Media Posts, Trading Attachments' }
       };
       files.forEach(f => {
-        if (f.type === 'Images') catMap.Designs.size += f.size;
-        else if (f.type === 'Logs') catMap.Logs.size += f.size;
-        else if (f.type === 'Database') catMap.Workspace.size += f.size;
-        else catMap.Other.size += f.size;
+        const type = f.type ? f.type.toLowerCase() : '';
+        if (type === 'images') {
+          catMap['Books & Accounting'].size += f.size;
+        } else if (type === 'logs') {
+          catMap['Finance & Investments'].size += f.size;
+        } else if (type === 'database') {
+          catMap['Tax & Deductions'].size += f.size;
+        } else if (type === 'attachment' || type === 'document') {
+          catMap['People & Reminders'].size += f.size;
+        } else {
+          catMap['Social & Media'].size += f.size;
+        }
       });
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     } else {
@@ -194,17 +203,17 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1.2fr 1.2fr 24px',
+          gridTemplateColumns: id === 'cliks' ? '1.2fr 1fr 1.8fr 24px' : '1fr 1.2fr 1.2fr 24px',
           alignItems: 'center',
           borderBottom: '1px solid var(--border-color)',
           paddingBottom: '1rem',
           marginBottom: '1.25rem'
         }}>
           <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
-            Storage by Category
+            {id === 'cliks' ? 'Module' : 'Storage by Category'}
           </h3>
           <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04rem', textAlign: 'center' }}>
-            Used
+            {id === 'cliks' ? 'Typical Storage Share' : 'Used'}
           </span>
           <span style={{
             fontSize: '0.75rem',
@@ -212,11 +221,11 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
             color: 'var(--text-muted)',
             textTransform: 'uppercase',
             letterSpacing: '0.04rem',
-            textAlign: id === 'cliks-business' ? 'left' : 'right',
-            paddingLeft: id === 'cliks-business' ? '1rem' : '0',
-            paddingRight: id === 'cliks-business' ? '0' : '1rem'
+            textAlign: (id === 'cliks-business' || id === 'cliks') ? 'left' : 'right',
+            paddingLeft: id === 'cliks' ? '6rem' : (id === 'cliks-business' ? '1rem' : '0'),
+            paddingRight: (id === 'cliks-business' || id === 'cliks') ? '0' : '1rem'
           }}>
-            {id === 'cliks-business' ? 'Description' : `% of ${allocatedText}`}
+            {id === 'cliks' ? 'Main File Types' : id === 'cliks-business' ? 'Description' : `% of ${allocatedText}`}
           </span>
           <div /> {/* empty chevron column */}
         </div>
@@ -275,6 +284,73 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                   {/* Right: Description Text */}
                   <div style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: '500', paddingLeft: '1rem' }}>
                     {cat.desc}
+                  </div>
+
+                  {/* Empty column */}
+                  <div />
+                </div>
+              );
+            }
+
+            if (id === 'cliks') {
+              return (
+                <div
+                  className="category-row-item"
+                  key={idx}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1.2fr 1fr 1.8fr 24px',
+                    alignItems: 'center',
+                    padding: '0.75rem 0',
+                    borderBottom: '1px solid var(--border-light)',
+                    gap: 0
+                  }}
+                >
+                  {/* Left: Dot icon + Category Name */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: cat.color,
+                        display: 'inline-block',
+                        flexShrink: 0
+                      }}
+                    />
+                    <span className="category-name-lbl" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{cat.name}</span>
+                  </div>
+
+                  {/* Middle: Typical Storage Share badge */}
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <span
+                      style={{
+                        backgroundColor: `${cat.color}15`,
+                        color: cat.color,
+                        border: `1px solid ${cat.color}35`,
+                        padding: '4px 12px',
+                        borderRadius: '12px',
+                        fontSize: '0.8rem',
+                        fontWeight: '700',
+                        textAlign: 'center',
+                        minWidth: '55px',
+                        display: 'inline-block'
+                      }}
+                    >
+                      {cat.share}
+                    </span>
+                  </div>
+
+                  {/* Right: Main File Types */}
+                  <div
+                    style={{
+                      color: '#64748b',
+                      fontSize: '0.85rem',
+                      fontWeight: '500',
+                      marginLeft: '4rem'
+                    }}
+                  >
+                    {cat.types}
                   </div>
 
                   {/* Empty column */}

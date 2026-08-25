@@ -27,30 +27,20 @@ export default function Header({
   }, []);
 
   return (
-    <header style={{ position: 'relative' }}>
-      <div className="header-info">
-        <h2>Storage Overview</h2>
-        <p>Track and manage storage across your Beta ecosystem</p>
+    <header className="navbar-card">
+      <div className="navbar-brand">
+        <img src="/logo.png" alt="Beta Logo" className="navbar-logo" />
+        <span className="navbar-title">BETA Storage Ecosystem</span>
       </div>
 
-      <div className="header-controls" ref={dropdownRef}>
-        {/* Refresh widget */}
-        <div className="header-update-tag" onClick={onRefresh}>
-          <span>Last updated: {lastUpdated}</span>
-          <RefreshCw size={12} className={isRefreshing ? 'spin' : ''} />
-        </div>
-
-        {/* Profile Pill Badge (toggles dropdown card) */}
-        <div 
-          className="header-profile-badge" 
+      <div className="navbar-controls" ref={dropdownRef}>
+        <button 
+          className="navbar-login-btn" 
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
-          <div className="header-profile-badge-avatar">{avatarChar}</div>
-          <span className="header-profile-badge-username">{username}</span>
-          <span className={`header-profile-badge-chevron ${isDropdownOpen ? 'open' : ''}`}>
-            <ChevronDown size={14} />
-          </span>
-        </div>
+          <User size={16} />
+          <span>Login</span>
+        </button>
 
         {/* Dropdown Card matching screenshot layout */}
         {isDropdownOpen && (

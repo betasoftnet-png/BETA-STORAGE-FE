@@ -40,12 +40,21 @@ body {
   overflow: hidden;
 }
 
+.app-layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
 /* Sidebar split view */
 .dashboard-layout {
   display: flex;
-  height: 100vh;
+  flex-grow: 1;
   width: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 .sidebar {
@@ -58,7 +67,7 @@ body {
   justify-content: space-between;
   flex-shrink: 0;
   border-right: 1px solid var(--border-color);
-  height: 100vh;
+  height: 100%;
 }
 
 .brand-section {
@@ -191,45 +200,87 @@ body {
   margin-top: 0.4rem;
 }
 
-/* Main Dashboard Panel */
 .main-content {
   flex-grow: 1;
   background-color: var(--bg-primary);
-  padding: 2.25rem 2.5rem 1.5rem 2.5rem;
-  height: 100vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
 }
 
-/* Header style align */
-header {
+.navbar-wrapper {
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.main-content-body {
+  flex-grow: 1;
+  padding: 1.5rem 2.5rem 2rem 2.5rem;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Navbar Card Styles */
+.navbar-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.25rem;
+  background-color: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
+  padding: 1rem 2.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
-header .header-info h2 {
-  font-size: 1.75rem;
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-logo {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+.navbar-title {
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-main);
-  letter-spacing: -0.02rem;
+  letter-spacing: -0.01em;
+}
+
+.navbar-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-login-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.65rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
 }
 
-header .header-info p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 0.2rem;
+.navbar-login-btn:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
+.navbar-login-btn svg {
+  color: #ffffff;
 }
 
 .header-update-tag {
@@ -1296,24 +1347,33 @@ header .header-info p {
   }
 
   .main-content {
-    padding: 1.5rem 1.25rem;
-    overflow-y: auto;
+    padding: 0;
     height: calc(100vh - 60px);
   }
+
+  .navbar-wrapper {
+    padding: 0;
+  }
+
+  .main-content-body {
+    padding: 1rem 1.25rem 1.5rem 1.25rem;
+  }
   
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+  .navbar-card {
+    padding: 0.75rem 1.25rem;
   }
 
-  header .header-controls {
-    width: 100%;
+  .navbar-title {
+    font-size: 1rem;
   }
 
-  header .header-update-tag {
-    width: 100%;
-    justify-content: center;
+  .navbar-logo {
+    height: 32px;
+  }
+
+  .navbar-login-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
   }
 }
 
@@ -1737,8 +1797,8 @@ header .header-info p {
 /* Profile Dropdown Card */
 .profile-dropdown-card {
   position: absolute;
-  top: 4.25rem;
-  right: 2.5rem;
+  top: calc(100% + 12px);
+  right: 0;
   width: 320px;
   background-color: #ffffff;
   border: 1px solid var(--border-color);
@@ -1910,4 +1970,18 @@ header .header-info p {
 
 .profile-menu-item.danger:hover svg {
   color: #b91c1c;
+}
+
+/* Helper class for showing/hiding mobile-only elements */
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 992px) {
+  .mobile-only {
+    display: flex !important;
+  }
+  .navbar-wrapper {
+    display: none !important;
+  }
 }

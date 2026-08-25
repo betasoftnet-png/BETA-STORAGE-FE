@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
 import {
   Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder,
-  Search, Trash2, Bell, Settings, Server, RefreshCw, Check, Menu
+  Search, Trash2, Bell, Settings, Server, RefreshCw, Check, Menu, LogOut
 } from 'lucide-react';
 import Header from './components/Header';
 import StorageOverview from './components/StorageOverview';
@@ -517,7 +517,19 @@ function AppContent() {
   }
 
   return (
-    <div className="dashboard-layout">
+    <div className="app-layout-container">
+      {/* Global Top Navbar */}
+      <div className="navbar-wrapper">
+        <Header
+          lastUpdated={state.lastUpdatedTime}
+          isRefreshing={isRefreshing}
+          onRefresh={handleRefreshState}
+          currentUserEmail={currentUserEmail}
+          onLogout={handleLogout}
+        />
+      </div>
+
+      <div className="dashboard-layout">
       {/* Mobile Top Bar */}
       <div className="mobile-header-bar">
         <button className="hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -537,7 +549,7 @@ function AppContent() {
       {/* Left Sidebar */}
       <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div>
-          <div className="brand-section">
+          <div className="brand-section mobile-only">
             <div className="logo-container">
               <img src="/logo.png" alt="BETA Logo" style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
             </div>
@@ -632,104 +644,109 @@ function AppContent() {
                 <Settings size={16} /> Settings
               </span>
             </div>
+
+            <div className="menu-group mobile-only" style={{ marginTop: '1.5rem' }}>
+              <span className="menu-label">ACCOUNT</span>
+              <span 
+                className="menu-item" 
+                onClick={handleLogout}
+                style={{ color: 'var(--color-critical)' }}
+              >
+                <LogOut size={16} /> Sign Out ({currentUserEmail ? currentUserEmail.split('@')[0] : 'User'})
+              </span>
+            </div>
           </nav>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <main className="main-content">
-        {location.pathname === '/storage-usage' ? (
-          <StorageUsageView
-            totalPoolMB={state.totalPoolMB}
-            apps={state.apps}
-            onBack={() => {
-              navigate('/');
-              setIsDrawerOpen(false);
-            }}
-          />
-        ) : location.pathname === '/file-categories' ? (
-          <FileCategoriesView
-            totalPoolMB={state.totalPoolMB}
-            apps={state.apps}
-            onBack={() => {
-              navigate('/');
-              setIsDrawerOpen(false);
-            }}
-          />
-        ) : location.pathname === '/recycle-bin' ? (
-          <RecycleBinView
-            totalPoolMB={state.totalPoolMB}
-            apps={state.apps}
-            deletedFiles={state.deletedFiles || []}
-            onRestoreFile={handleRestoreFile}
-            onPermanentDeleteFile={handlePermanentDeleteFile}
-            onBack={() => {
-              navigate('/');
-              setIsDrawerOpen(false);
-            }}
-          />
-        ) : selectedAppId && activeApp ? (
-          <AppStorageDetails
-            app={activeApp}
-            onBack={() => {
-              navigate('/');
-              setIsDrawerOpen(false);
-            }}
-            onManage={() => setIsDrawerOpen(true)}
-            lastUpdated={state.lastUpdatedTime}
-            isRefreshing={isRefreshing}
-            onRefresh={handleRefreshState}
-          />
-        ) : (
-          <>
-            {/* Header */}
-            <Header
+        {/* Scrollable Page Body */}
+        <div className="main-content-body">
+          {location.pathname === '/storage-usage' ? (
+            <StorageUsageView
+              totalPoolMB={state.totalPoolMB}
+              apps={state.apps}
+              onBack={() => {
+                navigate('/');
+                setIsDrawerOpen(false);
+              }}
+            />
+          ) : location.pathname === '/file-categories' ? (
+            <FileCategoriesView
+              totalPoolMB={state.totalPoolMB}
+              apps={state.apps}
+              onBack={() => {
+                navigate('/');
+                setIsDrawerOpen(false);
+              }}
+            />
+          ) : location.pathname === '/recycle-bin' ? (
+            <RecycleBinView
+              totalPoolMB={state.totalPoolMB}
+              apps={state.apps}
+              deletedFiles={state.deletedFiles || []}
+              onRestoreFile={handleRestoreFile}
+              onPermanentDeleteFile={handlePermanentDeleteFile}
+              onBack={() => {
+                navigate('/');
+                setIsDrawerOpen(false);
+              }}
+            />
+          ) : selectedAppId && activeApp ? (
+            <AppStorageDetails
+              app={activeApp}
+              onBack={() => {
+                navigate('/');
+                setIsDrawerOpen(false);
+              }}
+              onManage={() => setIsDrawerOpen(true)}
               lastUpdated={state.lastUpdatedTime}
               isRefreshing={isRefreshing}
               onRefresh={handleRefreshState}
-              currentUserEmail={currentUserEmail}
-              onLogout={handleLogout}
             />
+          ) : (
+            <>
+              {/* Total Ecosystem Storage wide card banner */}
+              <StorageOverview
+                totalPoolMB={state.totalPoolMB}
+                usedStorageMB={totalUsedStorageMB}
+              />
 
-            {/* Total Ecosystem Storage wide card banner */}
-            <StorageOverview
-              totalPoolMB={state.totalPoolMB}
-              usedStorageMB={totalUsedStorageMB}
-            />
+              {/* Application Storage Cards Grid section */}
+              <div className="section-header">
+                <h3>Application Storage</h3>
+                <p>{allocationText}</p>
+              </div>
 
-            {/* Application Storage Cards Grid section */}
-            <div className="section-header">
-              <h3>Application Storage</h3>
-              <p>{allocationText}</p>
-            </div>
+              <div className="apps-grid">
+                {state.apps.map(app => (
+                  <AppCard
+                    key={app.id}
+                    app={app}
+                    onManage={() => {
+                      navigate(`/storage/${app.id}`);
+                      setIsDrawerOpen(false);
+                    }}
+                  />
+                ))}
+              </div>
 
-            <div className="apps-grid">
-              {state.apps.map(app => (
-                <AppCard
-                  key={app.id}
-                  app={app}
-                  onManage={() => {
-                    navigate(`/storage/${app.id}`);
-                    setIsDrawerOpen(false);
-                  }}
-                />
-              ))}
-            </div>
+              {/* Insights Row (Storage Distribution, Category Breakdown, Status Security) */}
+              <StorageInsights
+                totalPoolMB={state.totalPoolMB}
+                usedStorageMB={totalUsedStorageMB}
+                apps={state.apps}
+              />
 
-            {/* Insights Row (Storage Distribution, Category Breakdown, Status Security) */}
-            <StorageInsights
-              totalPoolMB={state.totalPoolMB}
-              usedStorageMB={totalUsedStorageMB}
-              apps={state.apps}
-            />
-
-            {/* Recent Activity Table Ledger */}
-            <ActivityFeed
-              activities={state.activities}
-              onViewActivity={() => { }}
-            />
-          </>
-        )}
+              {/* Recent Activity Table Ledger */}
+              <ActivityFeed
+                activities={state.activities}
+                onViewActivity={() => { }}
+              />
+            </>
+          )}
+        </div>
       </main>
 
       {/* Drawer sandbox panels */}
@@ -757,6 +774,7 @@ function AppContent() {
         />
       )}
       */}
+      </div>
     </div>
   );
 }
