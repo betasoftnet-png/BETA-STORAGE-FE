@@ -434,7 +434,7 @@ export default function SettingsView({
                 <h3 style={sectionHeaderStyle}>REGIONAL</h3>
                 
                 {/* Language Row */}
-                <div style={rowItemStyle}>
+                <div style={lastRowItemStyle}>
                   <span>Language</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
                     <select
@@ -446,57 +446,6 @@ export default function SettingsView({
                       <option value="Spanish">Spanish</option>
                       <option value="French">French</option>
                       <option value="German">German</option>
-                    </select>
-                    <ChevronRight size={14} style={{ color: '#94a3b8' }} />
-                  </div>
-                </div>
-
-                {/* Time Zone Row */}
-                <div style={rowItemStyle}>
-                  <span>Time Zone</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-                    <select
-                      value={timezone}
-                      onChange={(e) => setTimezone(e.target.value)}
-                      style={selectStyle}
-                    >
-                      <option value="Asia/Kolkata">Asia/Kolkata</option>
-                      <option value="UTC">Coordinated Universal Time (UTC)</option>
-                      <option value="America/New_York">America/New_York</option>
-                      <option value="America/Los_Angeles">America/Los_Angeles</option>
-                    </select>
-                    <ChevronRight size={14} style={{ color: '#94a3b8' }} />
-                  </div>
-                </div>
-
-                {/* Date Format Row */}
-                <div style={rowItemStyle}>
-                  <span>Date Format</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-                    <select
-                      value={dateFormat}
-                      onChange={(e) => setDateFormat(e.target.value)}
-                      style={selectStyle}
-                    >
-                      <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                      <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                      <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                    </select>
-                    <ChevronRight size={14} style={{ color: '#94a3b8' }} />
-                  </div>
-                </div>
-
-                {/* Time Format Row */}
-                <div style={lastRowItemStyle}>
-                  <span>Time Format</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-                    <select
-                      value={timeFormat}
-                      onChange={(e) => setTimeFormat(e.target.value)}
-                      style={selectStyle}
-                    >
-                      <option value="24-hour">24-hour</option>
-                      <option value="12-hour">12-hour</option>
                     </select>
                     <ChevronRight size={14} style={{ color: '#94a3b8' }} />
                   </div>
