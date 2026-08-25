@@ -36,8 +36,7 @@ export default function SettingsView({
   };
 
   // 3. General -> Regional state
-
-
+  const [selectedLanguage, setSelectedLanguage] = useState(() => localStorage.getItem('storageLanguage') || 'en');
   // General -> Storage Display state
   const [storageUnit, setStorageUnit] = useState(() => localStorage.getItem('settings_storage_unit') || defaultStates.storageUnit);
   const [decimalPrecision, setDecimalPrecision] = useState(() => localStorage.getItem('settings_decimal_precision') || defaultStates.decimalPrecision);
@@ -99,6 +98,7 @@ export default function SettingsView({
     if (window.confirm(t('settings.resetMessage'))) {
       i18n.changeLanguage('en');
       localStorage.setItem('storageLanguage', 'en');
+      setSelectedLanguage('en');
       setStorageUnit(defaultStates.storageUnit);
       setDecimalPrecision(defaultStates.decimalPrecision);
       setShowUsagePercent(defaultStates.showUsagePercent);
@@ -118,19 +118,10 @@ export default function SettingsView({
 
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
-    localStorage.setItem('settings_theme', newTheme);
-    if (newTheme === 'Dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else if (newTheme === 'Light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
   };
 
   const handleLanguageChange = (lngCode) => {
-    i18n.changeLanguage(lngCode);
-    localStorage.setItem('storageLanguage', lngCode);
+    setSelectedLanguage(lngCode);
   };
 
   const handleSaveGeneral = () => {
@@ -158,6 +149,10 @@ export default function SettingsView({
       } else {
         document.documentElement.removeAttribute('data-theme');
       }
+
+      // Apply language changes to i18n
+      i18n.changeLanguage(selectedLanguage);
+      localStorage.setItem('storageLanguage', selectedLanguage);
 
       setIsSaving(false);
       setStatusMessage(t('settings.successMessage'));
@@ -441,7 +436,7 @@ export default function SettingsView({
                   <span>{t('settings.general.languageLabel')}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
                     <select
-                      value={i18n.language}
+                      value={selectedLanguage}
                       onChange={(e) => handleLanguageChange(e.target.value)}
                       style={selectStyle}
                     >
