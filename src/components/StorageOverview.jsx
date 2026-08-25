@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Database, HardDrive } from 'lucide-react';
 
 export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
+  const { t } = useTranslation();
   const usedGB = (usedStorageMB / 1024).toFixed(1);
   const totalGB = (totalPoolMB / 1024).toFixed(0);
   const availableGB = ((totalPoolMB - usedStorageMB) / 1024).toFixed(1);
@@ -16,9 +18,9 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
     <div className="glass-card overview-card" style={{ marginBottom: '1.5rem' }}>
       {/* Left Spec (Used capacity focus) */}
       <div className="overview-left">
-        <div className="label">Total Ecosystem Storage</div>
+        <div className="label">{t('dashboard.totalEcosystemStorage')}</div>
         <div className="value">{usedGB} GB</div>
-        <div className="sub">of {totalGB} GB Used</div>
+        <div className="sub">{t('dashboard.ofUsed', { total: totalGB })}</div>
       </div>
 
       {/* Center SVG Donut */}
@@ -44,7 +46,7 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
         </svg>
         <div className="donut-inner-text">
           <span className="donut-inner-percent">{usedPercent}%</span>
-          <span className="donut-inner-label">Used</span>
+          <span className="donut-inner-label">{t('dashboard.used')}</span>
         </div>
       </div>
 
@@ -57,7 +59,7 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
           </div>
           <div className="overview-metric-info">
             <span className="overview-metric-value">{usedGB} GB</span>
-            <span className="overview-metric-label">Used Storage</span>
+            <span className="overview-metric-label">{t('dashboard.usedStorage')}</span>
           </div>
         </div>
 
@@ -68,7 +70,7 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
           </div>
           <div className="overview-metric-info">
             <span className="overview-metric-value">{availableGB} GB</span>
-            <span className="overview-metric-label">Available Storage</span>
+            <span className="overview-metric-label">{t('dashboard.availableStorage')}</span>
           </div>
         </div>
       </div>
@@ -90,7 +92,7 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
         </svg>
         <div style={{ textAlign: 'center', marginTop: '-0.25rem' }}>
           <div style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-main)', fontFamily: 'var(--font-sans)', lineHeight: 1.1 }}>{totalGB} GB</div>
-          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>Total Capacity</div>
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>{t('dashboard.totalCapacity')}</div>
         </div>
       </div>
     </div>

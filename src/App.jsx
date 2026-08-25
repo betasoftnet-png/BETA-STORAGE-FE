@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder,
   Search, Trash2, Bell, Settings, Server, RefreshCw, Check, Menu, LogOut
@@ -185,6 +186,7 @@ function AppContent() {
   const match = location.pathname.match(/^\/storage\/([^/]+)$/);
   const selectedAppId = match ? match[1] : null;
 
+  const { t } = useTranslation();
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -438,7 +440,7 @@ function AppContent() {
     );
 
     if (tempFiles.length === 0) {
-      alert(`No temporary files found in ${targetApp.name}.`);
+      alert(t('appStorageDetails.tips.noTempFiles', 'No temporary files found in {{appName}}.', { appName: targetApp.name }));
       return;
     }
 
@@ -466,7 +468,7 @@ function AppContent() {
         activities: [newLog, ...prev.activities.slice(0, 9)]
       };
     });
-    alert(`Cleaned ${totalReleased} MB from cache.`);
+    alert(t('appStorageDetails.tips.cacheCleaned', 'Cleaned {{size}} MB from cache.', { size: totalReleased }));
   };
 
   const handleCompressLogs = (appId) => {
@@ -474,7 +476,7 @@ function AppContent() {
     const logsFiles = targetApp.files.filter(f => f.type === 'Logs');
 
     if (logsFiles.length === 0) {
-      alert(`No logs files found in ${targetApp.name}.`);
+      alert(t('appStorageDetails.tips.noLogsFiles', 'No logs files found in {{appName}}.', { appName: targetApp.name }));
       return;
     }
 
@@ -512,7 +514,7 @@ function AppContent() {
         activities: [newLog, ...prev.activities.slice(0, 9)]
       };
     });
-    alert(`Compressed logs. Reclaimed ${totalReleased} MB.`);
+    alert(t('appStorageDetails.tips.logsReclaimed', 'Compressed logs. Reclaimed {{size}} MB.', { size: totalReleased }));
   };
 
   const clearNotifications = () => {
@@ -522,8 +524,8 @@ function AppContent() {
   const activeApp = state.apps.find(a => a.id === selectedAppId);
   const allSameAllocation = state.apps.length > 0 && state.apps.every(app => app.allocatedMB === state.apps[0].allocatedMB);
   const allocationText = allSameAllocation
-    ? `Each application has ${(state.apps[0].allocatedMB / 1024).toFixed(0)} GB allocated storage`
-    : 'Track allocated storage limits across applications';
+    ? t('dashboard.allocationEach', { size: (state.apps[0].allocatedMB / 1024).toFixed(0) })
+    : t('dashboard.allocationTrack');
 
   if (location.pathname === '/login' || !isAuthenticated) {
     return <Login onLoginSuccess={handleLoginSuccess} />;
@@ -582,12 +584,12 @@ function AppContent() {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <Home size={16} /> Overview
+                <Home size={16} /> {t('sidebar.home')}
               </span>
             </div>
 
             <div className="menu-group">
-              <span className="menu-label">APPLICATIONS</span>
+              <span className="menu-label">{t('dashboard.appStorage').toUpperCase()}</span>
               {state.apps.map(app => (
                 <span
                   key={app.id}
@@ -613,7 +615,7 @@ function AppContent() {
             </div>
 
             <div className="menu-group">
-              <span className="menu-label">STORAGE MANAGEMENT</span>
+              <span className="menu-label">{t('appStorageDetails.breadcrumbsTitle').toUpperCase()}</span>
               <span
                 className={`menu-item ${location.pathname === '/storage-usage' ? 'active' : ''}`}
                 onClick={() => {
@@ -622,7 +624,7 @@ function AppContent() {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <BarChart3 size={16} /> Storage Usage
+                <BarChart3 size={16} /> {t('sidebar.storageUsage')}
               </span>
               <span
                 className={`menu-item ${location.pathname === '/recycle-bin' ? 'active' : ''}`}
@@ -632,15 +634,15 @@ function AppContent() {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <Trash2 size={16} /> Recycle Bin
+                <Trash2 size={16} /> {t('sidebar.recycleBin')}
               </span>
             </div>
 
             <div className="menu-group">
-              <span className="menu-label">SYSTEM</span>
+              <span className="menu-label">{t('sidebar.systemGroup')}</span>
               <span className="menu-item" style={{ justifyContent: 'space-between' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Bell size={16} /> Alerts
+                  <Bell size={16} /> {t('sidebar.alerts')}
                 </span>
               </span>
               <span
@@ -651,18 +653,18 @@ function AppContent() {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <Settings size={16} /> Settings
+                <Settings size={16} /> {t('sidebar.settings')}
               </span>
             </div>
 
             <div className="menu-group mobile-only" style={{ marginTop: '1.5rem' }}>
-              <span className="menu-label">ACCOUNT</span>
+              <span className="menu-label">{t('sidebar.accountGroup')}</span>
               <span 
                 className="menu-item" 
                 onClick={handleLogout}
                 style={{ color: 'var(--color-critical)' }}
               >
-                <LogOut size={16} /> Sign Out ({currentUserEmail ? currentUserEmail.split('@')[0] : 'User'})
+                <LogOut size={16} /> {t('sidebar.signOut')} ({currentUserEmail ? currentUserEmail.split('@')[0] : 'User'})
               </span>
             </div>
           </nav>
@@ -736,7 +738,7 @@ function AppContent() {
 
               {/* Application Storage Cards Grid section */}
               <div className="section-header">
-                <h3>Application Storage</h3>
+                <h3>{t('dashboard.appStorage')}</h3>
                 <p>{allocationText}</p>
               </div>
 

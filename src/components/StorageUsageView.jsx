@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight, BarChart3, Database, HardDrive, AlertTriangle, Trash2, ArrowRight } from 'lucide-react';
 
 export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerCleanup }) {
+  const { t } = useTranslation();
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   // Identify specific applications
@@ -36,7 +38,7 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
     { id: 'bnx-mail', name: 'BNX Mail', size: bnxUsedMB, color: '#2563eb', percent: (bnxUsedMB / totalPoolMB) * 100 },
     { id: 'cliks-business', name: 'Cliks Business', size: cliksBusinessUsedMB, color: '#8b5cf6', percent: (cliksBusinessUsedMB / totalPoolMB) * 100 },
     { id: 'cliks', name: 'Cliks', size: cliksUsedMB, color: '#0d9488', percent: (cliksUsedMB / totalPoolMB) * 100 },
-    { id: 'available', name: 'Available', size: availableMB, color: '#10b981', percent: (availableMB / totalPoolMB) * 100 }
+    { id: 'available', name: t('dashboard.health.available'), size: availableMB, color: '#10b981', percent: (availableMB / totalPoolMB) * 100 }
   ];
 
   // SVG dimensions & drawing constants
@@ -48,16 +50,16 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
     <div className="details-container">
       {/* 1. Breadcrumbs */}
       <div className="breadcrumbs">
-        <span className="crumb-link" onClick={onBack}>Storage Management</span>
+        <span className="crumb-link" onClick={onBack}>{t('appStorageDetails.breadcrumbsTitle')}</span>
         <ChevronRight size={14} className="crumb-separator" />
-        <span className="crumb-active">Storage Usage</span>
+        <span className="crumb-active">{t('sidebar.storageUsage')}</span>
       </div>
 
       {/* 2. Header Area */}
       <div className="details-header" style={{ marginBottom: '2rem' }}>
         <div className="details-header-title">
-          <h2>Storage Usage Tracking</h2>
-          <p>Real-time analytics and detailed storage allocation breakdown across all Beta applications.</p>
+          <h2>{t('storageUsage.title')}</h2>
+          <p>{t('storageUsage.subtitle')}</p>
         </div>
       </div>
 
@@ -65,7 +67,7 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
         {/* Left Side: Premium Interactive Chart Card */}
         <div className="glass-card" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '420px', justifyContent: 'center' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '2.5rem', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <BarChart3 size={20} style={{ color: 'var(--accent-blue)' }} /> Breakdown Chart
+            <BarChart3 size={20} style={{ color: 'var(--accent-blue)' }} /> {t('storageUsage.chartTitle')}
           </h3>
 
           <div style={{ position: 'relative', width: '220px', height: '220px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -117,21 +119,17 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
                 {hoveredIndex !== null ? (segments[hoveredIndex].size / 1024).toFixed(1) : totalUsedGBText} GB
               </span>
               <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '700', letterSpacing: '0.1rem', marginTop: '0.25rem' }}>
-                {hoveredIndex !== null ? segments[hoveredIndex].name.toUpperCase() : 'USED'}
+                {hoveredIndex !== null ? segments[hoveredIndex].name.toUpperCase() : t('dashboard.used').toUpperCase()}
               </span>
             </div>
           </div>
-
-          {/* <div style={{ marginTop: '2rem', width: '100%', display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            <span>* Hover over sections to focus</span>
-          </div> */}
         </div>
 
         {/* Right Side: Professional Legend and Detailed Stats */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Legend Details Card */}
           <div className="glass-card" style={{ padding: '2rem' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem' }}>Ecosystem App Breakdown</h3>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem' }}>{t('storageUsage.breakdownTitle')}</h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {segments.map((seg, idx) => {
@@ -171,7 +169,7 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
                         {formatSmart(seg.size)}
                       </span>
                       <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: '500' }}>
-                        {seg.percent.toFixed(0)}% of total pool
+                        {t('storageUsage.pctOfPool', { percent: seg.percent.toFixed(0) })}
                       </span>
                     </div>
                   </div>
@@ -183,11 +181,11 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
           {/* Quick Stats Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>TOTAL CAPACITY</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>{t('dashboard.totalCapacity').toUpperCase()}</span>
               <span style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)' }}>{formatGB(totalPoolMB)}</span>
             </div>
             <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>AVAILABLE</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>{t('dashboard.health.available').toUpperCase()}</span>
               <span style={{ fontSize: '1.25rem', fontWeight: '800', color: '#10b981' }}>{formatGB(availableMB)}</span>
             </div>
           </div>
@@ -195,8 +193,8 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
           {/* Storage Cleanup Action Box */}
           <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid var(--accent-blue)' }}>
             <div>
-              <h4 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>Need to reclaim space?</h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>Run cleanups inside individual app details to clear temporary files and logs.</p>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>{t('storageUsage.cleanupTitle')}</h4>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{t('storageUsage.cleanupDesc')}</p>
             </div>
           </div>
         </div>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Search, Trash2, Upload, AlertCircle, Sparkles, FolderArchive, Eraser } from 'lucide-react';
 
 export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, onTriggerCleanup, onCompressLogs }) {
+  const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
   const [searchTerm, setSearchTerm] = useState('');
   const [fileName, setFileName] = useState('');
@@ -28,18 +30,18 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
     setUploadError('');
 
     if (!fileName.trim()) {
-      setUploadError('Please specify a file name.');
+      setUploadError(t('drawer.errorName'));
       return;
     }
 
     const size = parseFloat(fileSize);
     if (isNaN(size) || size <= 0) {
-      setUploadError('File size must be a positive number.');
+      setUploadError(t('drawer.errorSize'));
       return;
     }
 
     if (usedMB + size > allocatedMB) {
-      setUploadError(`Failed: Adding this file would exceed the app's allocation limit of ${formatSize(allocatedMB)}.`);
+      setUploadError(t('drawer.errorExceedLimit', { limit: formatSize(allocatedMB) }));
       return;
     }
 
@@ -51,7 +53,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
   const handlePresetUpload = (presetName, presetSize, presetType) => {
     setUploadError('');
     if (usedMB + presetSize > allocatedMB) {
-      setUploadError(`Failed: Adding this file would exceed the app's allocation limit of ${formatSize(allocatedMB)}.`);
+      setUploadError(t('drawer.errorExceedLimit', { limit: formatSize(allocatedMB) }));
       return;
     }
     let finalType = presetType;
@@ -91,7 +93,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
-            <span style={{ fontWeight: 600 }}>App Allocation Usage</span>
+            <span style={{ fontWeight: 600 }}>{t('drawer.allocationUsage')}</span>
             <span style={{ color: `rgb(${colorTheme})`, fontWeight: 'bold' }}>
               {formatSize(usedMB)} / {formatSize(allocatedMB)} ({usedPercent}%)
             </span>
@@ -111,12 +113,12 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
         <div className="glass-card" style={{ marginBottom: '1.5rem' }}>
           <h3 className="card-title" style={{ fontSize: '0.95rem', marginBottom: '1rem' }}>
             <Upload size={16} style={{ color: 'var(--accent-cyan)' }} />
-            SIMULATE FILE UPLOAD
+            {t('drawer.simulateUpload')}
           </h3>
 
           <form onSubmit={handleUploadSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div className="form-group" style={{ margin: 0 }}>
-              <label>File Name</label>
+              <label>{t('appStorageDetails.fileName')}</label>
               <input 
                 type="text" 
                 placeholder="e.g. backup_db_v2.sql, attachment_image.png" 
@@ -128,7 +130,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="form-group" style={{ margin: 0 }}>
-                <label>File Size (MB)</label>
+                <label>{t('drawer.fileSizeMb')}</label>
                 <input 
                   type="number" 
                   className="form-control"
@@ -138,7 +140,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
                 />
               </div>
               <div className="form-group" style={{ margin: 0 }}>
-                <label>File Type</label>
+                <label>{t('appStorageDetails.type')}</label>
                  <select 
                   className="form-control"
                   value={fileType}
@@ -146,19 +148,19 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
                 >
                   {id === 'cliks-business' ? (
                     <>
-                      <option value="Audit & Tax (FIN-PRO)">Audit & Tax (FIN-PRO)</option>
-                      <option value="Sales & Purchases">Sales & Purchases</option>
-                      <option value="Expenses">Expenses</option>
-                      <option value="HR & Payroll">HR & Payroll</option>
-                      <option value="Inventory & Media">Inventory & Media</option>
+                      <option value="Audit & Tax (FIN-PRO)">{t('appStorageDetails.businessCategories.auditAndTax')}</option>
+                      <option value="Sales & Purchases">{t('appStorageDetails.businessCategories.salesAndPurchases')}</option>
+                      <option value="Expenses">{t('appStorageDetails.businessCategories.expenses')}</option>
+                      <option value="HR & Payroll">{t('appStorageDetails.businessCategories.hrAndPayroll')}</option>
+                      <option value="Inventory & Media">{t('appStorageDetails.businessCategories.inventoryAndMedia')}</option>
                     </>
                   ) : (
                     <>
-                      <option value="Document">Document</option>
-                      <option value="Database">Database Backup</option>
-                      <option value="Logs">Logs / System Records</option>
-                      <option value="Attachment">Attachment File</option>
-                      <option value="Media">Media Content</option>
+                      <option value="Document">{t('drawer.document', 'Document')}</option>
+                      <option value="Database">{t('drawer.dbBackup', 'Database Backup')}</option>
+                      <option value="Logs">{t('drawer.logsRecords', 'Logs / System Records')}</option>
+                      <option value="Attachment">{t('drawer.attachmentFile', 'Attachment File')}</option>
+                      <option value="Media">{t('drawer.mediaContent', 'Media Content')}</option>
                     </>
                   )}
                 </select>
@@ -182,14 +184,14 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
             )}
 
             <button type="submit" className="btn-primary">
-              Upload File
+              {t('appStorageDetails.uploadNewFile')}
             </button>
           </form>
 
           {/* Preset Buttons */}
           <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
             <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
-              Quick Presets
+              {t('drawer.quickPresets')}
             </span>
             <div className="quick-simulator-grid">
               <button 
@@ -221,7 +223,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
         <div className="glass-card" style={{ marginBottom: '1.5rem' }}>
           <h3 className="card-title" style={{ fontSize: '0.95rem', marginBottom: '1rem' }}>
             <Sparkles size={16} style={{ color: 'var(--accent-cyan)' }} />
-            CLEANUP & OPTIMIZATION POLICIES
+            {t('drawer.cleanupPolicies')}
           </h3>
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -233,7 +235,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
               title="Deletes temporary files (temp_*, cache_*)"
             >
               <Eraser size={14} />
-              Purge Temp Caches
+              {t('drawer.purgeCaches')}
             </button>
             <button 
               type="button" 
@@ -243,7 +245,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
               title="Compresses log files (reducing their sizes by half)"
             >
               <FolderArchive size={14} />
-              Compress SysLogs
+              {t('drawer.compressLogs')}
             </button>
           </div>
         </div>
@@ -251,13 +253,13 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
         {/* File inventory list */}
         <div className="glass-card">
           <h3 className="card-title" style={{ fontSize: '0.95rem', marginBottom: '0.75rem' }}>
-            FILE STORAGE INVENTORY
+            {t('drawer.storageInventory')}
           </h3>
 
           <div style={{ position: 'relative', marginBottom: '1rem' }}>
             <input 
               type="text" 
-              placeholder="Search files by name..." 
+              placeholder={t('drawer.searchPlaceholder')}
               className="form-control" 
               style={{ paddingLeft: '2.25rem', fontSize: '0.8rem' }}
               value={searchTerm}
@@ -278,7 +280,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
           <div className="file-list">
             {filteredFiles.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '2rem 0', fontSize: '0.8rem' }}>
-                No files found matching current criteria.
+                {t('drawer.noFilesFound')}
               </div>
             ) : (
               filteredFiles.map((file) => (
@@ -286,7 +288,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
                   <div className="file-item-info">
                     <span className="file-name">{file.name}</span>
                     <span className="file-meta">
-                      Type: {file.type} | Size: {formatSize(file.size)} | Uploaded: {file.time}
+                      {t('drawer.fileMeta', { type: file.type, size: formatSize(file.size), time: file.time })}
                     </span>
                   </div>
                   <button 

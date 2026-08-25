@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-react';
 
 export default function AppCard({ app, onManage }) {
+  const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
 
   // Calculate sizes
@@ -48,15 +50,15 @@ export default function AppCard({ app, onManage }) {
           </div>
         </div>
         <span className="app-card-badge">
-          {(allocatedMB / 1024).toFixed(0)} GB Allocated
+          {t('settings.manageApps.appLimitLabel', { appLimit: (allocatedMB / 1024).toFixed(0) })}
         </span>
       </div>
 
       {/* Progress & Value stats */}
       <div style={{ marginTop: '0.5rem' }}>
         <div className="app-card-numbers">
-          <span style={{ color: `rgb(${colorTheme})` }}>{usedMB} MB Used</span>
-          <span style={{ color: 'var(--text-muted)' }}>{freeMB} MB Free</span>
+          <span style={{ color: `rgb(${colorTheme})` }}>{usedMB} MB {t('dashboard.used')}</span>
+          <span style={{ color: 'var(--text-muted)' }}>{freeMB} MB {t('storageUsage.free')}</span>
         </div>
 
         <div className="progress-container" style={{ marginBottom: '0.65rem' }}>
@@ -71,10 +73,10 @@ export default function AppCard({ app, onManage }) {
 
         {/* Status indicator row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600 }}>
-          <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% Used</span>
+          <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% {t('dashboard.used')}</span>
           <span className="app-card-health" style={{ color: healthColor }}>
             <span className="app-card-health-dot" style={{ backgroundColor: healthColor }} />
-            {healthStatus}
+            {t(`dashboard.health.status${healthStatus}`)}
           </span>
         </div>
       </div>
@@ -86,7 +88,7 @@ export default function AppCard({ app, onManage }) {
           onClick={onManage}
           style={{ color: `rgb(${colorTheme})` }}
         >
-          View Details
+          {t('common.viewDetails')}
         </span>
         <button
           onClick={onManage}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ChevronRight, RefreshCw, Mail, Paperclip, Trash2,
   Send, FileText, Folder, Info, ChevronLeft, HelpCircle,
@@ -6,6 +7,7 @@ import {
 } from 'lucide-react';
 
 export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh }) {
+  const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
 
   // Calculate used storage
@@ -26,11 +28,11 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
   const isCritical = usedPercent >= 90;
   const isWarning = usedPercent >= 75 && usedPercent < 90;
   const healthStatus = isCritical ? 'Critical' : isWarning ? 'Warning' : 'Healthy';
-  const healthDesc = isCritical
-    ? 'Storage critically full. Action required.'
+  const healthDescKey = isCritical
+    ? 'descCritical'
     : isWarning
-      ? 'Storage space running low.'
-      : 'Plenty of space available';
+      ? 'descWarning'
+      : 'descHealthy';
   const healthColor = isCritical ? 'var(--color-critical)' : isWarning ? 'var(--color-warning)' : 'var(--color-healthy)';
 
   // Category Configuration maps dynamically depending on the active app
@@ -108,11 +110,39 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
 
   const categories = getCategoryBreakdown();
 
+  const getTranslatedCategory = (name) => {
+    switch (name) {
+      // BNX Mail
+      case 'Emails': return { name: t('appStorageDetails.categories.emails', 'Emails'), desc: t('appStorageDetails.categories.emailsDesc', 'Mail database archives') };
+      case 'Attachments': return { name: t('appStorageDetails.categories.attachments', 'Attachments'), desc: t('appStorageDetails.categories.attachmentsDesc', 'PDFs, ZIPs, Document attachments') };
+      case 'Trash': return { name: t('sidebar.recycleBin', 'Trash'), desc: t('appStorageDetails.categories.trashDesc', 'Spam, deleted items') };
+      case 'Sent': return { name: t('appStorageDetails.categories.sent', 'Sent'), desc: t('appStorageDetails.categories.sentDesc', 'Sent mail documents') };
+      case 'Drafts': return { name: t('appStorageDetails.categories.drafts', 'Drafts'), desc: t('appStorageDetails.categories.draftsDesc', 'Unsent drafts') };
+      case 'Other': return { name: t('dashboard.categories.others', 'Other'), desc: t('appStorageDetails.categories.otherDesc', 'Miscellaneous application files') };
+      
+      // Cliks
+      case 'Books & Accounting': return { name: t('appStorageDetails.cliksCategories.booksAndAccounting'), desc: t('appStorageDetails.cliksCategories.booksAndAccountingDesc', 'Sales Invoices, Purchase Bills, Money Trackers') };
+      case 'Finance & Investments': return { name: t('appStorageDetails.cliksCategories.financeAndInvestments'), desc: t('appStorageDetails.cliksCategories.financeAndInvestmentsDesc', 'Wallet Statements, Bank Accounts, Portfolio Docs') };
+      case 'Tax & Deductions': return { name: t('appStorageDetails.cliksCategories.taxAndDeductions'), desc: t('appStorageDetails.cliksCategories.taxAndDeductionsDesc', 'ITR Worksheets, Form 16, Audit Files') };
+      case 'People & Reminders': return { name: t('appStorageDetails.cliksCategories.peopleAndReminders'), desc: t('appStorageDetails.cliksCategories.peopleAndRemindersDesc', 'Contact Records, Reminders, Debt Statements') };
+      case 'Social & Media': return { name: t('appStorageDetails.cliksCategories.socialAndMedia'), desc: t('appStorageDetails.cliksCategories.socialAndMediaDesc', 'Profile Photos, Media Posts, Trading Attachments') };
+      
+      // Cliks Business
+      case 'Audit & Tax (FIN-PRO)': return { name: t('appStorageDetails.businessCategories.auditAndTax', 'Audit & Tax (FIN-PRO)'), desc: t('appStorageDetails.businessCategories.auditAndTaxDesc', 'PDFs, XLS, Signed Certificates') };
+      case 'Sales & Purchases': return { name: t('appStorageDetails.businessCategories.salesAndPurchases', 'Sales & Purchases'), desc: t('appStorageDetails.businessCategories.salesAndPurchasesDesc', 'PDF Invoices, Vendor Bills') };
+      case 'Expenses': return { name: t('appStorageDetails.businessCategories.expenses', 'Expenses'), desc: t('appStorageDetails.businessCategories.expensesDesc', 'Receipt Scans, Images') };
+      case 'HR & Payroll': return { name: t('appStorageDetails.businessCategories.hrAndPayroll', 'HR & Payroll'), desc: t('appStorageDetails.businessCategories.hrAndPayrollDesc', 'ID Documents, Payslip PDFs') };
+      case 'Inventory & Media': return { name: t('appStorageDetails.businessCategories.inventoryAndMedia', 'Inventory & Media'), desc: t('appStorageDetails.businessCategories.inventoryAndMediaDesc', 'Product Photos, Barcodes') };
+      
+      default: return { name, desc: '' };
+    }
+  };
+
   return (
     <div className="details-container">
       {/* 1. Breadcrumbs */}
       <div className="breadcrumbs">
-        <span className="crumb-link" onClick={onBack}>Storage Management</span>
+        <span className="crumb-link" onClick={onBack}>{t('appStorageDetails.breadcrumbsTitle')}</span>
         <ChevronRight size={14} className="crumb-separator" />
         <span className="crumb-active">{name}</span>
       </div>
@@ -120,12 +150,12 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
       {/* 2. Header Title Area */}
       <div className="details-header">
         <div className="details-header-title">
-          <h2>{name} Storage</h2>
-          <p>Track how your {allocatedText} storage is used in {name}.</p>
+          <h2>{t('appStorageDetails.appStorageTitle', { name })}</h2>
+          <p>{t('appStorageDetails.subtitle', { name, allocated: allocatedText })}</p>
         </div>
         <div className="details-header-controls">
           <div className="header-update-tag" onClick={onRefresh} style={{ cursor: 'pointer' }}>
-            <span>Last updated: {lastUpdated}</span>
+            <span>{t('appStorageDetails.lastUpdated')}: {lastUpdated}</span>
             <RefreshCw size={12} className={isRefreshing ? 'spin' : ''} />
           </div>
         </div>
@@ -152,7 +182,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
             </svg>
             <div className="donut-inner-text">
               <span className="donut-inner-percent">{usedPercent}%</span>
-              <span className="donut-inner-label">Used</span>
+              <span className="donut-inner-label">{t('dashboard.used')}</span>
             </div>
           </div>
         </div>
@@ -161,22 +191,22 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
           <div className="details-metrics-grid">
             <div className="metric-col">
               <span className="val" style={{ color: `rgb(${colorTheme})` }}>{usedText}</span>
-              <span className="lbl">Used</span>
+              <span className="lbl">{t('dashboard.used')}</span>
             </div>
             <div className="metric-col">
               <span className="val" style={{ color: '#10b981' }}>{freeText}</span>
-              <span className="lbl">Available</span>
+              <span className="lbl">{t('dashboard.health.available')}</span>
             </div>
             <div className="metric-col">
               <span className="val">{allocatedText}</span>
-              <span className="lbl">Total Allocated</span>
+              <span className="lbl">{t('dashboard.totalCapacity')}</span>
             </div>
             <div className="metric-col">
               <span className="val" style={{ color: healthColor, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: healthColor, display: 'inline-block' }} />
-                {healthStatus}
+                {t(`dashboard.health.status${healthStatus}`)}
               </span>
-              <span className="lbl">{healthDesc}</span>
+              <span className="lbl">{t(`dashboard.health.${healthDescKey}`)}</span>
             </div>
           </div>
 
@@ -192,7 +222,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
               />
             </div>
             <div className="progress-bar-label">
-              You're using {usedText} of {allocatedText} storage
+              {t('settings.manageApps.limitUsedLabel', { percent: usedPercent })} ({usedText} / {allocatedText})
             </div>
           </div>
         </div>
@@ -210,10 +240,10 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
           marginBottom: '1.25rem'
         }}>
           <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
-            {id === 'cliks' ? 'Module' : 'Storage by Category'}
+            {id === 'cliks' ? t('appStorageDetails.typicalStorageShare') : t('appStorageDetails.storageByCategory')}
           </h3>
           <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04rem', textAlign: 'center' }}>
-            {id === 'cliks' ? 'Typical Storage Share' : 'Used'}
+            {id === 'cliks' ? t('appStorageDetails.typicalStorageShare') : t('appStorageDetails.used')}
           </span>
           <span style={{
             fontSize: '0.75rem',
@@ -225,7 +255,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
             paddingLeft: id === 'cliks' ? '6rem' : (id === 'cliks-business' ? '1rem' : '0'),
             paddingRight: (id === 'cliks-business' || id === 'cliks') ? '0' : '1rem'
           }}>
-            {id === 'cliks' ? 'Main File Types' : id === 'cliks-business' ? 'Description' : `% of ${allocatedText}`}
+            {id === 'cliks' ? t('appStorageDetails.mainFileTypes') : id === 'cliks-business' ? t('appStorageDetails.type') : `% of ${allocatedText}`}
           </span>
           <div /> {/* empty chevron column */}
         </div>
@@ -233,6 +263,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
         <div className="category-list-wrapper">
           {categories.map((cat, idx) => {
             const catPercent = allocatedMB > 0 ? Math.round((cat.size / allocatedMB) * 100) : 0;
+            const trans = getTranslatedCategory(cat.name);
 
             if (id === 'cliks-business') {
               return (
@@ -260,7 +291,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                         flexShrink: 0
                       }}
                     />
-                    <span className="category-name-lbl" style={{ fontSize: '0.9rem' }}>{cat.name}</span>
+                    <span className="category-name-lbl" style={{ fontSize: '0.9rem' }}>{trans.name}</span>
                   </div>
 
                   {/* Middle: Percentage badge */}
@@ -283,7 +314,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
 
                   {/* Right: Description Text */}
                   <div style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: '500', paddingLeft: '1rem' }}>
-                    {cat.desc}
+                    {trans.desc}
                   </div>
 
                   {/* Empty column */}
@@ -318,7 +349,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                         flexShrink: 0
                       }}
                     />
-                    <span className="category-name-lbl" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{cat.name}</span>
+                    <span className="category-name-lbl" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{trans.name}</span>
                   </div>
 
                   {/* Middle: Typical Storage Share badge */}
@@ -350,7 +381,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                       marginLeft: '4rem'
                     }}
                   >
-                    {cat.types}
+                    {trans.desc}
                   </div>
 
                   {/* Empty column */}
@@ -377,7 +408,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                   <div className="category-icon-box" style={{ backgroundColor: `${cat.color}15`, color: cat.color }}>
                     {cat.icon}
                   </div>
-                  <span className="category-name-lbl">{cat.name}</span>
+                  <span className="category-name-lbl">{trans.name}</span>
                 </div>
 
                 {/* Used MB */}
@@ -406,8 +437,8 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
           <Info size={18} />
           <span>
             {id === 'bnx-mail'
-              ? 'Keep your mailbox light! Review and remove large attachments or empty trash to free up more space.'
-              : `Keep your storage light! Review cache logs, large attachments, or database backups inside ${name}.`
+              ? t('appStorageDetails.tips.tipsMailbox')
+              : t('appStorageDetails.tips.tipsApp', { appName: name })
             }
           </span>
         </div>

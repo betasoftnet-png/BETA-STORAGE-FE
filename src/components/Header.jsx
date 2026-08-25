@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RefreshCw, ChevronDown, Camera, UserPlus, LogOut, User } from 'lucide-react';
 
 export default function Header({ 
@@ -8,6 +9,7 @@ export default function Header({
   currentUserEmail,
   onLogout
 }) {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -30,7 +32,7 @@ export default function Header({
     <header className="navbar-card">
       <div className="navbar-brand">
         <img src="/logo.png" alt="Beta Logo" className="navbar-logo" />
-        <span className="navbar-title">BETA Storage Ecosystem</span>
+        <span className="navbar-title">{t('dashboard.title')}</span>
       </div>
 
       <div className="navbar-controls" ref={dropdownRef}>
@@ -39,7 +41,7 @@ export default function Header({
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
           <User size={16} />
-          <span>Login</span>
+          <span>{t('header.login')}</span>
         </button>
 
         {/* Dropdown Card matching screenshot layout */}
@@ -63,7 +65,7 @@ export default function Header({
                 onClick={() => alert('Simulated: Open Account Settings Dialog')}
               >
                 <User size={14} />
-                <span>Manage your account</span>
+                <span>{t('header.manageAccount')}</span>
               </button>
             </div>
 
@@ -76,7 +78,7 @@ export default function Header({
                 onClick={() => onLogout()}
               >
                 <UserPlus size={16} />
-                <span>Add another account</span>
+                <span>{t('header.addAnotherAccount')}</span>
               </button>
               
               <button 
@@ -85,7 +87,7 @@ export default function Header({
                 onClick={() => onLogout()}
               >
                 <LogOut size={16} />
-                <span>Sign out of this account</span>
+                <span>{t('header.signOutThis')}</span>
               </button>
               
               <button 
@@ -94,7 +96,7 @@ export default function Header({
                 onClick={() => onLogout()}
               >
                 <LogOut size={16} />
-                <span>Sign out of all accounts</span>
+                <span>{t('header.signOutAll')}</span>
               </button>
             </div>
 

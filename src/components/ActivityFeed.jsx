@@ -1,7 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Activity, Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-react';
 
 export default function ActivityFeed({ activities, onViewActivity }) {
+  const { t } = useTranslation();
+
   // Map icons
   const getAppIcon = (name) => {
     const lower = name.toLowerCase();
@@ -30,12 +33,21 @@ export default function ActivityFeed({ activities, onViewActivity }) {
     };
   };
 
+  // Translate action words in the feed
+  const getActivityLabel = (act) => {
+    const lower = act.toLowerCase();
+    if (lower.includes('upload')) return t('appStorageDetails.uploaded');
+    if (lower.includes('delet')) return t('common.delete');
+    if (lower.includes('restor')) return t('common.restore');
+    return act;
+  };
+
   return (
     <div className="glass-card activity-card" style={{ height: '100%' }}>
       <div className="card-title" style={{ justifyContent: 'space-between', alignItems: 'center', border: 'none', padding: 0, marginBottom: '0.75rem' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Activity size={18} style={{ color: 'var(--accent-blue)' }} />
-          Recent Storage Activity
+          {t('activity.title')}
         </span>
       </div>
 
@@ -43,11 +55,11 @@ export default function ActivityFeed({ activities, onViewActivity }) {
         <table className="activity-table">
           <thead>
             <tr>
-              <th className="activity-th">Application</th>
-              <th className="activity-th">Activity</th>
-              <th className="activity-th">File / Details</th>
-              <th className="activity-th" style={{ textAlign: 'left' }}>Change</th>
-              <th className="activity-th" style={{ textAlign: 'left' }}>Time</th>
+              <th className="activity-th">{t('activity.app')}</th>
+              <th className="activity-th">{t('activity.act')}</th>
+              <th className="activity-th">{t('activity.details')}</th>
+              <th className="activity-th" style={{ textAlign: 'left' }}>{t('activity.change')}</th>
+              <th className="activity-th" style={{ textAlign: 'left' }}>{t('activity.time')}</th>
             </tr>
           </thead>
           <tbody>
@@ -78,7 +90,7 @@ export default function ActivityFeed({ activities, onViewActivity }) {
 
                   {/* Activity */}
                   <td className="activity-td" style={{ minWidth: '140px' }}>
-                    <span className="activity-td-desc">{parsed.activity}</span>
+                    <span className="activity-td-desc">{getActivityLabel(parsed.activity)}</span>
                   </td>
 
                   {/* File / Details */}
@@ -119,7 +131,7 @@ export default function ActivityFeed({ activities, onViewActivity }) {
           }}
           className="app-card-link"
         >
-          View All Activity <ArrowRight size={14} />
+          {t('activity.viewAll')} <ArrowRight size={14} />
         </button>
       </div>
     </div>

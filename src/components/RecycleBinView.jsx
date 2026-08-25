@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight, Trash2, Search, Check, MoreVertical } from 'lucide-react';
 
 export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRestoreFile, onPermanentDeleteFile, onBack }) {
+  const { t } = useTranslation();
   // State for search and filtering
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('ALL'); // 'ALL', 'BNX_MAIL', 'CLIKS_BUSINESS', 'CLIKS', 'EXPIRING'
@@ -34,7 +36,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
   const handleRestore = (file) => {
     onRestoreFile(file);
     setActionMenuId(null);
-    setToastMessage(`Restored "${file.name}" successfully!`);
+    setToastMessage(t('recycleBin.restoreSuccess', { name: file.name }));
     setTimeout(() => setToastMessage(null), 3000);
   };
 
@@ -42,7 +44,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
   const handlePermanentDelete = (file) => {
     onPermanentDeleteFile(file);
     setActionMenuId(null);
-    setToastMessage(`Permanently deleted "${file.name}".`);
+    setToastMessage(t('recycleBin.deleteSuccess', { name: file.name }));
     setTimeout(() => setToastMessage(null), 3000);
   };
 
@@ -102,9 +104,9 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
 
       {/* 1. Breadcrumbs */}
       <div className="breadcrumbs">
-        <span className="crumb-link" onClick={onBack}>Storage Management</span>
+        <span className="crumb-link" onClick={onBack}>{t('appStorageDetails.breadcrumbsTitle')}</span>
         <ChevronRight size={14} className="crumb-separator" />
-        <span className="crumb-active">Recycle Bin</span>
+        <span className="crumb-active">{t('sidebar.recycleBin')}</span>
       </div>
 
       {/* 2. Header Area */}
@@ -115,8 +117,8 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
               <Trash2 size={22} />
             </div>
             <div>
-              <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>Recycle Bin</h2>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Recover deleted files across your applications</p>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>{t('sidebar.recycleBin')}</h2>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>{t('recycleBin.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -126,7 +128,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
           <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
           <input
             type="text"
-            placeholder="Search deleted files..."
+            placeholder={t('recycleBin.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -150,13 +152,13 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
       {/* 3. Storage capacity gauge panel */}
       <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
         <span style={{ fontSize: '0.7rem', fontWeight: '750', color: 'var(--text-dim)', letterSpacing: '0.08rem', textTransform: 'uppercase' }}>
-          Recycle Bin Storage
+          {t('recycleBin.title')}
         </span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: '0.25rem' }}>
           <span style={{ fontSize: '2.5rem', fontWeight: '800', color: '#ef4444', lineHeight: 1 }}>
             {totalDeletedMB} MB
           </span>
-          <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600' }}>used</span>
+          <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600' }}>{t('dashboard.used').toLowerCase()}</span>
         </div>
 
         {/* Custom Progress bar */}
@@ -173,8 +175,8 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-            <span>{totalCapacityGB} GB allocated</span>
-            <span>{freeGB} GB free</span>
+            <span>{totalCapacityGB} GB {t('storageUsage.allocatedSpace').toLowerCase()}</span>
+            <span>{freeGB} GB {t('storageUsage.free').toLowerCase()}</span>
           </div>
         </div>
       </div>
@@ -182,7 +184,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
       {/* 4. Sub-Applications Cards Grid */}
       <div style={{ marginBottom: '2.25rem' }}>
         <h3 style={{ fontSize: '0.9rem', fontWeight: '750', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06rem', marginBottom: '1rem' }}>
-          Applications
+          {t('dashboard.appStorage')}
         </h3>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
@@ -208,13 +210,13 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
               </div>
               <h4 style={{ fontSize: '1rem', fontWeight: '750', color: '#0f172a', margin: '0 0 0.25rem 0' }}>BNX Mail</h4>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>
-                {bnxCount} deleted items
+                {t('recycleBin.deletedItemsCount', { count: bnxCount })}
               </p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem' }}>
               <span style={{ fontSize: '1.1rem', fontWeight: '800', color: '#2563eb' }}>{Math.round(bnxSize)} MB</span>
               <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                View →
+                {t('common.viewDetails')} →
               </span>
             </div>
           </div>
@@ -241,13 +243,13 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
               </div>
               <h4 style={{ fontSize: '1rem', fontWeight: '750', color: '#0f172a', margin: '0 0 0.25rem 0' }}>Cliks Business</h4>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>
-                {businessCount} deleted items
+                {t('recycleBin.deletedItemsCount', { count: businessCount })}
               </p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem' }}>
               <span style={{ fontSize: '1.1rem', fontWeight: '800', color: '#8b5cf6' }}>{Math.round(businessSize)} MB</span>
               <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#8b5cf6', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                View →
+                {t('common.viewDetails')} →
               </span>
             </div>
           </div>
@@ -274,13 +276,13 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
               </div>
               <h4 style={{ fontSize: '1rem', fontWeight: '750', color: '#0f172a', margin: '0 0 0.25rem 0' }}>Cliks</h4>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>
-                {cliksCount} deleted items
+                {t('recycleBin.deletedItemsCount', { count: cliksCount })}
               </p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem' }}>
               <span style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0d9488' }}>{Math.round(cliksSize)} MB</span>
               <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#0d9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                View →
+                {t('common.viewDetails')} →
               </span>
             </div>
           </div>
@@ -291,10 +293,10 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
       <div className="glass-card" style={{ padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '750', color: 'var(--text-main)', margin: 0 }}>
-            Deleted Files
+            {t('recycleBin.title')}
           </h3>
           <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-dim)', letterSpacing: '0.04rem' }}>
-            {totalItems} ITEMS
+            {t('recycleBin.itemsCount', { count: totalItems })}
           </span>
         </div>
 
@@ -308,11 +310,11 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
           paddingBottom: '0.25rem'
         }}>
           {[
-            { id: 'ALL', name: 'ALL' },
+            { id: 'ALL', name: t('recycleBin.tabs.all') },
             { id: 'BNX_MAIL', name: 'BNX MAIL' },
             { id: 'CLIKS_BUSINESS', name: 'CLIKS BUSINESS' },
             { id: 'CLIKS', name: 'CLIKS' },
-            { id: 'EXPIRING', name: 'EXPIRING SOON' }
+            { id: 'EXPIRING', name: t('recycleBin.tabs.expiringSoon') }
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -403,9 +405,9 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
                   {/* Retention progress gauge */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-                      <span>Retention</span>
+                      <span>{t('recycleBin.retention')}</span>
                       <span style={{ color: file.daysRemaining <= 10 ? '#ef4444' : 'var(--text-muted)' }}>
-                        {file.daysRemaining} days remaining
+                        {t('recycleBin.daysRemaining', { count: file.daysRemaining })}
                       </span>
                     </div>
                     <div className="progress-container" style={{ height: '6px', borderRadius: '3px', backgroundColor: '#f1f5f9' }}>
@@ -447,7 +449,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
                         e.target.style.backgroundColor = '#ffffff';
                       }}
                     >
-                      Restore
+                      {t('common.restore')}
                     </button>
 
                     <div style={{ position: 'relative' }}>
@@ -511,7 +513,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
                               onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'}
                               onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             >
-                              Restore File
+                              {t('recycleBin.restore')}
                             </button>
                             <button
                               onClick={() => handlePermanentDelete(file)}
@@ -530,7 +532,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
                               onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
                               onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             >
-                              Delete Permanently
+                              {t('recycleBin.deletePermanently')}
                             </button>
                           </div>
                         </>
@@ -544,7 +546,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
         ) : (
           <div style={{ textAlign: 'center', padding: '3rem 1.5rem', color: 'var(--text-dim)' }}>
             <Trash2 size={40} style={{ marginBottom: '0.75rem', strokeWidth: '1.5' }} />
-            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: '500' }}>No deleted files found matching filters.</p>
+            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: '500' }}>{t('recycleBin.noDeletedFiles')}</p>
           </div>
         )}
 
@@ -552,7 +554,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
         {totalItems > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-              Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems}
+              {t('recycleBin.showing', { start: startIndex + 1, end: Math.min(startIndex + itemsPerPage, totalItems), total: totalItems })}
             </span>
 
             {/* Pagination Controls */}

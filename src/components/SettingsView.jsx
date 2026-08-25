@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Settings, Shield, Bell, LayoutGrid, ChevronRight, Save, 
   RotateCcw, Server, RefreshCw
@@ -11,12 +12,14 @@ export default function SettingsView({
   onUpdateAllocation,
   onBack 
 }) {
+  const { t, i18n } = useTranslation();
+
   // 1. Navigation Category tab state
   const [activeCategory, setActiveCategory] = useState('general'); // general | privacy | notifications | apps
 
   // 2. Default state values (for Reset action)
   const defaultStates = {
-    language: 'English',
+    language: 'en',
     timezone: 'Asia/Kolkata',
     dateFormat: 'DD/MM/YYYY',
     timeFormat: '24-hour',
@@ -33,10 +36,7 @@ export default function SettingsView({
   };
 
   // 3. General -> Regional state
-  const [language, setLanguage] = useState(() => localStorage.getItem('settings_lang') || defaultStates.language);
-  const [timezone, setTimezone] = useState(() => localStorage.getItem('settings_timezone') || defaultStates.timezone);
-  const [dateFormat, setDateFormat] = useState(() => localStorage.getItem('settings_date_format') || defaultStates.dateFormat);
-  const [timeFormat, setTimeFormat] = useState(() => localStorage.getItem('settings_time_format') || defaultStates.timeFormat);
+
 
   // General -> Storage Display state
   const [storageUnit, setStorageUnit] = useState(() => localStorage.getItem('settings_storage_unit') || defaultStates.storageUnit);
@@ -85,18 +85,20 @@ export default function SettingsView({
 
   // Saving states
   const [isSaving, setIsSaving] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('All settings are synced');
+  const [statusMessage, setStatusMessage] = useState('');
   const [statusColor, setStatusColor] = useState('#10b981'); // Green
+
+  useEffect(() => {
+    setStatusMessage(t('settings.successMessage'));
+  }, [t]);
 
   const totalAllocatedGB = Object.values(appAllocations).reduce((sum, val) => sum + val, 0);
   const unallocatedGB = Math.max(0, poolGB - totalAllocatedGB);
 
   const handleReset = () => {
-    if (window.confirm('Reset all General settings to their defaults?')) {
-      setLanguage(defaultStates.language);
-      setTimezone(defaultStates.timezone);
-      setDateFormat(defaultStates.dateFormat);
-      setTimeFormat(defaultStates.timeFormat);
+    if (window.confirm(t('settings.resetMessage'))) {
+      i18n.changeLanguage('en');
+      localStorage.setItem('storageLanguage', 'en');
       setStorageUnit(defaultStates.storageUnit);
       setDecimalPrecision(defaultStates.decimalPrecision);
       setShowUsagePercent(defaultStates.showUsagePercent);
@@ -109,7 +111,7 @@ export default function SettingsView({
       setCompactLayout(defaultStates.compactLayout);
 
       document.documentElement.removeAttribute('data-theme');
-      setStatusMessage('Settings reset to defaults');
+      setStatusMessage(t('settings.resetMessage'));
       setStatusColor('#3b82f6');
     }
   };
@@ -126,16 +128,17 @@ export default function SettingsView({
     }
   };
 
+  const handleLanguageChange = (lngCode) => {
+    i18n.changeLanguage(lngCode);
+    localStorage.setItem('storageLanguage', lngCode);
+  };
+
   const handleSaveGeneral = () => {
     setIsSaving(true);
-    setStatusMessage('Syncing workspace settings...');
+    setStatusMessage(t('settings.successMessage'));
     setStatusColor('#3b82f6');
 
     setTimeout(() => {
-      localStorage.setItem('settings_lang', language);
-      localStorage.setItem('settings_timezone', timezone);
-      localStorage.setItem('settings_date_format', dateFormat);
-      localStorage.setItem('settings_time_format', timeFormat);
       localStorage.setItem('settings_storage_unit', storageUnit);
       localStorage.setItem('settings_decimal_precision', decimalPrecision);
       localStorage.setItem('settings_show_usage_percent', showUsagePercent.toString());
@@ -157,28 +160,28 @@ export default function SettingsView({
       }
 
       setIsSaving(false);
-      setStatusMessage('Workspace preferences saved');
+      setStatusMessage(t('settings.successMessage'));
       setStatusColor('#10b981');
     }, 850);
   };
 
   const handleSavePrivacy = () => {
     setIsSaving(true);
-    setStatusMessage('Updating security policies...');
+    setStatusMessage(t('settings.successMessage'));
     setStatusColor('#3b82f6');
 
     setTimeout(() => {
       localStorage.setItem('settings_privacy_encryption', encryptionEnabled.toString());
       localStorage.setItem('settings_privacy_logging', activityLogging.toString());
       setIsSaving(false);
-      setStatusMessage('Privacy configs saved');
+      setStatusMessage(t('settings.successMessage'));
       setStatusColor('#10b981');
     }, 800);
   };
 
   const handleSaveNotifications = () => {
     setIsSaving(true);
-    setStatusMessage('Saving notifications...');
+    setStatusMessage(t('settings.successMessage'));
     setStatusColor('#3b82f6');
 
     setTimeout(() => {
@@ -186,14 +189,14 @@ export default function SettingsView({
       localStorage.setItem('settings_critical_threshold', criticalThreshold.toString());
       localStorage.setItem('settings_alert_email', emailAlerts.toString());
       setIsSaving(false);
-      setStatusMessage('Threshold rules saved');
+      setStatusMessage(t('settings.successMessage'));
       setStatusColor('#10b981');
     }, 800);
   };
 
   const handleSaveAppAllocations = () => {
     setIsSaving(true);
-    setStatusMessage('Updating pool partitions...');
+    setStatusMessage(t('settings.successMessage'));
     setStatusColor('#3b82f6');
 
     setTimeout(() => {
@@ -218,7 +221,7 @@ export default function SettingsView({
       });
 
       setIsSaving(false);
-      setStatusMessage('Ecosystem limits synced');
+      setStatusMessage(t('settings.successMessage'));
       setStatusColor('#10b981');
     }, 800);
   };
@@ -291,9 +294,9 @@ export default function SettingsView({
     <div className="details-container">
       {/* Breadcrumbs */}
       <div className="breadcrumbs">
-        <span className="crumb-link" onClick={onBack}>Storage Management</span>
+        <span className="crumb-link" onClick={onBack}>{t('appStorageDetails.breadcrumbsTitle')}</span>
         <ChevronRight size={14} className="crumb-separator" />
-        <span className="crumb-active">Settings</span>
+        <span className="crumb-active">{t('sidebar.settings')}</span>
       </div>
 
       {/* Main Settings Panel */}
@@ -302,7 +305,7 @@ export default function SettingsView({
         {/* Left Category Menu Sidebar */}
         <div style={{ borderRight: '1px solid var(--border-color)', padding: '1.75rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: 'rgba(248, 250, 252, 0.45)' }}>
           <h2 style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06rem', paddingLeft: '0.5rem', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-            SETTINGS
+            {t('settings.sidebarTitle')}
           </h2>
 
           {/* Tab 1: General */}
@@ -325,10 +328,10 @@ export default function SettingsView({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.88rem' }}>
               <Settings size={15} />
-              General
+              {t('settings.general.title')}
             </div>
             <span style={{ fontSize: '0.7rem', color: activeCategory === 'general' ? 'rgba(255,255,255,0.75)' : '#64748b', paddingLeft: '1.45rem', fontWeight: 500 }}>
-              Basic preferences
+              {t('settings.general.subtitle')}
             </span>
           </button>
 
@@ -352,10 +355,10 @@ export default function SettingsView({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.88rem' }}>
               <Shield size={15} />
-              Privacy
+              {t('settings.privacy.title')}
             </div>
             <span style={{ fontSize: '0.7rem', color: activeCategory === 'privacy' ? 'rgba(255,255,255,0.75)' : '#64748b', paddingLeft: '1.45rem', fontWeight: 500 }}>
-              Data & access
+              {t('settings.privacy.subtitle')}
             </span>
           </button>
 
@@ -379,10 +382,10 @@ export default function SettingsView({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.88rem' }}>
               <Bell size={15} />
-              Notifications
+              {t('settings.notifications.title')}
             </div>
             <span style={{ fontSize: '0.7rem', color: activeCategory === 'notifications' ? 'rgba(255,255,255,0.75)' : '#64748b', paddingLeft: '1.45rem', fontWeight: 500 }}>
-              Alerts & updates
+              {t('settings.notifications.subtitle')}
             </span>
           </button>
 
@@ -406,10 +409,10 @@ export default function SettingsView({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.88rem' }}>
               <LayoutGrid size={15} />
-              Manage Apps
+              {t('settings.manageApps.title')}
             </div>
             <span style={{ fontSize: '0.7rem', color: activeCategory === 'apps' ? 'rgba(255,255,255,0.75)' : '#64748b', paddingLeft: '1.45rem', fontWeight: 500 }}>
-              Connected apps
+              {t('settings.manageApps.subtitle')}
             </span>
           </button>
         </div>
@@ -421,8 +424,8 @@ export default function SettingsView({
           {activeCategory === 'general' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
-                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>General</h2>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>Manage your workspace preferences</p>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>{t('settings.general.title')}</h2>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>{t('settings.general.subtitle')}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: statusColor }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: statusColor, display: 'inline-block' }} />
                   <span>{statusMessage}</span>
@@ -431,21 +434,20 @@ export default function SettingsView({
 
               {/* CARD 1: REGIONAL */}
               <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                <h3 style={sectionHeaderStyle}>REGIONAL</h3>
+                <h3 style={sectionHeaderStyle}>{t('settings.general.regionalTitle')}</h3>
                 
                 {/* Language Row */}
                 <div style={lastRowItemStyle}>
-                  <span>Language</span>
+                  <span>{t('settings.general.languageLabel')}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
                     <select
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value)}
+                      value={i18n.language}
+                      onChange={(e) => handleLanguageChange(e.target.value)}
                       style={selectStyle}
                     >
-                      <option value="English">English</option>
-                      <option value="Spanish">Spanish</option>
-                      <option value="French">French</option>
-                      <option value="German">German</option>
+                      <option value="en">English</option>
+                      <option value="de">German</option>
+                      <option value="es">Spanish</option>
                     </select>
                     <ChevronRight size={14} style={{ color: '#94a3b8' }} />
                   </div>
@@ -454,11 +456,11 @@ export default function SettingsView({
 
               {/* CARD 2: STORAGE DISPLAY */}
               <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                <h3 style={sectionHeaderStyle}>STORAGE DISPLAY</h3>
+                <h3 style={sectionHeaderStyle}>{t('settings.general.storageDisplayTitle')}</h3>
 
                 {/* Storage Unit Radio */}
                 <div style={rowItemStyle}>
-                  <span>Storage Unit</span>
+                  <span>{t('settings.general.storageUnitLabel')}</span>
                   <div style={{ display: 'flex', gap: '1.25rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 'bold' }}>
                       <input 
@@ -483,7 +485,7 @@ export default function SettingsView({
 
                 {/* Decimal Precision Row */}
                 <div style={rowItemStyle}>
-                  <span>Decimal Precision</span>
+                  <span>{t('settings.general.decimalPrecisionLabel')}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
                     <select
                       value={decimalPrecision}
@@ -500,36 +502,36 @@ export default function SettingsView({
 
                 {/* Show Usage Percentage Row */}
                 <div style={rowItemStyle}>
-                  <span>Show Usage Percentage</span>
+                  <span>{t('settings.general.showUsagePercentLabel')}</span>
                   <button 
                     onClick={() => setShowUsagePercent(!showUsagePercent)}
                     style={toggleBtnStyle(showUsagePercent)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{showUsagePercent ? '●' : '○'}</span>
-                    <span>{showUsagePercent ? 'ON' : 'OFF'}</span>
+                    <span>{showUsagePercent ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
 
                 {/* Show Available Storage Row */}
                 <div style={lastRowItemStyle}>
-                  <span>Show Available Storage</span>
+                  <span>{t('settings.general.showAvailableStorageLabel')}</span>
                   <button 
                     onClick={() => setShowAvailableStorage(!showAvailableStorage)}
                     style={toggleBtnStyle(showAvailableStorage)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{showAvailableStorage ? '●' : '○'}</span>
-                    <span>{showAvailableStorage ? 'ON' : 'OFF'}</span>
+                    <span>{showAvailableStorage ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
               </div>
 
               {/* CARD 3: DASHBOARD */}
               <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                <h3 style={sectionHeaderStyle}>DASHBOARD</h3>
+                <h3 style={sectionHeaderStyle}>{t('settings.general.dashboardTitle')}</h3>
 
                 {/* Default View Row */}
                 <div style={rowItemStyle}>
-                  <span>Default View</span>
+                  <span>{t('settings.general.defaultViewLabel')}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
                     <select
                       value={defaultView}
@@ -545,48 +547,48 @@ export default function SettingsView({
 
                 {/* Show Application Status Row */}
                 <div style={rowItemStyle}>
-                  <span>Show Application Status</span>
+                  <span>{t('settings.general.showAppStatusLabel')}</span>
                   <button 
                     onClick={() => setShowAppStatus(!showAppStatus)}
                     style={toggleBtnStyle(showAppStatus)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{showAppStatus ? '●' : '○'}</span>
-                    <span>{showAppStatus ? 'ON' : 'OFF'}</span>
+                    <span>{showAppStatus ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
 
                 {/* Show Recent Activity Row */}
                 <div style={rowItemStyle}>
-                  <span>Show Recent Activity</span>
+                  <span>{t('settings.general.showRecentActivityLabel')}</span>
                   <button 
                     onClick={() => setShowRecentActivity(!showRecentActivity)}
                     style={toggleBtnStyle(showRecentActivity)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{showRecentActivity ? '●' : '○'}</span>
-                    <span>{showRecentActivity ? 'ON' : 'OFF'}</span>
+                    <span>{showRecentActivity ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
 
                 {/* Show Storage Alerts Row */}
                 <div style={lastRowItemStyle}>
-                  <span>Show Storage Alerts</span>
+                  <span>{t('settings.general.showStorageAlertsLabel')}</span>
                   <button 
                     onClick={() => setShowStorageAlerts(!showStorageAlerts)}
                     style={toggleBtnStyle(showStorageAlerts)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{showStorageAlerts ? '●' : '○'}</span>
-                    <span>{showStorageAlerts ? 'ON' : 'OFF'}</span>
+                    <span>{showStorageAlerts ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
               </div>
 
               {/* CARD 4: APPEARANCE */}
               <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                <h3 style={sectionHeaderStyle}>APPEARANCE</h3>
+                <h3 style={sectionHeaderStyle}>{t('settings.general.appearanceTitle')}</h3>
 
                 {/* Theme Radio */}
                 <div style={rowItemStyle}>
-                  <span>Theme</span>
+                  <span>{t('settings.general.themeLabel')}</span>
                   <div style={{ display: 'flex', gap: '1.25rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 'bold' }}>
                       <input 
@@ -595,7 +597,7 @@ export default function SettingsView({
                         checked={theme === 'Light'} 
                         onChange={() => handleThemeChange('Light')} 
                       />
-                      Light
+                      {t('settings.general.light')}
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 'bold' }}>
                       <input 
@@ -604,7 +606,7 @@ export default function SettingsView({
                         checked={theme === 'System'} 
                         onChange={() => handleThemeChange('System')} 
                       />
-                      System
+                      {t('settings.general.system')}
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 'bold' }}>
                       <input 
@@ -613,20 +615,20 @@ export default function SettingsView({
                         checked={theme === 'Dark'} 
                         onChange={() => handleThemeChange('Dark')} 
                       />
-                      Dark
+                      {t('settings.general.dark')}
                     </label>
                   </div>
                 </div>
 
                 {/* Compact Layout Row */}
                 <div style={lastRowItemStyle}>
-                  <span>Compact Layout</span>
+                  <span>{t('settings.general.compactLayoutLabel')}</span>
                   <button 
                     onClick={() => setCompactLayout(!compactLayout)}
                     style={toggleBtnStyle(compactLayout)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{compactLayout ? '●' : '○'}</span>
-                    <span>{compactLayout ? 'ON' : 'OFF'}</span>
+                    <span>{compactLayout ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
               </div>
@@ -639,7 +641,7 @@ export default function SettingsView({
                   style={{ width: 'auto', padding: '0.6rem 1.4rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px' }}
                 >
                   <RotateCcw size={14} />
-                  Reset
+                  {t('common.reset')}
                 </button>
                 <button 
                   onClick={handleSaveGeneral}
@@ -648,7 +650,7 @@ export default function SettingsView({
                   style={{ width: 'auto', padding: '0.65rem 1.5rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px' }}
                 >
                   {isSaving ? <RefreshCw size={14} className="spin" /> : <Save size={14} />}
-                  Save Changes
+                  {t('common.saveChanges')}
                 </button>
               </div>
             </div>
@@ -658,8 +660,8 @@ export default function SettingsView({
           {activeCategory === 'privacy' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
-                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>Privacy</h2>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>Manage encryption and access settings</p>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>{t('settings.privacy.title')}</h2>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>{t('settings.privacy.subtitle')}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: statusColor }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: statusColor, display: 'inline-block' }} />
                   <span>{statusMessage}</span>
@@ -667,27 +669,27 @@ export default function SettingsView({
               </div>
 
               <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                <h3 style={sectionHeaderStyle}>SECURITY POLICIES</h3>
+                <h3 style={sectionHeaderStyle}>{t('settings.privacy.securityPoliciesTitle')}</h3>
 
                 <div style={rowItemStyle}>
-                  <span>AES-256 File Encryption</span>
+                  <span>{t('settings.privacy.encryptionLabel')}</span>
                   <button 
                     onClick={() => setEncryptionEnabled(!encryptionEnabled)}
                     style={toggleBtnStyle(encryptionEnabled)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{encryptionEnabled ? '●' : '○'}</span>
-                    <span>{encryptionEnabled ? 'ON' : 'OFF'}</span>
+                    <span>{encryptionEnabled ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
 
                 <div style={lastRowItemStyle}>
-                  <span>Activity Feed Logging</span>
+                  <span>{t('settings.privacy.loggingLabel')}</span>
                   <button 
                     onClick={() => setActivityLogging(!activityLogging)}
                     style={toggleBtnStyle(activityLogging)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{activityLogging ? '●' : '○'}</span>
-                    <span>{activityLogging ? 'ON' : 'OFF'}</span>
+                    <span>{activityLogging ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
               </div>
@@ -700,7 +702,7 @@ export default function SettingsView({
                   style={{ width: 'auto', padding: '0.65rem 1.5rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px' }}
                 >
                   {isSaving ? <RefreshCw size={14} className="spin" /> : <Save size={14} />}
-                  Save Changes
+                  {t('common.saveChanges')}
                 </button>
               </div>
             </div>
@@ -710,8 +712,8 @@ export default function SettingsView({
           {activeCategory === 'notifications' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
-                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>Notifications</h2>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>Set threshold warnings and alert delivery rules</p>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>{t('settings.notifications.title')}</h2>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>{t('settings.notifications.subtitle')}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: statusColor }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: statusColor, display: 'inline-block' }} />
                   <span>{statusMessage}</span>
@@ -719,13 +721,13 @@ export default function SettingsView({
               </div>
 
               <div className="glass-card" style={{ padding: '1.5rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <h3 style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, borderBottom: '1px solid var(--border-light)', paddingBottom: '0.5rem' }}>
-                    Alert Configuration
-                  </h3>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, borderBottom: '1px solid var(--border-light)', paddingBottom: '0.5rem' }}>
+                  {t('settings.notifications.alertConfigTitle')}
+                </h3>
 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '700', marginBottom: '0.35rem' }}>
-                    <span>Warning threshold</span>
+                    <span>{t('settings.notifications.warningThresholdLabel')}</span>
                     <span style={{ color: '#f59e0b' }}>{warningThreshold}%</span>
                   </div>
                   <input 
@@ -740,7 +742,7 @@ export default function SettingsView({
 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '700', marginBottom: '0.35rem' }}>
-                    <span>Critical threshold</span>
+                    <span>{t('settings.notifications.criticalThresholdLabel')}</span>
                     <span style={{ color: '#ef4444' }}>{criticalThreshold}%</span>
                   </div>
                   <input 
@@ -754,13 +756,13 @@ export default function SettingsView({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '1rem' }}>
-                  <span>Send alerts to administrator email</span>
+                  <span>{t('settings.notifications.emailAlertsLabel')}</span>
                   <button 
                     onClick={() => setEmailAlerts(!emailAlerts)}
                     style={toggleBtnStyle(emailAlerts)}
                   >
                     <span style={{ fontSize: '0.65rem' }}>{emailAlerts ? '●' : '○'}</span>
-                    <span>{emailAlerts ? 'ON' : 'OFF'}</span>
+                    <span>{emailAlerts ? t('common.on') : t('common.off')}</span>
                   </button>
                 </div>
               </div>
@@ -773,7 +775,7 @@ export default function SettingsView({
                   style={{ width: 'auto', padding: '0.65rem 1.5rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px' }}
                 >
                   {isSaving ? <RefreshCw size={14} className="spin" /> : <Save size={14} />}
-                  Save Changes
+                  {t('common.saveChanges')}
                 </button>
               </div>
             </div>
@@ -783,8 +785,8 @@ export default function SettingsView({
           {activeCategory === 'apps' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
-                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>Manage Apps</h2>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>Manage storage boundaries and partition sizing limits</p>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>{t('settings.manageApps.title')}</h2>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>{t('settings.manageApps.subtitle')}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: statusColor }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: statusColor, display: 'inline-block' }} />
                   <span>{statusMessage}</span>
@@ -796,7 +798,7 @@ export default function SettingsView({
                 <Server size={28} style={{ color: '#2563eb' }} />
                 <div style={{ flex: 1 }}>
                   <label style={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '0.25rem', color: 'var(--text-muted)' }}>
-                    Total Capacity Pool Size (GB)
+                    {t('settings.manageApps.capacityPoolLabel')}
                   </label>
                   <input 
                     type="number"
@@ -808,15 +810,15 @@ export default function SettingsView({
                   />
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Unallocated Space:</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t('settings.manageApps.unallocatedSpaceLabel')}:</span>
                   <span style={{ fontSize: '1.2rem', fontWeight: '900', display: 'block', color: '#10b981' }}>{unallocatedGB} GB</span>
                 </div>
               </div>
 
               <div className="glass-card" style={{ padding: '1.5rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, borderBottom: '1px solid var(--border-light)', paddingBottom: '0.5rem' }}>
-                    Connected App Allocation Limits
-                  </h3>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, borderBottom: '1px solid var(--border-light)', paddingBottom: '0.5rem' }}>
+                  {t('settings.manageApps.appAllocationTitle')}
+                </h3>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   {apps.map(app => {
@@ -832,7 +834,9 @@ export default function SettingsView({
                       <div key={app.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ fontSize: '0.85rem', fontWeight: '800', color: `rgb(${app.colorTheme})` }}>{app.name}</span>
-                          <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main)' }}>{currentLimitGB} GB Limit</span>
+                          <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                            {t('settings.manageApps.appLimitLabel', { appLimit: currentLimitGB })}
+                          </span>
                         </div>
 
                         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
@@ -847,7 +851,7 @@ export default function SettingsView({
                             style={{ accentColor: `rgb(${app.colorTheme})`, flex: 1 }}
                           />
                           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, minWidth: '45px', textAlign: 'right' }}>
-                            {appPercent}% Used
+                            {t('settings.manageApps.limitUsedLabel', { percent: appPercent })}
                           </span>
                         </div>
                       </div>
@@ -864,7 +868,7 @@ export default function SettingsView({
                   style={{ width: 'auto', padding: '0.65rem 1.5rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px' }}
                 >
                   {isSaving ? <RefreshCw size={14} className="spin" /> : <Save size={14} />}
-                  Save Changes
+                  {t('common.saveChanges')}
                 </button>
               </div>
             </div>

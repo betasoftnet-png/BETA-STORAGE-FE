@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ShieldCheck, ShieldAlert } from 'lucide-react';
 
 export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
+  const { t } = useTranslation();
   const totalUsedGB = (usedStorageMB / 1024).toFixed(1);
   const totalCapacityGB = (totalPoolMB / 1024).toFixed(0);
   const availableGB = ((totalPoolMB - usedStorageMB) / 1024).toFixed(1);
@@ -72,8 +74,8 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
   });
   const overallUsedPercent = totalPoolMB > 0 ? (usedStorageMB / totalPoolMB) : 0;
 
-  let healthTitle = 'All systems healthy';
-  let healthDesc = 'All applications are within their storage limits.';
+  let healthTitle = t('dashboard.health.healthyTitle');
+  let healthDesc = t('dashboard.health.healthyDesc');
   let healthColor = '#10b981';
   let healthIconColor = '#10b981';
   let healthIconBg = '#d1fae5';
@@ -84,8 +86,8 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
   let HealthIcon = ShieldCheck;
 
   if (hasCritical || overallUsedPercent >= 0.85) {
-    healthTitle = 'System Critical';
-    healthDesc = 'Some applications have critically low storage space.';
+    healthTitle = t('dashboard.health.criticalTitle');
+    healthDesc = t('dashboard.health.criticalDesc');
     healthColor = '#ef4444';
     healthIconColor = '#ef4444';
     healthIconBg = '#fee2e2';
@@ -95,8 +97,8 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
     healthDescColor = '#b91c1c';
     HealthIcon = ShieldAlert;
   } else if (hasWarning || overallUsedPercent >= 0.7) {
-    healthTitle = 'System Warning';
-    healthDesc = 'Storage space running low for some applications.';
+    healthTitle = t('dashboard.health.warningTitle');
+    healthDesc = t('dashboard.health.warningDesc');
     healthColor = '#f59e0b';
     healthIconColor = '#d97706';
     healthIconBg = '#fef3c7';
@@ -113,10 +115,10 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
         {/* Card 1: Storage Distribution */}
         <div className="glass-card insight-card">
           <div className="card-title" style={{ border: 'none', padding: 0, marginBottom: '1rem' }}>
-            Storage Distribution
+            {t('dashboard.categories.distribution')}
           </div>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '1.25rem', marginTop: '-0.5rem' }}>
-            Used storage breakdown by application
+            {t('dashboard.categories.distributionDesc')}
           </span>
 
           <div className="distribution-layout">
@@ -161,7 +163,7 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
                 textAlign: 'center'
               }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-main)' }}>{totalUsedGB} GB</span>
-                <span style={{ fontSize: '0.55rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Used</span>
+                <span style={{ fontSize: '0.55rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t('dashboard.used')}</span>
               </div>
             </div>
 
@@ -183,10 +185,10 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
         {/* Card 2: Storage by Category */}
         <div className="glass-card insight-card">
           <div className="card-title" style={{ border: 'none', padding: 0, marginBottom: '1rem' }}>
-            Storage by Category
+            {t('dashboard.categories.byCategory')}
           </div>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '1.25rem', marginTop: '-0.5rem' }}>
-            Distribution across file categories
+            {t('dashboard.categories.byCategoryDesc')}
           </span>
 
           <div className="category-list">
@@ -195,7 +197,7 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
                 <div className="category-row-top">
                   <span className="category-row-label">
                     <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: cat.color }} />
-                    {cat.name}
+                    {t(`dashboard.categories.${cat.name.toLowerCase()}`)}
                   </span>
                   <span className="category-row-value">{cat.size} MB ({cat.percent}%)</span>
                 </div>
@@ -213,7 +215,7 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
         {/* Card 3: Storage Health */}
         <div className="glass-card insight-card">
           <div className="card-title" style={{ border: 'none', padding: 0, marginBottom: '1.25rem' }}>
-            Storage Health
+            {t('dashboard.health.title')}
           </div>
 
           <div className="health-layout">
@@ -230,15 +232,15 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
             <div className="health-metrics-row">
               <div className="health-metric-col">
                 <span className="health-metric-val">{apps.length}</span>
-                <span className="health-metric-lbl">Active Apps</span>
+                <span className="health-metric-lbl">{t('dashboard.health.activeApps')}</span>
               </div>
               <div className="health-metric-col" style={{ borderLeft: '1px solid var(--border-color)', borderRight: '1px solid var(--border-color)', flex: 1, padding: '0 0.5rem' }}>
                 <span className="health-metric-val">{availableGB} GB</span>
-                <span className="health-metric-lbl">Available</span>
+                <span className="health-metric-lbl">{t('dashboard.health.available')}</span>
               </div>
               <div className="health-metric-col">
                 <span className="health-metric-val">{totalCapacityGB} GB</span>
-                <span className="health-metric-lbl">Total Capacity</span>
+                <span className="health-metric-lbl">{t('dashboard.totalCapacity')}</span>
               </div>
             </div>
           </div>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Shield } from 'lucide-react';
 
 export default function Login({ onLoginSuccess }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,19 +19,19 @@ export default function Login({ onLoginSuccess }) {
 
     // Basic Validation
     if (!email) {
-      setError('Email address is required.');
+      setError(t('login.emailRequired'));
       return;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address.');
+      setError(t('login.emailError'));
       return;
     }
     if (!password) {
-      setError('Password is required.');
+      setError(t('login.passwordRequired'));
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError(t('login.passwordError'));
       return;
     }
 
@@ -64,9 +66,9 @@ export default function Login({ onLoginSuccess }) {
           <div className="login-logo-container">
             <img src="/logo.png" alt="Beta Storage Logo" className="login-logo-img" />
           </div>
-          <h1 className="login-title">BETA STORAGE MANAGEMENT</h1>
-          <h2 className="login-welcome">Welcome back</h2>
-          <p className="login-subtitle">Sign in to manage your storage</p>
+          <h1 className="login-title">{t('dashboard.title').toUpperCase()}</h1>
+          <h2 className="login-welcome">{t('login.welcome')}</h2>
+          <p className="login-subtitle">{t('login.title')}</p>
         </div>
 
         {/* Form Error Alert */}
@@ -80,7 +82,7 @@ export default function Login({ onLoginSuccess }) {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="login-form">
           <div className="login-form-group">
-            <label className="login-label" htmlFor="email-input">Email</label>
+            <label className="login-label" htmlFor="email-input">{t('login.emailLabel')}</label>
             <div className="login-input-wrapper">
               <Mail className="login-input-icon" size={16} />
               <input
@@ -96,7 +98,7 @@ export default function Login({ onLoginSuccess }) {
           </div>
 
           <div className="login-form-group">
-            <label className="login-label" htmlFor="password-input">Password</label>
+            <label className="login-label" htmlFor="password-input">{t('login.passwordLabel')}</label>
             <div className="login-input-wrapper">
               <Lock className="login-input-icon" size={16} />
               <input
@@ -128,10 +130,10 @@ export default function Login({ onLoginSuccess }) {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 disabled={isLoading}
               />
-              <span>Remember me</span>
+              <span>{t('login.rememberMe')}</span>
             </label>
             <a href="#" className="login-forgot-link" onClick={handleForgotPassword}>
-              Forgot password?
+              {t('login.forgotPassword')}
             </a>
           </div>
 
@@ -143,7 +145,7 @@ export default function Login({ onLoginSuccess }) {
             {isLoading ? (
               <span className="spinner"></span>
             ) : (
-              'SIGN IN'
+              t('login.submitBtn').toUpperCase()
             )}
           </button>
         </form>
@@ -152,7 +154,7 @@ export default function Login({ onLoginSuccess }) {
         <div className="login-footer">
           <div className="environment-badge">
             <Shield size={12} />
-            <span>Beta Environment • v1.0</span>
+            <span>{t('login.environment')}</span>
           </div>
         </div>
 
