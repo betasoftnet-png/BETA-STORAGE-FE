@@ -14,6 +14,7 @@ import AppDrawer from './components/AppDrawer';
 import StorageUsageView from './components/StorageUsageView';
 import FileCategoriesView from './components/FileCategoriesView';
 import RecycleBinView from './components/RecycleBinView';
+import Login from './components/Login';
 
 // Load or return reference default state
 const getInitialState = () => {
@@ -151,6 +152,33 @@ function AppContent() {
   const [state, setState] = useState(getInitialState);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Authentication & Current User State
+  const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem('isAuthenticated') === 'true');
+  const [currentUserEmail, setCurrentUserEmail] = useState(() => localStorage.getItem('currentUserEmail') || '');
+
+  // Route guarding and redirection checking
+  useEffect(() => {
+    if (!isAuthenticated && location.pathname !== '/login') {
+      navigate('/login');
+    } else if (isAuthenticated && (location.pathname === '/login' || location.pathname === '/dashboard')) {
+      navigate('/');
+    }
+  }, [isAuthenticated, location.pathname, navigate]);
+
+  const handleLoginSuccess = (email) => {
+    setCurrentUserEmail(email);
+    setIsAuthenticated(true);
+    navigate('/');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('currentUserEmail');
+    setIsAuthenticated(false);
+    setCurrentUserEmail('');
+    navigate('/login');
+  };
 
   // Extract selectedAppId from URL pathname: e.g. /storage/bnx-mail -> bnx-mail
   const match = location.pathname.match(/^\/storage\/([^/]+)$/);
@@ -484,6 +512,10 @@ function AppContent() {
     ? `Each application has ${(state.apps[0].allocatedMB / 1024).toFixed(0)} GB allocated storage`
     : 'Track allocated storage limits across applications';
 
+  if (location.pathname === '/login' || !isAuthenticated) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <div className="dashboard-layout">
       {/* Mobile Top Bar */}
@@ -655,6 +687,8 @@ function AppContent() {
               lastUpdated={state.lastUpdatedTime}
               isRefreshing={isRefreshing}
               onRefresh={handleRefreshState}
+              currentUserEmail={currentUserEmail}
+              onLogout={handleLogout}
             />
 
             {/* Total Ecosystem Storage wide card banner */}
