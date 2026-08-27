@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Search, Trash2, Upload, AlertCircle, Sparkles, FolderArchive, Eraser } from 'lucide-react';
 
-export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, onTriggerCleanup, onCompressLogs }) {
+export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, onTriggerCleanup, onCompressLogs, decimalPrecision = 2 }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +17,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
   
   // Format sizes
   const formatSize = (mb) => {
-    return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${Math.round(mb)} MB`;
+    return mb >= 1024 ? `${(mb / 1024).toFixed(decimalPrecision)} GB` : `${mb.toFixed(decimalPrecision)} MB`;
   };
 
   const filteredFiles = files.filter(f => 

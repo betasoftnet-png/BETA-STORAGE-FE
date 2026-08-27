@@ -42,7 +42,7 @@ export const classifyFile = (file) => {
   return 'Other';
 };
 
-export default function FileCategoriesView({ totalPoolMB, apps, onBack }) {
+export default function FileCategoriesView({ totalPoolMB, apps, onBack, decimalPrecision = 2 }) {
   const [activeTab, setActiveTab] = useState('bnx-mail');
 
   const activeApp = apps.find(a => a.id === activeTab) || apps[0];
@@ -53,7 +53,7 @@ export default function FileCategoriesView({ totalPoolMB, apps, onBack }) {
   const allocatedMB = activeApp.allocatedMB || 1024;
   const usedPercentOfAllocation = Math.min(100, Math.round((appUsedMB / allocatedMB) * 100));
   const formatCapacity = (mb) => {
-    return mb >= 1024 ? `${(mb / 1024).toFixed(0)} GB` : `${Math.round(mb)} MB`;
+    return mb >= 1024 ? `${(mb / 1024).toFixed(decimalPrecision)} GB` : `${mb.toFixed(decimalPrecision)} MB`;
   };
 
   // Categories template for generic products (BNX Mail, Cliks)
@@ -135,7 +135,7 @@ export default function FileCategoriesView({ totalPoolMB, apps, onBack }) {
   }
 
   const formatSize = (mb) => {
-    return mb >= 1024 ? `${(mb / 1024).toFixed(2)} GB` : `${Math.round(mb)} MB`;
+    return mb >= 1024 ? `${(mb / 1024).toFixed(decimalPrecision)} GB` : `${mb.toFixed(decimalPrecision)} MB`;
   };
 
   return (

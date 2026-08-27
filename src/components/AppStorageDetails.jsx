@@ -6,7 +6,7 @@ import {
   LayoutGrid, Briefcase, Scale, Receipt, CreditCard, Users, Image
 } from 'lucide-react';
 
-export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh }) {
+export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh, decimalPrecision = 2 }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
 
@@ -17,12 +17,12 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
 
   // Dynamic formatting helpers
   const formatSize = (mb) => {
-    return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${Math.round(mb)} MB`;
+    return mb >= 1024 ? `${(mb / 1024).toFixed(decimalPrecision)} GB` : `${mb.toFixed(decimalPrecision)} MB`;
   };
 
   const usedText = formatSize(usedMB);
   const freeText = formatSize(freeMB);
-  const allocatedText = allocatedMB >= 1024 ? `${(allocatedMB / 1024).toFixed(0)} GB` : `${allocatedMB} MB`;
+  const allocatedText = allocatedMB >= 1024 ? `${(allocatedMB / 1024).toFixed(decimalPrecision)} GB` : `${allocatedMB} MB`;
 
   // Health evaluations
   const isCritical = usedPercent >= 90;

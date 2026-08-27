@@ -7,7 +7,8 @@ export default function AdminSettings({
   onClose, 
   onResizePool, 
   onUpdateAllocation, 
-  onAddNewApp 
+  onAddNewApp,
+  decimalPrecision = 2
 }) {
   const [activeTab, setActiveTab] = useState('allocations'); // allocations | add-app
   const [newPoolGB, setNewPoolGB] = useState(totalPoolMB / 1024);
@@ -45,7 +46,7 @@ export default function AdminSettings({
 
     const newSizeMB = newSizeGB * 1024;
     if (newSizeMB < totalAllocatedMB) {
-      setPoolError(`Failed: The new pool size (${newSizeGB} GB) is smaller than the current total allocated space of ${(totalAllocatedMB / 1024).toFixed(1)} GB.`);
+      setPoolError(`Failed: The new pool size (${newSizeGB} GB) is smaller than the current total allocated space of ${(totalAllocatedMB / 1024).toFixed(decimalPrecision)} GB.`);
       return;
     }
 
@@ -97,7 +98,7 @@ export default function AdminSettings({
 
     // Check pool capacity
     if (totalAllocatedMB + allocationMB > totalPoolMB) {
-      setAddAppError(`Failed: Not enough storage pool space. You are trying to allocate ${appAllocationGB} GB, but only ${(remainingAllocatedMB / 1024).toFixed(1)} GB is unallocated.`);
+      setAddAppError(`Failed: Not enough storage pool space. You are trying to allocate ${appAllocationGB} GB, but only ${(remainingAllocatedMB / 1024).toFixed(decimalPrecision)} GB is unallocated.`);
       return;
     }
 
@@ -219,7 +220,7 @@ export default function AdminSettings({
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '0.75rem' }}>
                 <span>Unallocated Pool Space</span>
                 <span style={{ color: remainingAllocatedMB > 0 ? 'var(--color-healthy)' : 'var(--text-muted)' }}>
-                  {(remainingAllocatedMB / 1024).toFixed(1)} GB Available
+                  {(remainingAllocatedMB / 1024).toFixed(decimalPrecision)} GB Available
                 </span>
               </div>
 
@@ -238,7 +239,7 @@ export default function AdminSettings({
                       <div className="settings-slider-header">
                         <span style={{ color: `rgb(${app.colorTheme})` }}>{app.name}</span>
                         <span>
-                          {currentLimitGB.toFixed(0)} GB limit
+                          {currentLimitGB.toFixed(decimalPrecision)} GB limit
                         </span>
                       </div>
                       
@@ -254,7 +255,7 @@ export default function AdminSettings({
                       />
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-dim)' }}>
-                        <span>Min (used): {currentUsedGB.toFixed(1)} GB</span>
+                        <span>Min (used): {currentUsedGB.toFixed(decimalPrecision)} GB</span>
                         <span>Max (pool): {Math.floor(maxSliderGB)} GB</span>
                       </div>
                     </div>
@@ -298,7 +299,7 @@ export default function AdminSettings({
                   max={Math.floor(totalPoolMB / 1024)}
                 />
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', marginTop: '0.25rem', display: 'block' }}>
-                  Available Pool space: {(remainingAllocatedMB / 1024).toFixed(1)} GB
+                  Available Pool space: {(remainingAllocatedMB / 1024).toFixed(decimalPrecision)} GB
                 </span>
               </div>
 

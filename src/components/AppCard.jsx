@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-react';
 
-export default function AppCard({ app, onManage }) {
+export default function AppCard({ app, onManage, decimalPrecision = 2 }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
 
@@ -50,15 +50,15 @@ export default function AppCard({ app, onManage }) {
           </div>
         </div>
         <span className="app-card-badge">
-          {t('settings.manageApps.appLimitLabel', { appLimit: (allocatedMB / 1024).toFixed(0) })}
+          {t('settings.manageApps.appLimitLabel', { appLimit: (allocatedMB / 1024).toFixed(decimalPrecision) })}
         </span>
       </div>
 
       {/* Progress & Value stats */}
       <div style={{ marginTop: '0.5rem' }}>
         <div className="app-card-numbers">
-          <span style={{ color: `rgb(${colorTheme})` }}>{usedMB} MB {t('dashboard.used')}</span>
-          <span style={{ color: 'var(--text-muted)' }}>{freeMB} MB {t('storageUsage.free')}</span>
+          <span style={{ color: `rgb(${colorTheme})` }}>{usedMB.toFixed(decimalPrecision)} MB {t('dashboard.used')}</span>
+          <span style={{ color: 'var(--text-muted)' }}>{freeMB.toFixed(decimalPrecision)} MB {t('storageUsage.free')}</span>
         </div>
 
         <div className="progress-container" style={{ marginBottom: '0.65rem' }}>

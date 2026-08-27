@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Trash2, Search, Check, MoreVertical } from 'lucide-react';
 
-export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRestoreFile, onPermanentDeleteFile, onBack }) {
+export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRestoreFile, onPermanentDeleteFile, onBack, decimalPrecision = 2 }) {
   const { t } = useTranslation();
   // State for search and filtering
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,7 +29,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
   const totalDeletedMB = Math.round(bnxSize + businessSize + cliksSize);
   const totalCapacityGB = 5;
   const totalCapacityMB = totalCapacityGB * 1024;
-  const freeGB = ((totalCapacityMB - totalDeletedMB) / 1024).toFixed(2);
+  const freeGB = ((totalCapacityMB - totalDeletedMB) / 1024).toFixed(decimalPrecision);
   const usedPercent = Math.min(100, Math.round((totalDeletedMB / totalCapacityMB) * 100));
 
   // Handler to restore a file
@@ -73,7 +73,7 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
   const paginatedFiles = filteredFiles.slice(startIndex, startIndex + itemsPerPage);
 
   const formatSize = (mb) => {
-    return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(1)} MB`;
+    return mb >= 1024 ? `${(mb / 1024).toFixed(decimalPrecision)} GB` : `${mb.toFixed(decimalPrecision)} MB`;
   };
 
   return (

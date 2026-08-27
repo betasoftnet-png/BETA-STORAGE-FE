@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, BarChart3, Database, HardDrive, AlertTriangle, Trash2, ArrowRight } from 'lucide-react';
 
-export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerCleanup }) {
+export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerCleanup, decimalPrecision = 2 }) {
   const { t } = useTranslation();
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -21,17 +21,17 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
 
   // Formatting helpers
   const formatGB = (mb) => {
-    return (mb / 1024).toFixed(1) + ' GB';
+    return (mb / 1024).toFixed(decimalPrecision) + ' GB';
   };
 
   const formatSmart = (mb) => {
     if (mb >= 1024) {
-      return (mb / 1024).toFixed(1) + ' GB';
+      return (mb / 1024).toFixed(decimalPrecision) + ' GB';
     }
-    return Math.round(mb) + ' MB';
+    return mb.toFixed(decimalPrecision) + ' MB';
   };
 
-  const totalUsedGBText = (totalUsedMB / 1024).toFixed(1);
+  const totalUsedGBText = (totalUsedMB / 1024).toFixed(decimalPrecision);
 
   // Configure segments for the donut chart
   const segments = [
@@ -116,7 +116,7 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
               pointerEvents: 'none'
             }}>
               <span style={{ fontSize: '2.25rem', fontWeight: '800', color: 'var(--text-main)', lineHeight: '1.1' }}>
-                {hoveredIndex !== null ? (segments[hoveredIndex].size / 1024).toFixed(1) : totalUsedGBText} GB
+                {hoveredIndex !== null ? (segments[hoveredIndex].size / 1024).toFixed(decimalPrecision) : totalUsedGBText} GB
               </span>
               <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '700', letterSpacing: '0.1rem', marginTop: '0.25rem' }}>
                 {hoveredIndex !== null ? segments[hoveredIndex].name.toUpperCase() : t('dashboard.used').toUpperCase()}

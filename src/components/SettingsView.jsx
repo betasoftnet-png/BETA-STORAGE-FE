@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-  Settings, Shield, Bell, LayoutGrid, ChevronRight, Save, 
+  Settings, Shield, Bell, LayoutGrid, ChevronRight, ChevronDown, Check, Save, 
   RotateCcw, Server, RefreshCw
 } from 'lucide-react';
 
@@ -10,9 +10,58 @@ export default function SettingsView({
   apps, 
   onResizePool, 
   onUpdateAllocation,
-  onBack 
+  onBack,
+  onSaveSettings
 }) {
   const { t, i18n } = useTranslation();
+
+  // Custom Dropdowns States, Refs & Lists
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const languagesList = [
+    { code: 'en', label: 'English' },
+    { code: 'de', label: 'German' },
+    { code: 'es', label: 'Spanish' }
+  ];
+
+  const [isPrecisionOpen, setIsPrecisionOpen] = useState(false);
+  const precisionRef = useRef(null);
+  const precisionList = [
+    { code: '3 digits', label: '3 digits' },
+    { code: '2 digits', label: '2 digits' },
+    { code: '1 digit', label: '1 digit' },
+    { code: '0 digits', label: '0 digits' }
+  ];
+
+  const [isDefaultViewOpen, setIsDefaultViewOpen] = useState(false);
+  const defaultViewRef = useRef(null);
+  const defaultViewList = [
+    { code: 'Storage Overview', label: 'Storage Overview' },
+    { code: 'Recycle Bin', label: 'Recycle Bin' }
+  ];
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+      if (precisionRef.current && !precisionRef.current.contains(event.target)) {
+        setIsPrecisionOpen(false);
+      }
+      if (defaultViewRef.current && !defaultViewRef.current.contains(event.target)) {
+        setIsDefaultViewOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSelectLanguage = (langCode) => {
+    handleLanguageChange(langCode);
+    setIsDropdownOpen(false);
+  };
 
   // 1. Navigation Category tab state
   const [activeCategory, setActiveCategory] = useState('general'); // general | privacy | notifications | apps
@@ -110,6 +159,12 @@ export default function SettingsView({
       setTheme(defaultStates.theme);
       setCompactLayout(defaultStates.compactLayout);
 
+      if (onSaveSettings) {
+        onSaveSettings({
+          decimalPrecision: defaultStates.decimalPrecision
+        });
+      }
+
       document.documentElement.removeAttribute('data-theme');
       setStatusMessage(t('settings.resetMessage'));
       setStatusColor('#3b82f6');
@@ -153,6 +208,12 @@ export default function SettingsView({
       // Apply language changes to i18n
       i18n.changeLanguage(selectedLanguage);
       localStorage.setItem('storageLanguage', selectedLanguage);
+
+      if (onSaveSettings) {
+        onSaveSettings({
+          decimalPrecision
+        });
+      }
 
       setIsSaving(false);
       setStatusMessage(t('settings.successMessage'));
@@ -259,17 +320,6 @@ export default function SettingsView({
     borderBottom: '1px solid var(--border-light)'
   };
 
-  const selectStyle = {
-    border: 'none',
-    background: 'none',
-    textAlign: 'right',
-    fontSize: '0.85rem',
-    fontWeight: '600',
-    color: 'var(--text-main)',
-    cursor: 'pointer',
-    outline: 'none',
-    paddingRight: '0.25rem'
-  };
 
   const toggleBtnStyle = (active) => ({
     display: 'flex',
@@ -428,29 +478,57 @@ export default function SettingsView({
               </div>
 
               {/* CARD 1: REGIONAL */}
-              <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                <h3 style={sectionHeaderStyle}>{t('settings.general.regionalTitle')}</h3>
+              <div className="glass-card" style={{ padding: 0, overflow: 'visible', border: '1px solid var(--border-color)' }}>
+                <h3 style={{ ...sectionHeaderStyle, borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>{t('settings.general.regionalTitle')}</h3>
                 {/* Language Row */}
                 <div style={lastRowItemStyle}>
                   <span>{t('settings.general.languageLabel')}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-                    <select
-                      value={selectedLanguage}
-                      onChange={(e) => handleLanguageChange(e.target.value)}
-                      style={selectStyle}
+                  <div className="lang-dropdown-container" ref={dropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsDropdownOpen(prev => !prev)}
+                      className="lang-dropdown-trigger"
                     >
-                      <option value="en">English</option>
-                      <option value="de">German</option>
-                      <option value="es">Spanish</option>
-                    </select>
-                    <ChevronRight size={14} style={{ color: '#94a3b8' }} />
+                      <span>
+                        {selectedLanguage === 'en' ? 'English' : selectedLanguage === 'de' ? 'German' : 'Spanish'}
+                      </span>
+                      <ChevronDown
+                        size={14}
+                        className={`lang-dropdown-chevron ${isDropdownOpen ? 'open' : ''}`}
+                      />
+                    </button>
+
+                    {isDropdownOpen && (
+                      <div className="lang-dropdown-menu">
+                        {languagesList.map((lang) => {
+                          const isSelected = selectedLanguage === lang.code;
+                          return (
+                            <button
+                              key={lang.code}
+                              type="button"
+                              onClick={() => handleSelectLanguage(lang.code)}
+                              className={`lang-dropdown-item ${isSelected ? 'selected' : ''}`}
+                            >
+                              {isSelected ? (
+                                <span className="lang-dropdown-checkmark">
+                                  <Check size={14} strokeWidth={3} />
+                                </span>
+                              ) : (
+                                <span className="lang-dropdown-checkmark-placeholder" />
+                              )}
+                              <span>{lang.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* CARD 2: STORAGE DISPLAY */}
-              <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                <h3 style={sectionHeaderStyle}>{t('settings.general.storageDisplayTitle')}</h3>
+              <div className="glass-card" style={{ padding: 0, overflow: 'visible', border: '1px solid var(--border-color)' }}>
+                <h3 style={{ ...sectionHeaderStyle, borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>{t('settings.general.storageDisplayTitle')}</h3>
 
                 {/* Storage Unit Radio */}
                 <div style={rowItemStyle}>
@@ -480,17 +558,46 @@ export default function SettingsView({
                 {/* Decimal Precision Row */}
                 <div style={rowItemStyle}>
                   <span>{t('settings.general.decimalPrecisionLabel')}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-                    <select
-                      value={decimalPrecision}
-                      onChange={(e) => setDecimalPrecision(e.target.value)}
-                      style={selectStyle}
+                  <div className="lang-dropdown-container" ref={precisionRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsPrecisionOpen(prev => !prev)}
+                      className="lang-dropdown-trigger"
                     >
-                      <option value="2 digits">2 digits</option>
-                      <option value="1 digit">1 digit</option>
-                      <option value="0 digits">0 digits</option>
-                    </select>
-                    <ChevronRight size={14} style={{ color: '#94a3b8' }} />
+                      <span>{decimalPrecision}</span>
+                      <ChevronDown
+                        size={14}
+                        className={`lang-dropdown-chevron ${isPrecisionOpen ? 'open' : ''}`}
+                      />
+                    </button>
+
+                    {isPrecisionOpen && (
+                      <div className="lang-dropdown-menu">
+                        {precisionList.map((item) => {
+                          const isSelected = decimalPrecision === item.code;
+                          return (
+                            <button
+                              key={item.code}
+                              type="button"
+                              onClick={() => {
+                                setDecimalPrecision(item.code);
+                                setIsPrecisionOpen(false);
+                              }}
+                              className={`lang-dropdown-item ${isSelected ? 'selected' : ''}`}
+                            >
+                              {isSelected ? (
+                                <span className="lang-dropdown-checkmark">
+                                  <Check size={14} strokeWidth={3} />
+                                </span>
+                              ) : (
+                                <span className="lang-dropdown-checkmark-placeholder" />
+                              )}
+                              <span>{item.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -520,22 +627,52 @@ export default function SettingsView({
               </div>
 
               {/* CARD 3: DASHBOARD */}
-              <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                <h3 style={sectionHeaderStyle}>{t('settings.general.dashboardTitle')}</h3>
+              <div className="glass-card" style={{ padding: 0, overflow: 'visible', border: '1px solid var(--border-color)' }}>
+                <h3 style={{ ...sectionHeaderStyle, borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>{t('settings.general.dashboardTitle')}</h3>
 
                 {/* Default View Row */}
                 <div style={rowItemStyle}>
                   <span>{t('settings.general.defaultViewLabel')}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-                    <select
-                      value={defaultView}
-                      onChange={(e) => setDefaultView(e.target.value)}
-                      style={selectStyle}
+                  <div className="lang-dropdown-container" ref={defaultViewRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsDefaultViewOpen(prev => !prev)}
+                      className="lang-dropdown-trigger"
                     >
-                      <option value="Storage Overview">Storage Overview</option>
-                      <option value="Recycle Bin">Recycle Bin</option>
-                    </select>
-                    <ChevronRight size={14} style={{ color: '#94a3b8' }} />
+                      <span>{defaultView}</span>
+                      <ChevronDown
+                        size={14}
+                        className={`lang-dropdown-chevron ${isDefaultViewOpen ? 'open' : ''}`}
+                      />
+                    </button>
+
+                    {isDefaultViewOpen && (
+                      <div className="lang-dropdown-menu">
+                        {defaultViewList.map((item) => {
+                          const isSelected = defaultView === item.code;
+                          return (
+                            <button
+                              key={item.code}
+                              type="button"
+                              onClick={() => {
+                                setDefaultView(item.code);
+                                setIsDefaultViewOpen(false);
+                              }}
+                              className={`lang-dropdown-item ${isSelected ? 'selected' : ''}`}
+                            >
+                              {isSelected ? (
+                                <span className="lang-dropdown-checkmark">
+                                  <Check size={14} strokeWidth={3} />
+                                </span>
+                              ) : (
+                                <span className="lang-dropdown-checkmark-placeholder" />
+                              )}
+                              <span>{item.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 

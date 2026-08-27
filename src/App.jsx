@@ -192,6 +192,27 @@ function AppContent() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const [decimalPrecision, setDecimalPrecision] = useState(() => {
+    const precisionStr = localStorage.getItem('settings_decimal_precision') || '2 digits';
+    if (precisionStr === '0 digits') return 0;
+    if (precisionStr === '1 digit') return 1;
+    if (precisionStr === '2 digits') return 2;
+    if (precisionStr === '3 digits') return 3;
+    return 2;
+  });
+
+  const handleSettingsSave = (settings) => {
+    if (settings && settings.decimalPrecision) {
+      const precisionStr = settings.decimalPrecision;
+      let p = 2;
+      if (precisionStr === '0 digits') p = 0;
+      else if (precisionStr === '1 digit') p = 1;
+      else if (precisionStr === '2 digits') p = 2;
+      else if (precisionStr === '3 digits') p = 3;
+      setDecimalPrecision(p);
+    }
+  };
+
   // Sync to local storage
   useEffect(() => {
     localStorage.setItem('beta_storage_state_v5', JSON.stringify(state));
@@ -674,6 +695,7 @@ function AppContent() {
             <StorageUsageView
               totalPoolMB={state.totalPoolMB}
               apps={state.apps}
+              decimalPrecision={decimalPrecision}
               onBack={() => {
                 navigate('/');
                 setIsDrawerOpen(false);
@@ -683,6 +705,7 @@ function AppContent() {
             <FileCategoriesView
               totalPoolMB={state.totalPoolMB}
               apps={state.apps}
+              decimalPrecision={decimalPrecision}
               onBack={() => {
                 navigate('/');
                 setIsDrawerOpen(false);
@@ -693,6 +716,7 @@ function AppContent() {
               totalPoolMB={state.totalPoolMB}
               apps={state.apps}
               deletedFiles={state.deletedFiles || []}
+              decimalPrecision={decimalPrecision}
               onRestoreFile={handleRestoreFile}
               onPermanentDeleteFile={handlePermanentDeleteFile}
               onBack={() => {
@@ -710,10 +734,12 @@ function AppContent() {
                 navigate('/');
                 setIsDrawerOpen(false);
               }}
+              onSaveSettings={handleSettingsSave}
             />
           ) : selectedAppId && activeApp ? (
             <AppStorageDetails
               app={activeApp}
+              decimalPrecision={decimalPrecision}
               onBack={() => {
                 navigate('/');
                 setIsDrawerOpen(false);
@@ -729,6 +755,7 @@ function AppContent() {
               <StorageOverview
                 totalPoolMB={state.totalPoolMB}
                 usedStorageMB={totalUsedStorageMB}
+                decimalPrecision={decimalPrecision}
               />
 
               {/* Application Storage Cards Grid section */}
@@ -742,6 +769,7 @@ function AppContent() {
                   <AppCard
                     key={app.id}
                     app={app}
+                    decimalPrecision={decimalPrecision}
                     onManage={() => {
                       navigate(`/storage/${app.id}`);
                       setIsDrawerOpen(false);
@@ -755,6 +783,7 @@ function AppContent() {
                 totalPoolMB={state.totalPoolMB}
                 usedStorageMB={totalUsedStorageMB}
                 apps={state.apps}
+                decimalPrecision={decimalPrecision}
               />
 
               {/* Recent Activity Table Ledger */}
@@ -771,6 +800,7 @@ function AppContent() {
       {(activeApp && isDrawerOpen) && (
         <AppDrawer
           app={activeApp}
+          decimalPrecision={decimalPrecision}
           onClose={() => setIsDrawerOpen(false)}
           onUploadFile={handleUploadFile}
           onDeleteFile={handleDeleteFile}

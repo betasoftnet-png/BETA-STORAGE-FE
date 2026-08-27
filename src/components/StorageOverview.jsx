@@ -2,11 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Database, HardDrive } from 'lucide-react';
 
-export default function StorageOverview({ totalPoolMB, usedStorageMB }) {
+export default function StorageOverview({ totalPoolMB, usedStorageMB, decimalPrecision = 2 }) {
   const { t } = useTranslation();
-  const usedGB = (usedStorageMB / 1024).toFixed(1);
-  const totalGB = (totalPoolMB / 1024).toFixed(0);
-  const availableGB = ((totalPoolMB - usedStorageMB) / 1024).toFixed(1);
+  const usedGB = (usedStorageMB / 1024).toFixed(decimalPrecision);
+  const totalGB = (totalPoolMB / 1024).toFixed(decimalPrecision);
+  const availableGB = ((totalPoolMB - usedStorageMB) / 1024).toFixed(decimalPrecision);
   const usedPercent = totalPoolMB > 0 ? Math.round((usedStorageMB / totalPoolMB) * 100) : 0;
 
   // Donut SVG constants

@@ -1,8 +1,8 @@
 import React from 'react';
 import { GitFork } from 'lucide-react';
 
-export default function AllocationTree({ totalPoolMB, apps, onSelectApp, onAddApp }) {
-  const totalPoolGB = (totalPoolMB / 1024).toFixed(0);
+export default function AllocationTree({ totalPoolMB, apps, onSelectApp, onAddApp, decimalPrecision = 2 }) {
+  const totalPoolGB = (totalPoolMB / 1024).toFixed(decimalPrecision);
   
   // Calculate total allocated
   const totalAllocatedMB = apps.reduce((acc, app) => acc + app.allocatedMB, 0);
@@ -18,7 +18,7 @@ export default function AllocationTree({ totalPoolMB, apps, onSelectApp, onAddAp
       id: app.id,
       name: app.name.replace('BETA ', '').replace('BNX ', 'BNX').split(' ')[0], // short name e.g. "BNX", "CLIKS"
       fullName: app.name,
-      allocatedGB: (app.allocatedMB / 1024).toFixed(0) + ' GB',
+      allocatedGB: (app.allocatedMB / 1024).toFixed(decimalPrecision) + ' GB',
       color: app.colorTheme,
       rawMB: app.allocatedMB
     });
@@ -43,7 +43,7 @@ export default function AllocationTree({ totalPoolMB, apps, onSelectApp, onAddAp
     branches.push({
       type: 'future',
       name: 'FUTURE APP',
-      allocatedGB: `${(tempRemainingMB / 1024).toFixed(1)} GB`,
+      allocatedGB: `${(tempRemainingMB / 1024).toFixed(decimalPrecision)} GB`,
       color: '84, 101, 126',
       rawMB: tempRemainingMB
     });

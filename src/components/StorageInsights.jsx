@@ -2,11 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck, ShieldAlert } from 'lucide-react';
 
-export default function StorageInsights({ totalPoolMB, usedStorageMB, apps }) {
+export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, decimalPrecision = 2 }) {
   const { t } = useTranslation();
-  const totalUsedGB = (usedStorageMB / 1024).toFixed(1);
-  const totalCapacityGB = (totalPoolMB / 1024).toFixed(0);
-  const availableGB = ((totalPoolMB - usedStorageMB) / 1024).toFixed(1);
+  const totalUsedGB = (usedStorageMB / 1024).toFixed(decimalPrecision);
+  const totalCapacityGB = (totalPoolMB / 1024).toFixed(decimalPrecision);
+  const availableGB = ((totalPoolMB - usedStorageMB) / 1024).toFixed(decimalPrecision);
 
   // 1. Storage Distribution Data
   const appStats = apps.map(app => {
