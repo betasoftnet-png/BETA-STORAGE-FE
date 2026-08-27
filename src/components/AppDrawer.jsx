@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Search, Trash2, Upload, AlertCircle, Sparkles, FolderArchive, Eraser } from 'lucide-react';
 
-export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, onTriggerCleanup, onCompressLogs, decimalPrecision = 2 }) {
+export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, onTriggerCleanup, onCompressLogs, decimalPrecision = 2, showUsagePercent = true }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
   const [searchTerm, setSearchTerm] = useState('');
@@ -95,7 +95,7 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
             <span style={{ fontWeight: 600 }}>{t('drawer.allocationUsage')}</span>
             <span style={{ color: `rgb(${colorTheme})`, fontWeight: 'bold' }}>
-              {formatSize(usedMB)} / {formatSize(allocatedMB)} ({usedPercent}%)
+              {formatSize(usedMB)} / {formatSize(allocatedMB)}{showUsagePercent && ` (${usedPercent}%)`}
             </span>
           </div>
           <div className="progress-container">

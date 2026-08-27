@@ -6,7 +6,7 @@ import {
   LayoutGrid, Briefcase, Scale, Receipt, CreditCard, Users, Image
 } from 'lucide-react';
 
-export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh, decimalPrecision = 2 }) {
+export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh, decimalPrecision = 2, showUsagePercent = true }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
 
@@ -181,7 +181,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
               />
             </svg>
             <div className="donut-inner-text">
-              <span className="donut-inner-percent">{usedPercent}%</span>
+              {showUsagePercent && <span className="donut-inner-percent">{usedPercent}%</span>}
               <span className="donut-inner-label">{t('dashboard.used')}</span>
             </div>
           </div>
@@ -222,7 +222,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
               />
             </div>
             <div className="progress-bar-label">
-              {t('settings.manageApps.limitUsedLabel', { percent: usedPercent })} ({usedText} / {allocatedText})
+              {showUsagePercent ? `${t('settings.manageApps.limitUsedLabel', { percent: usedPercent })} (${usedText} / {allocatedText})` : `(${usedText} / {allocatedText})`}
             </div>
           </div>
         </div>

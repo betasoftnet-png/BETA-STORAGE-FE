@@ -201,15 +201,24 @@ function AppContent() {
     return 2;
   });
 
+  const [showUsagePercent, setShowUsagePercent] = useState(() => {
+    return localStorage.getItem('settings_show_usage_percent') !== 'false';
+  });
+
   const handleSettingsSave = (settings) => {
-    if (settings && settings.decimalPrecision) {
-      const precisionStr = settings.decimalPrecision;
-      let p = 2;
-      if (precisionStr === '0 digits') p = 0;
-      else if (precisionStr === '1 digit') p = 1;
-      else if (precisionStr === '2 digits') p = 2;
-      else if (precisionStr === '3 digits') p = 3;
-      setDecimalPrecision(p);
+    if (settings) {
+      if (settings.decimalPrecision) {
+        const precisionStr = settings.decimalPrecision;
+        let p = 2;
+        if (precisionStr === '0 digits') p = 0;
+        else if (precisionStr === '1 digit') p = 1;
+        else if (precisionStr === '2 digits') p = 2;
+        else if (precisionStr === '3 digits') p = 3;
+        setDecimalPrecision(p);
+      }
+      if (settings.showUsagePercent !== undefined) {
+        setShowUsagePercent(settings.showUsagePercent);
+      }
     }
   };
 
@@ -706,6 +715,7 @@ function AppContent() {
               totalPoolMB={state.totalPoolMB}
               apps={state.apps}
               decimalPrecision={decimalPrecision}
+              showUsagePercent={showUsagePercent}
               onBack={() => {
                 navigate('/');
                 setIsDrawerOpen(false);
@@ -716,6 +726,7 @@ function AppContent() {
               totalPoolMB={state.totalPoolMB}
               apps={state.apps}
               decimalPrecision={decimalPrecision}
+              showUsagePercent={showUsagePercent}
               onBack={() => {
                 navigate('/');
                 setIsDrawerOpen(false);
@@ -750,6 +761,7 @@ function AppContent() {
             <AppStorageDetails
               app={activeApp}
               decimalPrecision={decimalPrecision}
+              showUsagePercent={showUsagePercent}
               onBack={() => {
                 navigate('/');
                 setIsDrawerOpen(false);
@@ -766,6 +778,7 @@ function AppContent() {
                 totalPoolMB={state.totalPoolMB}
                 usedStorageMB={totalUsedStorageMB}
                 decimalPrecision={decimalPrecision}
+                showUsagePercent={showUsagePercent}
               />
 
               {/* Application Storage Cards Grid section */}
@@ -780,6 +793,7 @@ function AppContent() {
                     key={app.id}
                     app={app}
                     decimalPrecision={decimalPrecision}
+                    showUsagePercent={showUsagePercent}
                     onManage={() => {
                       navigate(`/storage/${app.id}`);
                       setIsDrawerOpen(false);
@@ -794,6 +808,7 @@ function AppContent() {
                 usedStorageMB={totalUsedStorageMB}
                 apps={state.apps}
                 decimalPrecision={decimalPrecision}
+                showUsagePercent={showUsagePercent}
               />
 
               {/* Recent Activity Table Ledger */}
@@ -811,6 +826,7 @@ function AppContent() {
         <AppDrawer
           app={activeApp}
           decimalPrecision={decimalPrecision}
+          showUsagePercent={showUsagePercent}
           onClose={() => setIsDrawerOpen(false)}
           onUploadFile={handleUploadFile}
           onDeleteFile={handleDeleteFile}

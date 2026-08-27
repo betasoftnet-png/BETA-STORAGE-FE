@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Database, HardDrive } from 'lucide-react';
 
-export default function StorageOverview({ totalPoolMB, usedStorageMB, decimalPrecision = 2 }) {
+export default function StorageOverview({ totalPoolMB, usedStorageMB, decimalPrecision = 2, showUsagePercent = true }) {
   const { t } = useTranslation();
   const usedGB = (usedStorageMB / 1024).toFixed(decimalPrecision);
   const totalGB = (totalPoolMB / 1024).toFixed(decimalPrecision);
@@ -45,7 +45,7 @@ export default function StorageOverview({ totalPoolMB, usedStorageMB, decimalPre
           />
         </svg>
         <div className="donut-inner-text">
-          <span className="donut-inner-percent">{usedPercent}%</span>
+          {showUsagePercent && <span className="donut-inner-percent">{usedPercent}%</span>}
           <span className="donut-inner-label">{t('dashboard.used')}</span>
         </div>
       </div>

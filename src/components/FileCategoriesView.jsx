@@ -42,7 +42,7 @@ export const classifyFile = (file) => {
   return 'Other';
 };
 
-export default function FileCategoriesView({ totalPoolMB, apps, onBack, decimalPrecision = 2 }) {
+export default function FileCategoriesView({ totalPoolMB, apps, onBack, decimalPrecision = 2, showUsagePercent = true }) {
   const [activeTab, setActiveTab] = useState('bnx-mail');
 
   const activeApp = apps.find(a => a.id === activeTab) || apps[0];
@@ -221,7 +221,7 @@ export default function FileCategoriesView({ totalPoolMB, apps, onBack, decimalP
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-            <span>{usedPercentOfAllocation}% of {formatCapacity(allocatedMB)} Pool</span>
+            <span>{showUsagePercent ? `${usedPercentOfAllocation}% of ` : ''}{formatCapacity(allocatedMB)} Pool</span>
             <span>Total Capacity: {formatCapacity(allocatedMB)}</span>
           </div>
         </div>

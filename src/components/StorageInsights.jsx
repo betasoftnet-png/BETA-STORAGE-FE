@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck, ShieldAlert } from 'lucide-react';
 
-export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, decimalPrecision = 2 }) {
+export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, decimalPrecision = 2, showUsagePercent = true }) {
   const { t } = useTranslation();
   const totalUsedGB = (usedStorageMB / 1024).toFixed(decimalPrecision);
   const totalCapacityGB = (totalPoolMB / 1024).toFixed(decimalPrecision);
@@ -175,7 +175,7 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, deci
                     <span className="legend-dot" style={{ backgroundColor: `rgb(${app.color})` }} />
                     {app.name}
                   </span>
-                  <span className="legend-value">{app.usedMB} MB ({app.percent}%)</span>
+                  <span className="legend-value">{app.usedMB} MB{showUsagePercent && ` (${app.percent}%)`}</span>
                 </div>
               ))}
             </div>
@@ -199,7 +199,7 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, deci
                     <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: cat.color }} />
                     {t(`dashboard.categories.${cat.name.toLowerCase()}`)}
                   </span>
-                  <span className="category-row-value">{cat.size} MB ({cat.percent}%)</span>
+                  <span className="category-row-value">{cat.size} MB{showUsagePercent && ` (${cat.percent}%)`}</span>
                 </div>
                 <div className="progress-container" style={{ height: '4px' }}>
                   <div

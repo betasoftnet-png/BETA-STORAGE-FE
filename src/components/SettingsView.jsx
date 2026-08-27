@@ -161,7 +161,8 @@ export default function SettingsView({
 
       if (onSaveSettings) {
         onSaveSettings({
-          decimalPrecision: defaultStates.decimalPrecision
+          decimalPrecision: defaultStates.decimalPrecision,
+          showUsagePercent: defaultStates.showUsagePercent
         });
       }
 
@@ -211,7 +212,8 @@ export default function SettingsView({
 
       if (onSaveSettings) {
         onSaveSettings({
-          decimalPrecision
+          decimalPrecision,
+          showUsagePercent
         });
       }
 

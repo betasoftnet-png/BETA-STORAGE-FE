@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, BarChart3, Database, HardDrive, AlertTriangle, Trash2, ArrowRight } from 'lucide-react';
 
-export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerCleanup, decimalPrecision = 2 }) {
+export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerCleanup, decimalPrecision = 2, showUsagePercent = true }) {
   const { t } = useTranslation();
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -168,9 +168,11 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
                       <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)' }}>
                         {formatSmart(seg.size)}
                       </span>
-                      <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: '500' }}>
-                        {t('storageUsage.pctOfPool', { percent: seg.percent.toFixed(0) })}
-                      </span>
+                      {showUsagePercent && (
+                        <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: '500' }}>
+                          {t('storageUsage.pctOfPool', { percent: seg.percent.toFixed(0) })}
+                        </span>
+                      )}
                     </div>
                   </div>
                 );

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-react';
 
-export default function AppCard({ app, onManage, decimalPrecision = 2 }) {
+export default function AppCard({ app, onManage, decimalPrecision = 2, showUsagePercent = true }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
 
@@ -73,7 +73,11 @@ export default function AppCard({ app, onManage, decimalPrecision = 2 }) {
 
         {/* Status indicator row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600 }}>
-          <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% {t('dashboard.used')}</span>
+          {showUsagePercent ? (
+            <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% {t('dashboard.used')}</span>
+          ) : (
+            <span /> // layout balance placeholder
+          )}
           <span className="app-card-health" style={{ color: healthColor }}>
             <span className="app-card-health-dot" style={{ backgroundColor: healthColor }} />
             {t(`dashboard.health.status${healthStatus}`)}
