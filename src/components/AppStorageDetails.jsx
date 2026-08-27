@@ -222,7 +222,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
               />
             </div>
             <div className="progress-bar-label">
-              {showUsagePercent ? `${t('settings.manageApps.limitUsedLabel', { percent: usedPercent })} (${usedText} / {allocatedText})` : `(${usedText} / {allocatedText})`}
+              {showUsagePercent && t('settings.manageApps.limitUsedLabel', { percent: usedPercent })}
             </div>
           </div>
         </div>
