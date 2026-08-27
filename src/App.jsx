@@ -235,6 +235,16 @@ function AppContent() {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Handle default view routing on root path
+  useEffect(() => {
+    if (location.pathname === '/') {
+      const defaultViewSetting = localStorage.getItem('settings_default_view') || 'Storage Overview';
+      if (defaultViewSetting === 'Recycle Bin') {
+        navigate('/recycle-bin', { replace: true });
+      }
+    }
+  }, [location.pathname, navigate]);
+
   const handleRefreshState = () => {
     setIsRefreshing(true);
     setTimeout(() => {
