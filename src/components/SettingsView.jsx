@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-  Settings, Shield, Bell, LayoutGrid, ChevronRight, ChevronDown, Save, 
+  Settings, Shield, Bell, LayoutGrid, ChevronRight, Save, 
   RotateCcw, Server, RefreshCw
 } from 'lucide-react';
 
@@ -37,7 +37,6 @@ export default function SettingsView({
 
   // 3. General -> Regional state
   const [selectedLanguage, setSelectedLanguage] = useState(() => localStorage.getItem('storageLanguage') || 'en');
-  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   // General -> Storage Display state
   const [storageUnit, setStorageUnit] = useState(() => localStorage.getItem('settings_storage_unit') || defaultStates.storageUnit);
   const [decimalPrecision, setDecimalPrecision] = useState(() => localStorage.getItem('settings_decimal_precision') || defaultStates.decimalPrecision);
@@ -431,98 +430,20 @@ export default function SettingsView({
               {/* CARD 1: REGIONAL */}
               <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
                 <h3 style={sectionHeaderStyle}>{t('settings.general.regionalTitle')}</h3>
-                
                 {/* Language Row */}
                 <div style={lastRowItemStyle}>
                   <span>{t('settings.general.languageLabel')}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', position: 'relative' }}>
-                    <button
-                      onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        padding: '4px 0px',
-                        fontSize: '0.85rem',
-                        fontWeight: '700',
-                        color: 'var(--text-main)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '2px',
-                        cursor: 'pointer',
-                        outline: 'none',
-                        fontFamily: 'inherit'
-                      }}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
+                    <select
+                      value={selectedLanguage}
+                      onChange={(e) => handleLanguageChange(e.target.value)}
+                      style={selectStyle}
                     >
-                      <span>{selectedLanguage === 'de' ? 'German' : selectedLanguage === 'es' ? 'Spanish' : 'English'}</span>
-                      <ChevronDown size={14} style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', marginTop: '2px' }} />
-                    </button>
-                    <ChevronRight size={14} style={{ color: '#cbd5e1', cursor: 'pointer', marginLeft: '2px' }} onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)} />
-
-                    {isLangDropdownOpen && (
-                      <>
-                        <div
-                          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
-                          onClick={() => setIsLangDropdownOpen(false)}
-                        />
-                        <div style={{
-                          position: 'absolute',
-                          right: '18px',
-                          top: '100%',
-                          marginTop: '4px',
-                          backgroundColor: '#ffffff',
-                          border: '1px solid #cbd5e1',
-                          boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
-                          zIndex: 100,
-                          minWidth: '95px',
-                          display: 'flex',
-                          flexDirection: 'column'
-                        }}>
-                          {[
-                            { code: 'en', label: 'English' },
-                            { code: 'de', label: 'German' },
-                            { code: 'es', label: 'Spanish' }
-                          ].map((opt) => {
-                            const isSel = selectedLanguage === opt.code;
-                            return (
-                              <button
-                                key={opt.code}
-                                onClick={() => {
-                                  handleLanguageChange(opt.code);
-                                  setIsLangDropdownOpen(false);
-                                }}
-                                style={{
-                                  border: 'none',
-                                  backgroundColor: isSel ? '#7f7f7f' : '#ffffff',
-                                  color: isSel ? '#ffffff' : '#4b5563',
-                                  padding: '6px 12px',
-                                  fontSize: '0.85rem',
-                                  fontWeight: '500',
-                                  textAlign: 'left',
-                                  cursor: 'pointer',
-                                  width: '100%',
-                                  fontFamily: 'inherit',
-                                  transition: 'background-color 0.15s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (!isSel) {
-                                    e.target.style.backgroundColor = '#f1f5f9';
-                                    e.target.style.color = '#1e293b';
-                                  }
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (!isSel) {
-                                    e.target.style.backgroundColor = '#ffffff';
-                                    e.target.style.color = '#4b5563';
-                                  }
-                                }}
-                              >
-                                {opt.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </>
-                    )}
+                      <option value="en">English</option>
+                      <option value="de">German</option>
+                      <option value="es">Spanish</option>
+                    </select>
+                    <ChevronRight size={14} style={{ color: '#94a3b8' }} />
                   </div>
                 </div>
               </div>
