@@ -42,7 +42,7 @@
     "environment": "Beta Environment • v1.0"
   },
   "dashboard": {
-    "title": "Beta Storage Ecosystem",
+    "title": "Beta",
     "totalEcosystemStorage": "Total Ecosystem Storage",
     "ofUsed": "of {{total}} GB Used",
     "usedStorage": "Used Storage",
