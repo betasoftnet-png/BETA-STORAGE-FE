@@ -158,29 +158,101 @@ function AppContent() {
   // Authentication & Current User State
   const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem('isAuthenticated') === 'true');
   const [currentUserEmail, setCurrentUserEmail] = useState(() => localStorage.getItem('currentUserEmail') || '');
+  const [signedInAccounts, setSignedInAccounts] = useState(() => {
+    try {
+      const stored = localStorage.getItem('signedInAccounts');
+      const accounts = stored ? JSON.parse(stored) : [];
+      const current = localStorage.getItem('currentUserEmail');
+      if (current && !accounts.includes(current)) {
+        accounts.push(current);
+        localStorage.setItem('signedInAccounts', JSON.stringify(accounts));
+      }
+      return accounts;
+    } catch (e) {
+      return [];
+    }
+  });
+  const [isAddingAccount, setIsAddingAccount] = useState(false);
 
   // Route guarding and redirection checking
   useEffect(() => {
     if (!isAuthenticated && location.pathname !== '/login') {
       navigate('/login');
-    } else if (isAuthenticated && (location.pathname === '/login' || location.pathname === '/dashboard')) {
+    } else if (isAuthenticated && location.pathname === '/login' && !isAddingAccount) {
+      navigate('/');
+    } else if (isAuthenticated && location.pathname === '/dashboard') {
       navigate('/');
     }
-  }, [isAuthenticated, location.pathname, navigate]);
+  }, [isAuthenticated, location.pathname, navigate, isAddingAccount]);
+
+  // Reset isAddingAccount if navigating away from /login
+  useEffect(() => {
+    if (location.pathname !== '/login') {
+      setIsAddingAccount(false);
+    }
+  }, [location.pathname]);
 
   const handleLoginSuccess = (email) => {
     setCurrentUserEmail(email);
     setIsAuthenticated(true);
+    
+    // Add account to list of signed-in accounts
+    setSignedInAccounts(prev => {
+      const updated = prev.includes(email) ? prev : [...prev, email];
+      localStorage.setItem('signedInAccounts', JSON.stringify(updated));
+      return updated;
+    });
+
+    setIsAddingAccount(false);
     navigate('/');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('currentUserEmail');
-    setIsAuthenticated(false);
-    setCurrentUserEmail('');
+  const handleSwitchAccount = (email) => {
+    setCurrentUserEmail(email);
+    localStorage.setItem('currentUserEmail', email);
+    localStorage.setItem('isAuthenticated', 'true');
+    setIsAuthenticated(true);
+  };
+
+  const handleAddAccount = () => {
+    setIsAddingAccount(true);
     navigate('/login');
   };
+
+  const handleSignOutThis = () => {
+    setSignedInAccounts(prev => {
+      const updated = prev.filter(acc => acc !== currentUserEmail);
+      localStorage.setItem('signedInAccounts', JSON.stringify(updated));
+      
+      if (updated.length > 0) {
+        const nextEmail = updated[0];
+        setCurrentUserEmail(nextEmail);
+        localStorage.setItem('currentUserEmail', nextEmail);
+        localStorage.setItem('isAuthenticated', 'true');
+        setIsAuthenticated(true);
+      } else {
+        setCurrentUserEmail('');
+        setIsAuthenticated(false);
+        localStorage.removeItem('currentUserEmail');
+        localStorage.removeItem('isAuthenticated');
+        navigate('/login');
+      }
+      
+      return updated;
+    });
+  };
+
+  const handleSignOutAll = () => {
+    setSignedInAccounts([]);
+    setCurrentUserEmail('');
+    setIsAuthenticated(false);
+    localStorage.removeItem('signedInAccounts');
+    localStorage.removeItem('currentUserEmail');
+    localStorage.removeItem('isAuthenticated');
+    navigate('/login');
+  };
+
+  const handleLogout = handleSignOutAll;
 
   // Extract selectedAppId from URL pathname: e.g. /storage/bnx-mail -> bnx-mail
   const match = location.pathname.match(/^\/storage\/([^/]+)$/);
@@ -580,6 +652,11 @@ function AppContent() {
           isRefreshing={isRefreshing}
           onRefresh={handleRefreshState}
           currentUserEmail={currentUserEmail}
+          signedInAccounts={signedInAccounts}
+          onSwitchAccount={handleSwitchAccount}
+          onAddAccount={handleAddAccount}
+          onSignOutThis={handleSignOutThis}
+          onSignOutAll={handleSignOutAll}
           onLogout={handleLogout}
         />
       </div>

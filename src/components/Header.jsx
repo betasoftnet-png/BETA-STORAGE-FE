@@ -7,6 +7,11 @@ export default function Header({
   isRefreshing, 
   onRefresh,
   currentUserEmail,
+  signedInAccounts = [],
+  onSwitchAccount,
+  onAddAccount,
+  onSignOutThis,
+  onSignOutAll,
   onLogout
 }) {
   const { t } = useTranslation();
@@ -71,11 +76,43 @@ export default function Header({
 
             <hr className="profile-card-divider" />
 
+            {/* Other signed-in accounts switcher */}
+            {signedInAccounts.filter(acc => acc !== email).length > 0 && (
+              <>
+                <div className="profile-switch-accounts">
+                  <div className="switch-accounts-title">{t('header.switchAccount', 'Switch Account')}</div>
+                  {signedInAccounts.filter(acc => acc !== email).map(accEmail => {
+                    const accUsername = accEmail.split('@')[0];
+                    const accAvatarChar = accUsername.charAt(0).toUpperCase();
+                    return (
+                      <div 
+                        key={accEmail} 
+                        className="switch-account-row" 
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          if (onSwitchAccount) onSwitchAccount(accEmail);
+                        }}
+                      >
+                        <div className="switch-account-avatar">{accAvatarChar}</div>
+                        <div className="switch-account-info">
+                          <span className="switch-account-email">{accEmail}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <hr className="profile-card-divider" style={{ margin: '0.25rem 0 0 0' }} />
+              </>
+            )}
+
             <div className="profile-card-menu">
               <button 
                 type="button" 
                 className="profile-menu-item" 
-                onClick={() => onLogout()}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  if (onAddAccount) onAddAccount();
+                }}
               >
                 <UserPlus size={16} />
                 <span>{t('header.addAnotherAccount')}</span>
@@ -84,7 +121,10 @@ export default function Header({
               <button 
                 type="button" 
                 className="profile-menu-item" 
-                onClick={() => onLogout()}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  if (onSignOutThis) onSignOutThis();
+                }}
               >
                 <LogOut size={16} />
                 <span>{t('header.signOutThis')}</span>
@@ -93,7 +133,10 @@ export default function Header({
               <button 
                 type="button" 
                 className="profile-menu-item danger" 
-                onClick={() => onLogout()}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  if (onSignOutAll) onSignOutAll();
+                }}
               >
                 <LogOut size={16} />
                 <span>{t('header.signOutAll')}</span>
