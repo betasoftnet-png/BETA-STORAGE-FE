@@ -591,7 +591,7 @@ function AppContent() {
           <Menu size={20} />
         </button>
         <div className="mobile-brand">
-          <img src="/logo.png" alt="BETA" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+          <img src="/logo.png" alt="BETA" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
           <span>BETA ECOSYSTEM</span>
         </div>
         <div style={{ width: '20px' }} /> {/* alignment balance */}

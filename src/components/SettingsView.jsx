@@ -81,7 +81,6 @@ export default function SettingsView({
     showRecentActivity: true,
     showStorageAlerts: true,
     theme: 'System',
-    compactLayout: false,
   };
 
   // 3. General -> Regional state
@@ -100,7 +99,6 @@ export default function SettingsView({
 
   // General -> Appearance state
   const [theme, setTheme] = useState(() => localStorage.getItem('settings_theme') || defaultStates.theme);
-  const [compactLayout, setCompactLayout] = useState(() => localStorage.getItem('settings_compact_layout') === 'true');
 
   // Privacy States
   const [encryptionEnabled, setEncryptionEnabled] = useState(() => localStorage.getItem('settings_privacy_encryption') === 'true');
@@ -157,7 +155,6 @@ export default function SettingsView({
       setShowRecentActivity(defaultStates.showRecentActivity);
       setShowStorageAlerts(defaultStates.showStorageAlerts);
       setTheme(defaultStates.theme);
-      setCompactLayout(defaultStates.compactLayout);
 
       if (onSaveSettings) {
         onSaveSettings({
@@ -195,7 +192,6 @@ export default function SettingsView({
       localStorage.setItem('settings_show_recent_activity', showRecentActivity.toString());
       localStorage.setItem('settings_show_storage_alerts', showStorageAlerts.toString());
       localStorage.setItem('settings_theme', theme);
-      localStorage.setItem('settings_compact_layout', compactLayout.toString());
 
       // Apply theme changes to document
       if (theme === 'Dark') {
@@ -720,7 +716,7 @@ export default function SettingsView({
                 <h3 style={sectionHeaderStyle}>{t('settings.general.appearanceTitle')}</h3>
 
                 {/* Theme Radio */}
-                <div style={rowItemStyle}>
+                <div style={lastRowItemStyle}>
                   <span>{t('settings.general.themeLabel')}</span>
                   <div style={{ display: 'flex', gap: '1.25rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 'bold' }}>
@@ -751,18 +747,6 @@ export default function SettingsView({
                       {t('settings.general.dark')}
                     </label>
                   </div>
-                </div>
-
-                {/* Compact Layout Row */}
-                <div style={lastRowItemStyle}>
-                  <span>{t('settings.general.compactLayoutLabel')}</span>
-                  <button 
-                    onClick={() => setCompactLayout(!compactLayout)}
-                    style={toggleBtnStyle(compactLayout)}
-                  >
-                    <span style={{ fontSize: '0.65rem' }}>{compactLayout ? '●' : '○'}</span>
-                    <span>{compactLayout ? t('common.on') : t('common.off')}</span>
-                  </button>
                 </div>
               </div>
 
