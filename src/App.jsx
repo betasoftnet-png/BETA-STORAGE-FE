@@ -3,7 +3,7 @@ import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-
 import { useTranslation } from 'react-i18next';
 import {
   Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder,
-  Search, Trash2, Bell, Settings, Server, RefreshCw, Check, Menu, LogOut
+  Search, Trash2, Settings, Server, RefreshCw, Check, Menu, LogOut
 } from 'lucide-react';
 import Header from './components/Header';
 import StorageOverview from './components/StorageOverview';
@@ -640,11 +640,6 @@ function AppContent() {
 
             <div className="menu-group">
               <span className="menu-label">{t('sidebar.systemGroup')}</span>
-              <span className="menu-item" style={{ justifyContent: 'space-between' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Bell size={16} /> {t('sidebar.alerts')}
-                </span>
-              </span>
               <span
                 className={`menu-item ${location.pathname === '/settings' ? 'active' : ''}`}
                 onClick={() => {
