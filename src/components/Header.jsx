@@ -12,7 +12,8 @@ export default function Header({
   onAddAccount,
   onSignOutThis,
   onSignOutAll,
-  onLogout
+  onLogout,
+  onManageAccount
 }) {
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -67,7 +68,10 @@ export default function Header({
               <button 
                 type="button" 
                 className="profile-manage-btn" 
-                onClick={() => alert('Simulated: Open Account Settings Dialog')}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  if (onManageAccount) onManageAccount();
+                }}
               >
                 <User size={14} />
                 <span>{t('header.manageAccount')}</span>

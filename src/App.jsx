@@ -17,6 +17,7 @@ import FileCategoriesView from './components/FileCategoriesView';
 import RecycleBinView from './components/RecycleBinView';
 import SettingsView from './components/SettingsView';
 import Login from './components/Login';
+import AccountManagementView from './components/AccountManagementView';
 
 // Load or return reference default state
 const getInitialState = () => {
@@ -643,6 +644,19 @@ function AppContent() {
     return <Login onLoginSuccess={handleLoginSuccess} />;
   }
 
+  if (location.pathname === '/security') {
+    return (
+      <AccountManagementView
+        key={currentUserEmail}
+        currentUserEmail={currentUserEmail}
+        onBack={() => navigate('/')}
+        onLogout={handleLogout}
+        totalPoolMB={state.totalPoolMB}
+        apps={state.apps}
+      />
+    );
+  }
+
   return (
     <div className="app-layout-container">
       {/* Global Top Navbar */}
@@ -658,6 +672,7 @@ function AppContent() {
           onSignOutThis={handleSignOutThis}
           onSignOutAll={handleSignOutAll}
           onLogout={handleLogout}
+          onManageAccount={() => navigate('/security')}
         />
       </div>
 
