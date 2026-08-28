@@ -157,12 +157,14 @@ export default function SettingsView({
       setTheme(defaultStates.theme);
 
       localStorage.setItem('settings_show_app_status', defaultStates.showAppStatus.toString());
+      localStorage.setItem('settings_show_recent_activity', defaultStates.showRecentActivity.toString());
 
       if (onSaveSettings) {
         onSaveSettings({
           decimalPrecision: defaultStates.decimalPrecision,
           showUsagePercent: defaultStates.showUsagePercent,
-          showAppStatus: defaultStates.showAppStatus
+          showAppStatus: defaultStates.showAppStatus,
+          showRecentActivity: defaultStates.showRecentActivity
         });
       }
 
@@ -213,7 +215,8 @@ export default function SettingsView({
         onSaveSettings({
           decimalPrecision,
           showUsagePercent,
-          showAppStatus
+          showAppStatus,
+          showRecentActivity
         });
       }
 

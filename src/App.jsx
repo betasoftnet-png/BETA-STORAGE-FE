@@ -282,6 +282,10 @@ function AppContent() {
     return localStorage.getItem('settings_show_app_status') !== 'false';
   });
 
+  const [showRecentActivity, setShowRecentActivity] = useState(() => {
+    return localStorage.getItem('settings_show_recent_activity') !== 'false';
+  });
+
   const handleSettingsSave = (settings) => {
     if (settings) {
       if (settings.decimalPrecision) {
@@ -298,6 +302,9 @@ function AppContent() {
       }
       if (settings.showAppStatus !== undefined) {
         setShowAppStatus(settings.showAppStatus);
+      }
+      if (settings.showRecentActivity !== undefined) {
+        setShowRecentActivity(settings.showRecentActivity);
       }
     }
   };
@@ -913,10 +920,12 @@ function AppContent() {
               />
 
               {/* Recent Activity Table Ledger */}
-              <ActivityFeed
-                activities={state.activities}
-                onViewActivity={() => { }}
-              />
+              {showRecentActivity && (
+                <ActivityFeed
+                  activities={state.activities}
+                  onViewActivity={() => { }}
+                />
+              )}
             </>
           )}
         </div>
