@@ -107,7 +107,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   flex-shrink: 0;
-  border-right: none;
+  border-right: 1px solid var(--border-color);
   height: 100%;
 }
 
@@ -2301,7 +2301,7 @@ body {
 .account-mgmt-sidebar {
   width: 280px;
   background-color: #ffffff;
-  border-right: none;
+  border-right: 1px solid #e2e8f0;
   padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
