@@ -661,7 +661,7 @@ export default function AccountManagementView({
       {/* Top Navbar */}
       <header className="account-mgmt-navbar">
         <div className="navbar-brand-account">
-          <div className="b2-logo">B2</div>
+          <img src="/logo.png" alt="Beta Logo" className="navbar-logo-account" />
           <span className="account-title-label">Account</span>
         </div>
         <div className="navbar-controls-account">
