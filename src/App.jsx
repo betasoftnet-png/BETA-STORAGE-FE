@@ -3,7 +3,7 @@ import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-
 import { useTranslation } from 'react-i18next';
 import {
   Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder,
-  Search, Trash2, Settings, Server, RefreshCw, Check, Menu, LogOut
+  Search, Trash2, Settings, Server, RefreshCw, Check, Menu, LogOut, AlertCircle
 } from 'lucide-react';
 import Header from './components/Header';
 import StorageOverview from './components/StorageOverview';
@@ -286,6 +286,10 @@ function AppContent() {
     return localStorage.getItem('settings_show_recent_activity') !== 'false';
   });
 
+  const [showStorageAlerts, setShowStorageAlerts] = useState(() => {
+    return localStorage.getItem('settings_show_storage_alerts') !== 'false';
+  });
+
   const handleSettingsSave = (settings) => {
     if (settings) {
       if (settings.decimalPrecision) {
@@ -305,6 +309,9 @@ function AppContent() {
       }
       if (settings.showRecentActivity !== undefined) {
         setShowRecentActivity(settings.showRecentActivity);
+      }
+      if (settings.showStorageAlerts !== undefined) {
+        setShowStorageAlerts(settings.showStorageAlerts);
       }
     }
   };
@@ -363,8 +370,14 @@ function AppContent() {
     const used = app.files.reduce((sum, f) => sum + f.size, 0);
     return app.allocatedMB > 0 && (used / app.allocatedMB) >= 0.9;
   });
+  const hasWarning = state.apps.some(app => {
+    const used = app.files.reduce((sum, f) => sum + f.size, 0);
+    return app.allocatedMB > 0 && (used / app.allocatedMB) >= 0.75 && (used / app.allocatedMB) < 0.9;
+  });
   if (hasCritical || (totalUsedStorageMB / state.totalPoolMB) >= 0.85) {
     systemHealth = 'critical';
+  } else if (hasWarning || (totalUsedStorageMB / state.totalPoolMB) >= 0.7) {
+    systemHealth = 'warning';
   }
 
   // Callbacks
@@ -880,6 +893,33 @@ function AppContent() {
             />
           ) : (
             <>
+              {/* Storage Alert Banner */}
+              {showStorageAlerts && systemHealth !== 'healthy' && (
+                <div style={{
+                  padding: '1rem 1.5rem',
+                  borderRadius: '12px',
+                  backgroundColor: systemHealth === 'critical' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                  border: `1px solid ${systemHealth === 'critical' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
+                  color: systemHealth === 'critical' ? '#991b1b' : '#92400e',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  fontSize: '0.88rem',
+                  fontWeight: '600'
+                }}>
+                  <AlertCircle size={20} style={{ color: systemHealth === 'critical' ? '#ef4444' : '#f59e0b', flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontWeight: '800', textTransform: 'uppercase', marginRight: '0.5rem' }}>
+                      {systemHealth === 'critical' ? t('dashboard.health.criticalTitle') : t('dashboard.health.warningTitle')}
+                    </span>
+                    <span>
+                      {systemHealth === 'critical' ? t('dashboard.health.criticalDesc') : t('dashboard.health.warningDesc')}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Total Ecosystem Storage wide card banner */}
               <StorageOverview
                 totalPoolMB={state.totalPoolMB}
@@ -917,6 +957,7 @@ function AppContent() {
                 apps={state.apps}
                 decimalPrecision={decimalPrecision}
                 showUsagePercent={showUsagePercent}
+                showStorageAlerts={showStorageAlerts}
               />
 
               {/* Recent Activity Table Ledger */}

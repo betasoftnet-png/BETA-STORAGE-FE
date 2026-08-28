@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck, ShieldAlert } from 'lucide-react';
 
-export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, decimalPrecision = 2, showUsagePercent = true }) {
+export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, decimalPrecision = 2, showUsagePercent = true, showStorageAlerts = true }) {
   const { t } = useTranslation();
   const totalUsedGB = (usedStorageMB / 1024).toFixed(decimalPrecision);
   const totalCapacityGB = (totalPoolMB / 1024).toFixed(decimalPrecision);
@@ -219,15 +219,17 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, deci
           </div>
 
           <div className="health-layout">
-            <div className="health-status-box" style={{ backgroundColor: healthBg, borderColor: healthBorder }}>
-              <div className="health-status-icon" style={{ backgroundColor: healthIconBg, color: healthIconColor }}>
-                <HealthIcon size={24} />
+            {showStorageAlerts && (
+              <div className="health-status-box" style={{ backgroundColor: healthBg, borderColor: healthBorder }}>
+                <div className="health-status-icon" style={{ backgroundColor: healthIconBg, color: healthIconColor }}>
+                  <HealthIcon size={24} />
+                </div>
+                <div className="health-status-info">
+                  <h4 style={{ color: healthTitleColor }}>{healthTitle}</h4>
+                  <p style={{ color: healthDescColor }}>{healthDesc}</p>
+                </div>
               </div>
-              <div className="health-status-info">
-                <h4 style={{ color: healthTitleColor }}>{healthTitle}</h4>
-                <p style={{ color: healthDescColor }}>{healthDesc}</p>
-              </div>
-            </div>
+            )}
 
             <div className="health-metrics-row">
               <div className="health-metric-col">

@@ -158,13 +158,15 @@ export default function SettingsView({
 
       localStorage.setItem('settings_show_app_status', defaultStates.showAppStatus.toString());
       localStorage.setItem('settings_show_recent_activity', defaultStates.showRecentActivity.toString());
+      localStorage.setItem('settings_show_storage_alerts', defaultStates.showStorageAlerts.toString());
 
       if (onSaveSettings) {
         onSaveSettings({
           decimalPrecision: defaultStates.decimalPrecision,
           showUsagePercent: defaultStates.showUsagePercent,
           showAppStatus: defaultStates.showAppStatus,
-          showRecentActivity: defaultStates.showRecentActivity
+          showRecentActivity: defaultStates.showRecentActivity,
+          showStorageAlerts: defaultStates.showStorageAlerts
         });
       }
 
@@ -216,7 +218,8 @@ export default function SettingsView({
           decimalPrecision,
           showUsagePercent,
           showAppStatus,
-          showRecentActivity
+          showRecentActivity,
+          showStorageAlerts
         });
       }
 
