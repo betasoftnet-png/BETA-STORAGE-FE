@@ -6,7 +6,7 @@ import {
   LayoutGrid, Briefcase, Scale, Receipt, CreditCard, Users, Image
 } from 'lucide-react';
 
-export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh, decimalPrecision = 2, showUsagePercent = true }) {
+export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh, decimalPrecision = 2, showUsagePercent = true, showAppStatus = true }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
 
@@ -201,26 +201,23 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
               <span className="val">{allocatedText}</span>
               <span className="lbl">{t('dashboard.totalCapacity')}</span>
             </div>
-            <div className="metric-col">
-              <span className="val" style={{ color: healthColor, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: healthColor, display: 'inline-block' }} />
-                {t(`dashboard.health.status${healthStatus}`)}
-              </span>
-              <span className="lbl">{t(`dashboard.health.${healthDescKey}`)}</span>
-            </div>
+            {showAppStatus ? (
+              <div className="metric-col">
+                <span className="val" style={{ color: healthColor, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: healthColor, display: 'inline-block' }} />
+                  {t(`dashboard.health.status${healthStatus}`)}
+                </span>
+                <span className="lbl">{t(`dashboard.health.${healthDescKey}`)}</span>
+              </div>
+            ) : (
+              <div className="metric-col">
+                <span className="val" style={{ color: 'var(--text-muted)' }}>—</span>
+                <span className="lbl">{t('dashboard.health.title')}</span>
+              </div>
+            )}
           </div>
 
           <div className="progress-bar-wrapper">
-            <div className="progress-container" style={{ height: '8px', borderRadius: '4px' }}>
-              <div
-                className="progress-bar"
-                style={{
-                  width: `${usedPercent}%`,
-                  backgroundColor: `rgb(${colorTheme})`,
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
             <div className="progress-bar-label">
               {showUsagePercent && t('settings.manageApps.limitUsedLabel', { percent: usedPercent })}
             </div>

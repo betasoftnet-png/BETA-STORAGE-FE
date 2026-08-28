@@ -210,16 +210,6 @@ export default function FileCategoriesView({ totalPoolMB, apps, onBack, decimalP
 
         {/* Progress Bar out of Product Capacity */}
         <div style={{ marginTop: '1.5rem' }}>
-          <div className="progress-container" style={{ height: '10px', borderRadius: '5px' }}>
-            <div
-              className="progress-bar"
-              style={{
-                width: `${usedPercentOfAllocation}%`,
-                backgroundColor: `rgb(${colorTheme})`,
-                borderRadius: '5px'
-              }}
-            />
-          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
             <span>{showUsagePercent ? `${usedPercentOfAllocation}% of ` : ''}{formatCapacity(allocatedMB)} Pool</span>
             <span>Total Capacity: {formatCapacity(allocatedMB)}</span>

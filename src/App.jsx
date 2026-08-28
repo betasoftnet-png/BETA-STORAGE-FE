@@ -278,6 +278,10 @@ function AppContent() {
     return localStorage.getItem('settings_show_usage_percent') !== 'false';
   });
 
+  const [showAppStatus, setShowAppStatus] = useState(() => {
+    return localStorage.getItem('settings_show_app_status') !== 'false';
+  });
+
   const handleSettingsSave = (settings) => {
     if (settings) {
       if (settings.decimalPrecision) {
@@ -291,6 +295,9 @@ function AppContent() {
       }
       if (settings.showUsagePercent !== undefined) {
         setShowUsagePercent(settings.showUsagePercent);
+      }
+      if (settings.showAppStatus !== undefined) {
+        setShowAppStatus(settings.showAppStatus);
       }
     }
   };
@@ -854,6 +861,7 @@ function AppContent() {
               app={activeApp}
               decimalPrecision={decimalPrecision}
               showUsagePercent={showUsagePercent}
+              showAppStatus={showAppStatus}
               onBack={() => {
                 navigate('/');
                 setIsDrawerOpen(false);
@@ -886,6 +894,7 @@ function AppContent() {
                     app={app}
                     decimalPrecision={decimalPrecision}
                     showUsagePercent={showUsagePercent}
+                    showAppStatus={showAppStatus}
                     onManage={() => {
                       navigate(`/storage/${app.id}`);
                       setIsDrawerOpen(false);

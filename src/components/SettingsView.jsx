@@ -156,10 +156,13 @@ export default function SettingsView({
       setShowStorageAlerts(defaultStates.showStorageAlerts);
       setTheme(defaultStates.theme);
 
+      localStorage.setItem('settings_show_app_status', defaultStates.showAppStatus.toString());
+
       if (onSaveSettings) {
         onSaveSettings({
           decimalPrecision: defaultStates.decimalPrecision,
-          showUsagePercent: defaultStates.showUsagePercent
+          showUsagePercent: defaultStates.showUsagePercent,
+          showAppStatus: defaultStates.showAppStatus
         });
       }
 
@@ -209,7 +212,8 @@ export default function SettingsView({
       if (onSaveSettings) {
         onSaveSettings({
           decimalPrecision,
-          showUsagePercent
+          showUsagePercent,
+          showAppStatus
         });
       }
 

@@ -98,15 +98,6 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
               {formatSize(usedMB)} / {formatSize(allocatedMB)}{showUsagePercent && ` (${usedPercent}%)`}
             </span>
           </div>
-          <div className="progress-container">
-            <div 
-              className="progress-bar" 
-              style={{ 
-                width: `${Math.min(100, usedPercent)}%`,
-                background: `rgb(${colorTheme})` 
-              }}
-            />
-          </div>
         </div>
 
         {/* Simulated upload section */}

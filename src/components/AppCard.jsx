@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-react';
 
-export default function AppCard({ app, onManage, decimalPrecision = 2, showUsagePercent = true }) {
+export default function AppCard({ app, onManage, decimalPrecision = 2, showUsagePercent = true, showAppStatus = true }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
 
@@ -61,16 +61,6 @@ export default function AppCard({ app, onManage, decimalPrecision = 2, showUsage
           <span style={{ color: 'var(--text-muted)' }}>{freeMB.toFixed(decimalPrecision)} MB {t('storageUsage.free')}</span>
         </div>
 
-        <div className="progress-container" style={{ marginBottom: '0.65rem' }}>
-          <div
-            className="progress-bar"
-            style={{
-              width: `${Math.min(100, usedPercent)}%`,
-              backgroundColor: `rgb(${colorTheme})`
-            }}
-          />
-        </div>
-
         {/* Status indicator row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600 }}>
           {showUsagePercent ? (
@@ -78,10 +68,12 @@ export default function AppCard({ app, onManage, decimalPrecision = 2, showUsage
           ) : (
             <span /> // layout balance placeholder
           )}
-          <span className="app-card-health" style={{ color: healthColor }}>
-            <span className="app-card-health-dot" style={{ backgroundColor: healthColor }} />
-            {t(`dashboard.health.status${healthStatus}`)}
-          </span>
+          {showAppStatus && (
+            <span className="app-card-health" style={{ color: healthColor }}>
+              <span className="app-card-health-dot" style={{ backgroundColor: healthColor }} />
+              {t(`dashboard.health.status${healthStatus}`)}
+            </span>
+          )}
         </div>
       </div>
 
