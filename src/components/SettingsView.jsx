@@ -528,32 +528,6 @@ export default function SettingsView({
             </span>
           </button>
 
-          {/* Tab 3: Notifications */}
-          <button
-            onClick={() => setActiveCategory('notifications')}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.15rem',
-              width: '100%',
-              padding: '0.75rem 0.85rem',
-              borderRadius: '10px',
-              border: 'none',
-              background: activeCategory === 'notifications' ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'none',
-              color: activeCategory === 'notifications' ? '#ffffff' : 'var(--text-main)',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              textAlign: 'left'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.88rem' }}>
-              <Bell size={15} />
-              {t('settings.notifications.title')}
-            </div>
-            <span style={{ fontSize: '0.7rem', color: activeCategory === 'notifications' ? 'rgba(255,255,255,0.75)' : '#64748b', paddingLeft: '1.45rem', fontWeight: 500 }}>
-              {t('settings.notifications.subtitle')}
-            </span>
-          </button>
 
           {/* Tab 4: Manage Apps */}
           <button
@@ -1283,78 +1257,6 @@ export default function SettingsView({
             </div>
           )}
 
-          {/* NOTIFICATIONS TAB CONTENT */}
-          {activeCategory === 'notifications' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div>
-                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>{t('settings.notifications.title')}</h2>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>{t('settings.notifications.subtitle')}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: statusColor }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: statusColor, display: 'inline-block' }} />
-                  <span>{statusMessage}</span>
-                </div>
-              </div>
-
-              <div className="glass-card" style={{ padding: '1.5rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <h3 style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, borderBottom: '1px solid var(--border-light)', paddingBottom: '0.5rem' }}>
-                  {t('settings.notifications.alertConfigTitle')}
-                </h3>
-
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '700', marginBottom: '0.35rem' }}>
-                    <span>{t('settings.notifications.warningThresholdLabel')}</span>
-                    <span style={{ color: '#f59e0b' }}>{warningThreshold}%</span>
-                  </div>
-                  <input 
-                    type="range"
-                    min="50"
-                    max="89"
-                    value={warningThreshold}
-                    onChange={(e) => setWarningThreshold(parseInt(e.target.value))}
-                    style={{ width: '100%', accentColor: '#f59e0b' }}
-                  />
-                </div>
-
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '700', marginBottom: '0.35rem' }}>
-                    <span>{t('settings.notifications.criticalThresholdLabel')}</span>
-                    <span style={{ color: '#ef4444' }}>{criticalThreshold}%</span>
-                  </div>
-                  <input 
-                    type="range"
-                    min="90"
-                    max="99"
-                    value={criticalThreshold}
-                    onChange={(e) => setCriticalThreshold(parseInt(e.target.value))}
-                    style={{ width: '100%', accentColor: '#ef4444' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '1rem' }}>
-                  <span>{t('settings.notifications.emailAlertsLabel')}</span>
-                  <button 
-                    onClick={() => setEmailAlerts(!emailAlerts)}
-                    style={toggleBtnStyle(emailAlerts)}
-                  >
-                    <span style={{ fontSize: '0.65rem' }}>{emailAlerts ? '●' : '○'}</span>
-                    <span>{emailAlerts ? t('common.on') : t('common.off')}</span>
-                  </button>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '0.5rem' }}>
-                <button 
-                  onClick={handleSaveNotifications}
-                  disabled={isSaving}
-                  className="btn-primary" 
-                  style={{ width: 'auto', padding: '0.65rem 1.5rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px' }}
-                >
-                  {isSaving ? <RefreshCw size={14} className="spin" /> : <Save size={14} />}
-                  {t('common.saveChanges')}
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* MANAGE APPS TAB CONTENT */}
           {activeCategory === 'apps' && (
