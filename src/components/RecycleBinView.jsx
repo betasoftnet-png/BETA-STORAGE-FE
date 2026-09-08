@@ -113,8 +113,19 @@ export default function RecycleBinView({ totalPoolMB, apps, deletedFiles, onRest
       <div className="details-header" style={{ marginBottom: '1.75rem', gap: '1.5rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="details-header-title">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: '42px', height: '42px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.08)', display: 'flex', alignItems: 'center', justify: 'center', color: '#ef4444' }}>
-              <Trash2 size={22} />
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ef4444',
+              flexShrink: 0
+            }}>
+              <Trash2 size={22} style={{ display: 'block' }} />
             </div>
             <div>
               <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>{t('sidebar.recycleBin')}</h2>

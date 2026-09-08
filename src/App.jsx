@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder,
+  Cloud, Home, Mail, Layers, Briefcase, BarChart3, Folder, LayoutGrid,
   Search, Trash2, Settings, Server, RefreshCw, Check, Menu, LogOut, AlertCircle
 } from 'lucide-react';
 import Header from './components/Header';
@@ -18,6 +18,7 @@ import RecycleBinView from './components/RecycleBinView';
 import SettingsView from './components/SettingsView';
 import Login from './components/Login';
 import AccountManagementView from './components/AccountManagementView';
+import ManageAppsView from './components/ManageAppsView';
 
 // Load or return reference default state
 const getInitialState = () => {
@@ -795,6 +796,16 @@ function AppContent() {
               >
                 <Trash2 size={16} /> {t('sidebar.recycleBin')}
               </span>
+              <span
+                className={`menu-item ${location.pathname === '/manage-apps' ? 'active' : ''}`}
+                onClick={() => {
+                  navigate('/manage-apps');
+                  setIsDrawerOpen(false);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <LayoutGrid size={16} /> Manage Apps
+              </span>
             </div>
 
             <div className="menu-group">
@@ -875,6 +886,13 @@ function AppContent() {
                 setIsDrawerOpen(false);
               }}
               onSaveSettings={handleSettingsSave}
+            />
+          ) : location.pathname === '/manage-apps' ? (
+            <ManageAppsView
+              totalPoolMB={state.totalPoolMB}
+              apps={state.apps}
+              onResizePool={handleResizePool}
+              onUpdateAllocation={handleUpdateAllocation}
             />
           ) : selectedAppId && activeApp ? (
             <AppStorageDetails

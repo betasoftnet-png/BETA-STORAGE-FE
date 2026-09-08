@@ -1,18 +1,30 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import translationEN from './en.json';
-import translationDE from './de.json';
-import translationES from './es.json';
+import translationTA from './ta.json';
+import translationTE from './te.json';
+import translationKN from './kn.json';
+import translationML from './ml.json';
+import translationHI from './hi.json';
 
 const resources = {
   en: {
     translation: translationEN
   },
-  de: {
-    translation: translationDE
+  ta: {
+    translation: translationTA
   },
-  es: {
-    translation: translationES
+  te: {
+    translation: translationTE
+  },
+  kn: {
+    translation: translationKN
+  },
+  ml: {
+    translation: translationML
+  },
+  hi: {
+    translation: translationHI
   }
 };
 

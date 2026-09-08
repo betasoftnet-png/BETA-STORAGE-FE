@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import ManageAppsView from './ManageAppsView';
 import { 
   Settings, Shield, Bell, LayoutGrid, ChevronRight, ChevronDown, Check, Save, 
   RotateCcw, Server, RefreshCw, Lock, Layers, Users, Mail, FileText, Briefcase, 
@@ -21,8 +22,11 @@ export default function SettingsView({
   const dropdownRef = useRef(null);
   const languagesList = [
     { code: 'en', label: 'English' },
-    { code: 'de', label: 'German' },
-    { code: 'es', label: 'Spanish' }
+    { code: 'ta', label: 'Tamil' },
+    { code: 'te', label: 'Telugu' },
+    { code: 'kn', label: 'Kannada' },
+    { code: 'ml', label: 'Malayalam' },
+    { code: 'hi', label: 'Hindi' }
   ];
 
   const [isPrecisionOpen, setIsPrecisionOpen] = useState(false);
@@ -558,7 +562,7 @@ export default function SettingsView({
         </div>
 
         {/* Right Settings Content Area */}
-        <div style={{ padding: '2rem 3rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'rgba(255, 255, 255, 0.2)', overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
+        <div style={{ padding: '2rem 3rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
           
           {/* GENERAL TAB CONTENT */}
           {activeCategory === 'general' && (
@@ -585,7 +589,7 @@ export default function SettingsView({
                       className="lang-dropdown-trigger"
                     >
                       <span>
-                        {selectedLanguage === 'en' ? 'English' : selectedLanguage === 'de' ? 'German' : 'Spanish'}
+                        {languagesList.find(l => l.code === selectedLanguage)?.label || 'English'}
                       </span>
                       <ChevronDown
                         size={14}
@@ -966,7 +970,7 @@ export default function SettingsView({
                     padding: '1.4rem 1.6rem', 
                     display: 'flex', 
                     flexDirection: 'column', 
-                    justify: 'space-between'
+                    justifyContent: 'space-between'
                   }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
@@ -1074,11 +1078,10 @@ export default function SettingsView({
                 <h3 style={sectionHeaderStyle}>{t('settings.privacy.applicationAccess')}</h3>
                 <div className="privacy-card" style={{ padding: 0, overflow: 'hidden' }}>
                   {[
-                    { name: 'BNX Mail', desc: 'Emails & attachments', icon: Mail, type: 'mail' },
-                    { name: 'Cliks', desc: 'Files & documents', icon: FileText, type: 'cliks' },
-                    { name: 'Cliks Business', desc: 'Business files', icon: Briefcase, type: 'business' },
+                    { name: 'BNX Mail', desc: 'Emails & attachments', logo: '/bnx_mail_logo.png', type: 'mail' },
+                    { name: 'Cliks', desc: 'Files & documents', logo: '/cliks_logo.png', type: 'cliks' },
+                    { name: 'Cliks Business', desc: 'Business files', logo: '/cliks_business_logo.png', type: 'business' },
                   ].map((app, index, array) => {
-                    const AppIcon = app.icon;
                     const isLast = index === array.length - 1;
                     const isAppAllowed = appPermissions[app.name] !== false;
                     return (
@@ -1098,14 +1101,14 @@ export default function SettingsView({
                             width: '40px', 
                             height: '40px', 
                             borderRadius: '10px', 
-                            backgroundColor: app.type === 'mail' ? 'rgba(37, 99, 235, 0.1)' : app.type === 'cliks' ? 'rgba(14, 165, 233, 0.1)' : 'rgba(139, 92, 246, 0.1)',
+                            backgroundColor: app.type === 'mail' ? 'rgba(37, 99, 235, 0.08)' : app.type === 'cliks' ? 'rgba(14, 165, 233, 0.08)' : 'rgba(139, 92, 246, 0.08)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: app.type === 'mail' ? '#2563eb' : app.type === 'cliks' ? '#0ea5e9' : '#8b5cf6',
+                            border: '1px solid var(--border-color)',
                             boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                           }}>
-                            <AppIcon size={20} />
+                            <img src={app.logo} alt={app.name} style={{ width: '22px', height: '22px', objectFit: 'contain' }} />
                           </div>
                           <div>
                             <div style={{ fontSize: '0.9rem', fontWeight: 750, color: 'var(--text-main)' }}>{app.name}</div>
@@ -1158,7 +1161,7 @@ export default function SettingsView({
                     padding: '1.25rem 1.4rem', 
                     display: 'flex', 
                     flexDirection: 'column', 
-                    justify: 'space-between',
+                    justifyContent: 'space-between',
                     minHeight: '140px'
                   }}>
                     <div>
@@ -1187,7 +1190,7 @@ export default function SettingsView({
                     padding: '1.25rem 1.4rem', 
                     display: 'flex', 
                     flexDirection: 'column', 
-                    justify: 'space-between',
+                    justifyContent: 'space-between',
                     minHeight: '140px'
                   }}>
                     <div>
@@ -1216,7 +1219,7 @@ export default function SettingsView({
                     padding: '1.25rem 1.4rem', 
                     display: 'flex', 
                     flexDirection: 'column', 
-                    justify: 'space-between',
+                    justifyContent: 'space-between',
                     minHeight: '140px'
                   }}>
                     <div>
@@ -1260,95 +1263,12 @@ export default function SettingsView({
 
           {/* MANAGE APPS TAB CONTENT */}
           {activeCategory === 'apps' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div>
-                <h2 style={{ fontSize: '1.4rem', fontWeight: '850', color: 'var(--text-main)', margin: 0 }}>{t('settings.manageApps.title')}</h2>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>{t('settings.manageApps.subtitle')}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: statusColor }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: statusColor, display: 'inline-block' }} />
-                  <span>{statusMessage}</span>
-                </div>
-              </div>
-
-              {/* Pool Size Section */}
-              <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', backgroundColor: 'rgba(37, 99, 235, 0.03)', padding: '1.25rem', borderRadius: '12px', border: '1px dashed rgba(37, 99, 235, 0.2)' }}>
-                <Server size={28} style={{ color: '#2563eb' }} />
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '0.25rem', color: 'var(--text-muted)' }}>
-                    {t('settings.manageApps.capacityPoolLabel')}
-                  </label>
-                  <input 
-                    type="number"
-                    min={Math.ceil(totalAllocatedGB)}
-                    className="form-control"
-                    value={poolGB}
-                    onChange={(e) => setPoolGB(Math.max(Math.ceil(totalAllocatedGB), parseInt(e.target.value) || 1))}
-                    style={{ width: '120px', padding: '6px 10px', fontSize: '0.85rem', fontWeight: 'bold', height: 'auto', borderRadius: '6px' }}
-                  />
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t('settings.manageApps.unallocatedSpaceLabel')}:</span>
-                  <span style={{ fontSize: '1.2rem', fontWeight: '900', display: 'block', color: '#10b981' }}>{unallocatedGB} GB</span>
-                </div>
-              </div>
-
-              <div className="glass-card" style={{ padding: '1.5rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, borderBottom: '1px solid var(--border-light)', paddingBottom: '0.5rem' }}>
-                  {t('settings.manageApps.appAllocationTitle')}
-                </h3>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  {apps.map(app => {
-                    const currentUsedMB = app.files.reduce((acc, f) => acc + f.size, 0);
-                    const currentLimitGB = appAllocations[app.id] || Math.round(app.allocatedMB / 1024);
-                    const currentUsedGB = currentUsedMB / 1024;
-                    const appPercent = currentLimitGB > 0 ? Math.round((currentUsedGB / currentLimitGB) * 100) : 0;
-                    
-                    const minSliderGB = Math.max(1, Math.ceil(currentUsedGB));
-                    const maxSliderGB = poolGB - (totalAllocatedGB - currentLimitGB);
-
-                    return (
-                      <div key={app.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '0.85rem', fontWeight: '800', color: `rgb(${app.colorTheme})` }}>{app.name}</span>
-                          <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main)' }}>
-                            {t('settings.manageApps.appLimitLabel', { appLimit: currentLimitGB })}
-                          </span>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
-                          <input 
-                            type="range"
-                            min={minSliderGB}
-                            max={Math.max(minSliderGB, Math.floor(maxSliderGB))}
-                            step="1"
-                            value={currentLimitGB}
-                            className="settings-slider"
-                            onChange={(e) => handleAppSliderChange(app.id, parseInt(e.target.value), minSliderGB)}
-                            style={{ accentColor: `rgb(${app.colorTheme})`, flex: 1 }}
-                          />
-                          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, minWidth: '45px', textAlign: 'right' }}>
-                            {t('settings.manageApps.limitUsedLabel', { percent: appPercent })}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '0.5rem' }}>
-                <button 
-                  onClick={handleSaveAppAllocations}
-                  disabled={isSaving}
-                  className="btn-primary" 
-                  style={{ width: 'auto', padding: '0.65rem 1.5rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px' }}
-                >
-                  {isSaving ? <RefreshCw size={14} className="spin" /> : <Save size={14} />}
-                  {t('common.saveChanges')}
-                </button>
-              </div>
-            </div>
+            <ManageAppsView
+              totalPoolMB={totalPoolMB}
+              apps={apps}
+              onResizePool={onResizePool}
+              onUpdateAllocation={onUpdateAllocation}
+            />
           )}
 
         </div>
@@ -1397,7 +1317,11 @@ export default function SettingsView({
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', backgroundColor: 'rgba(37, 99, 235, 0.04)', borderRadius: '12px', border: '1px solid rgba(37, 99, 235, 0.15)' }}>
-                  <ShieldCheck size={28} style={{ color: '#2563eb' }} />
+                  <img 
+                    src={selectedAppForManage === 'BNX Mail' ? '/bnx_mail_logo.png' : selectedAppForManage === 'Cliks' ? '/cliks_logo.png' : '/cliks_business_logo.png'} 
+                    alt={selectedAppForManage} 
+                    style={{ width: '28px', height: '28px', objectFit: 'contain' }} 
+                  />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 750, fontSize: '0.95rem', color: 'var(--text-main)' }}>{selectedAppForManage}</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
