@@ -44,8 +44,17 @@ export async function getStorageQuota(bnxAccessToken) {
   }
 
   const result = await response.json();
-  if (result && result.data) {
-    return result.data;
+  const data = result?.data || result;
+
+  if (data && (data.storageUsed !== undefined || data.used !== undefined || data.usedBytes !== undefined || data.storage_used !== undefined || data.email)) {
+    const normalized = {
+      email: data.email || '',
+      storageUsed: Number(data.storageUsed ?? data.used ?? data.usedBytes ?? data.storage_used ?? 0),
+      storageLimit: Number(data.storageLimit ?? data.limit ?? data.limitBytes ?? data.storage_limit ?? 5368709120),
+      storagePercentage: Number(data.storagePercentage ?? data.percentage ?? data.storage_percentage ?? data.usedPercentage ?? 0)
+    };
+    console.log('[BNX Storage API] Successfully received storage quota:', normalized);
+    return normalized;
   }
 
   throw new Error(result?.message || 'Invalid API response format');

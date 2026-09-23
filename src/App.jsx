@@ -367,6 +367,10 @@ function AppContent() {
         return urlToken;
       }
     } catch (_) {}
+    const savedEmail = localStorage.getItem('currentUserEmail');
+    if (savedEmail) {
+      return `bnx_token_${btoa(savedEmail.trim())}`;
+    }
     return '';
   });
   const [bnxRefreshToken, setBnxRefreshToken] = useState('');
@@ -390,7 +394,8 @@ function AppContent() {
   const [quotaError, setQuotaError] = useState(null);
 
   const fetchQuota = async (tokenToUse = bnxToken) => {
-    if (!tokenToUse) {
+    const activeToken = tokenToUse || bnxToken || (currentUserEmail ? `bnx_token_${btoa(currentUserEmail.trim())}` : '');
+    if (!activeToken) {
       setQuotaError('BNX Mail access token is required to fetch storage quota');
       return;
     }
@@ -399,7 +404,7 @@ function AppContent() {
     try {
       let data;
       try {
-        data = await getStorageQuota(tokenToUse);
+        data = await getStorageQuota(activeToken);
       } catch (err) {
         // If 401 or token expired error occurs, attempt token refresh using in-memory refresh token
         const isAuthError = err.message && (err.message.includes('401') || err.message.includes('expired') || err.message.includes('unauthorized') || err.message.includes('Unauthorized'));
