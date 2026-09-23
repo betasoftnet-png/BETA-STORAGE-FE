@@ -20,6 +20,7 @@ import Login from './components/Login';
 import AccountManagementView from './components/AccountManagementView';
 import ManageAppsView from './components/ManageAppsView';
 import { getStorageQuota } from './services/storageService';
+import { refreshAccessToken } from './services/authService';
 import { formatBytes } from './utils/storage';
 
 // Load or return real-time storage state
@@ -124,10 +125,29 @@ function AppContent() {
     }
   }, [location.pathname]);
 
-  const handleLoginSuccess = (email, token) => {
-    if (token) {
-      setBnxToken(token);
+  const handleLoginSuccess = (email, accessToken, refreshToken) => {
+    // 1. Immediately wipe any previous user storage state to ensure strict isolation
+    setState(prev => ({
+      ...prev,
+      apps: prev.apps.map(app => {
+        if (app.id === 'bnx-mail') {
+          const { usedBytes, allocatedBytes, storagePercentage, usedMB, ...rest } = app;
+          return { ...rest, files: [] };
+        }
+        return app;
+      }),
+      activities: [],
+      deletedFiles: []
+    }));
+
+    // 2. Set the newly authenticated user's access & refresh tokens in-memory
+    if (accessToken) {
+      setBnxToken(accessToken);
     }
+    if (refreshToken) {
+      setBnxRefreshToken(refreshToken);
+    }
+
     setCurrentUserEmail(email);
     setIsAuthenticated(true);
     
@@ -143,6 +163,19 @@ function AppContent() {
   };
 
   const handleSwitchAccount = (email) => {
+    // Clear storage info on account switch until new token is loaded
+    setBnxToken('');
+    setBnxRefreshToken('');
+    setState(prev => ({
+      ...prev,
+      apps: prev.apps.map(app => {
+        if (app.id === 'bnx-mail') {
+          const { usedBytes, allocatedBytes, storagePercentage, usedMB, ...rest } = app;
+          return { ...rest, files: [] };
+        }
+        return app;
+      })
+    }));
     setCurrentUserEmail(email);
     localStorage.setItem('currentUserEmail', email);
     localStorage.setItem('isAuthenticated', 'true');
@@ -155,6 +188,22 @@ function AppContent() {
   };
 
   const handleSignOutThis = () => {
+    // Clear in-memory tokens and storage state
+    setBnxToken('');
+    setBnxRefreshToken('');
+    setState(prev => ({
+      ...prev,
+      apps: prev.apps.map(app => {
+        if (app.id === 'bnx-mail') {
+          const { usedBytes, allocatedBytes, storagePercentage, usedMB, ...rest } = app;
+          return { ...rest, files: [] };
+        }
+        return app;
+      }),
+      activities: [],
+      deletedFiles: []
+    }));
+
     setSignedInAccounts(prev => {
       const updated = prev.filter(acc => acc !== currentUserEmail);
       localStorage.setItem('signedInAccounts', JSON.stringify(updated));
@@ -178,6 +227,21 @@ function AppContent() {
   };
 
   const handleSignOutAll = () => {
+    // Wipe all in-memory tokens and storage data
+    setBnxToken('');
+    setBnxRefreshToken('');
+    setState(prev => ({
+      ...prev,
+      apps: prev.apps.map(app => {
+        if (app.id === 'bnx-mail') {
+          const { usedBytes, allocatedBytes, storagePercentage, usedMB, ...rest } = app;
+          return { ...rest, files: [] };
+        }
+        return app;
+      }),
+      activities: [],
+      deletedFiles: []
+    }));
     setSignedInAccounts([]);
     setCurrentUserEmail('');
     setIsAuthenticated(false);
@@ -292,7 +356,7 @@ function AppContent() {
     }
   }, [location.pathname, navigate]);
 
-  // In-memory secure BNX Mail access token (never stored in localStorage/sessionStorage)
+  // In-memory secure BNX Mail tokens (never stored in localStorage/sessionStorage)
   const [bnxToken, setBnxToken] = useState(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -305,12 +369,16 @@ function AppContent() {
     } catch (_) {}
     return '';
   });
+  const [bnxRefreshToken, setBnxRefreshToken] = useState('');
 
   // Listen to secure postMessage token transfers from BNX Mail / ecosystem shell
   useEffect(() => {
     const handleTokenMessage = (event) => {
       if (event.data && typeof event.data === 'object' && event.data.type === 'BNX_AUTH_TOKEN' && event.data.token) {
         setBnxToken(event.data.token);
+        if (event.data.refreshToken) {
+          setBnxRefreshToken(event.data.refreshToken);
+        }
       }
     };
     window.addEventListener('message', handleTokenMessage);
@@ -329,7 +397,32 @@ function AppContent() {
     setIsLoadingQuota(true);
     setQuotaError(null);
     try {
-      const data = await getStorageQuota(tokenToUse);
+      let data;
+      try {
+        data = await getStorageQuota(tokenToUse);
+      } catch (err) {
+        // If 401 or token expired error occurs, attempt token refresh using in-memory refresh token
+        const isAuthError = err.message && (err.message.includes('401') || err.message.includes('expired') || err.message.includes('unauthorized') || err.message.includes('Unauthorized'));
+        if (isAuthError && bnxRefreshToken) {
+          try {
+            const refreshed = await refreshAccessToken(bnxRefreshToken);
+            if (refreshed && refreshed.accessToken) {
+              setBnxToken(refreshed.accessToken);
+              if (refreshed.refreshToken) {
+                setBnxRefreshToken(refreshed.refreshToken);
+              }
+              data = await getStorageQuota(refreshed.accessToken);
+            }
+          } catch (refreshErr) {
+            console.warn('Token refresh failed, logging out:', refreshErr.message);
+            handleLogout();
+            throw new Error('Session expired. Please log in again.');
+          }
+        } else {
+          throw err;
+        }
+      }
+
       if (data) {
         if (data.email) {
           setCurrentUserEmail(data.email);
