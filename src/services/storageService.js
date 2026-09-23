@@ -3,7 +3,15 @@
  * Integrates with BNX Mail backend storage quota API
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined' && window.location.hostname.includes('beta-softnet.com')) {
+    return 'https://mail.beta-softnet.com';
+  }
+  return '';
+};
 
 /**
  * Fetch storage quota for the authenticated user
@@ -26,7 +34,8 @@ export async function getStorageQuota(bnxAccessToken) {
     'Authorization': authHeader
   };
 
-  const response = await fetch(`${API_BASE_URL}/api/mail/storage-quota`, {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(`${baseUrl}/api/mail/storage-quota`, {
     method: 'GET',
     headers,
     credentials: 'include'

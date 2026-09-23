@@ -1,6 +1,12 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
+  }
+  return '';
+};
 
 export async function loginUser(email, password) {
+  const API_BASE_URL = getApiBaseUrl();
   // On static hosting domains without a local auth server (e.g. storage.beta-softnet.com),
   // directly generate the authenticated in-memory session token to prevent static server 405 Method Not Allowed error
   if (!API_BASE_URL && typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
