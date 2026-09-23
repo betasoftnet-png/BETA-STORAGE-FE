@@ -187,7 +187,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
       {/* 3. Summary Panel Card */}
       <div className="glass-card details-summary-card">
         <div className="summary-left-donut">
-          <div style={{ position: 'relative', width: '110px', height: '110px' }}>
+          <div style={{ position: 'relative', width: '110px', height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="110" height="110" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)' }}>
               <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" strokeWidth="8" />
               <circle
@@ -203,10 +203,6 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                 style={{ transition: 'stroke-dashoffset 0.5s ease-in-out' }}
               />
             </svg>
-            <div className="donut-inner-text">
-              {showUsagePercent && <span className="donut-inner-percent">{usedPercent}%</span>}
-              <span className="donut-inner-label">{t('dashboard.used')}</span>
-            </div>
           </div>
         </div>
 
@@ -242,7 +238,9 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
 
           <div className="progress-bar-wrapper">
             <div className="progress-bar-label">
-              {showUsagePercent && t('settings.manageApps.limitUsedLabel', { percent: usedPercent })}
+              {showUsagePercent && t('settings.manageApps.limitUsedLabel', { 
+                percent: typeof usedPercent === 'number' ? (usedPercent < 0.01 && usedPercent > 0 ? parseFloat(usedPercent.toFixed(4)) : parseFloat(usedPercent.toFixed(decimalPrecision))) : usedPercent 
+              })}
             </div>
           </div>
         </div>

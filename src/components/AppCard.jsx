@@ -88,7 +88,9 @@ export default function AppCard({ app, onManage, decimalPrecision = 2, showUsage
         {/* Status indicator row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600 }}>
           {showUsagePercent ? (
-            <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% {t('dashboard.used')}</span>
+            <span style={{ color: `rgb(${colorTheme})` }}>
+              {typeof usedPercent === 'number' ? (usedPercent < 0.01 && usedPercent > 0 ? parseFloat(usedPercent.toFixed(4)) : parseFloat(usedPercent.toFixed(decimalPrecision))) : usedPercent}% {t('dashboard.used')}
+            </span>
           ) : (
             <span />
           )}
