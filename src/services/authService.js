@@ -2,7 +2,7 @@ const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
   }
-  return '';
+  return 'https://api.bnxmail.com';
 };
 
 export async function loginUser(email, password) {

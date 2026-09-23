@@ -7,10 +7,7 @@ const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
   }
-  if (typeof window !== 'undefined' && window.location.hostname.includes('beta-softnet.com')) {
-    return 'https://mail.beta-softnet.com';
-  }
-  return '';
+  return 'https://api.bnxmail.com';
 };
 
 /**
