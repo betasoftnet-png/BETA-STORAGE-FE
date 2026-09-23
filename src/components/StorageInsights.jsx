@@ -10,11 +10,11 @@ export default function StorageInsights({ totalPoolMB, usedStorageMB, apps, deci
 
   // 1. Storage Distribution Data
   const appStats = apps.map(app => {
-    const used = app.files.reduce((sum, f) => sum + f.size, 0);
+    const used = app.usedBytes !== undefined ? (app.usedBytes / (1024 * 1024)) : (app.files ? app.files.reduce((sum, f) => sum + f.size, 0) : 0);
     const percent = usedStorageMB > 0 ? Math.round((used / usedStorageMB) * 100) : 0;
     return {
       name: app.name,
-      usedMB: used,
+      usedMB: Math.round(used * 100) / 100,
       percent,
       color: app.colorTheme
     };

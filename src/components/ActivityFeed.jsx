@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Activity, Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-react';
 
-export default function ActivityFeed({ activities, onViewActivity }) {
+export default function ActivityFeed({ activities = [], onViewActivity }) {
   const { t } = useTranslation();
 
   // Map icons
@@ -36,9 +36,9 @@ export default function ActivityFeed({ activities, onViewActivity }) {
   // Translate action words in the feed
   const getActivityLabel = (act) => {
     const lower = act.toLowerCase();
-    if (lower.includes('upload')) return t('appStorageDetails.uploaded');
-    if (lower.includes('delet')) return t('common.delete');
-    if (lower.includes('restor')) return t('common.restore');
+    if (lower.includes('upload')) return t('appStorageDetails.uploaded', 'Uploaded');
+    if (lower.includes('delet')) return t('common.delete', 'Deleted');
+    if (lower.includes('restor')) return t('common.restore', 'Restored');
     return act;
   };
 
@@ -47,93 +47,107 @@ export default function ActivityFeed({ activities, onViewActivity }) {
       <div className="card-title" style={{ justifyContent: 'space-between', alignItems: 'center', border: 'none', padding: 0, marginBottom: '0.75rem' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Activity size={18} style={{ color: 'var(--accent-blue)' }} />
-          {t('activity.title')}
+          {t('activity.title', 'Recent Activity')}
         </span>
       </div>
 
       <div style={{ flexGrow: 1, overflowX: 'auto' }}>
-        <table className="activity-table">
-          <thead>
-            <tr>
-              <th className="activity-th">{t('activity.app')}</th>
-              <th className="activity-th">{t('activity.act')}</th>
-              <th className="activity-th">{t('activity.details')}</th>
-              <th className="activity-th" style={{ textAlign: 'left' }}>{t('activity.change')}</th>
-              <th className="activity-th" style={{ textAlign: 'left' }}>{t('activity.time')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {activities.map((activity, index) => {
-              const isPositive = activity.diff.startsWith('+');
-              const diffColor = isPositive ? '#2563eb' : '#ef4444'; // blue for +, red for -
-              const parsed = parseDescription(activity.description);
+        {activities.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-dim)' }}>
+            <Activity size={32} style={{ marginBottom: '0.75rem', strokeWidth: '1.5', opacity: 0.5, margin: '0 auto 0.5rem auto' }} />
+            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-main)' }}>
+              No recent storage activity yet
+            </p>
+            <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Actions like uploading, deleting, or restoring files will appear here in real time.
+            </p>
+          </div>
+        ) : (
+          <table className="activity-table">
+            <thead>
+              <tr>
+                <th className="activity-th">{t('activity.app')}</th>
+                <th className="activity-th">{t('activity.act')}</th>
+                <th className="activity-th">{t('activity.details')}</th>
+                <th className="activity-th" style={{ textAlign: 'left' }}>{t('activity.change')}</th>
+                <th className="activity-th" style={{ textAlign: 'left' }}>{t('activity.time')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activities.map((activity, index) => {
+                const isPositive = activity.diff.startsWith('+');
+                const diffColor = isPositive ? '#2563eb' : '#ef4444'; // blue for +, red for -
+                const parsed = parseDescription(activity.description);
 
-              return (
-                <tr className="activity-tr" key={index}>
-                  {/* Application */}
-                  <td className="activity-td" style={{ minWidth: '150px' }}>
-                    <div className="activity-td-app">
-                      <div 
-                        className="activity-app-icon"
-                        style={{ 
-                          backgroundColor: `rgba(${activity.colorTheme}, 0.1)`, 
-                          color: `rgb(${activity.colorTheme})` 
-                        }}
-                      >
-                        {getAppIcon(activity.appName)}
+                return (
+                  <tr className="activity-tr" key={index}>
+                    {/* Application */}
+                    <td className="activity-td" style={{ minWidth: '150px' }}>
+                      <div className="activity-td-app">
+                        <div 
+                          className="activity-app-icon"
+                          style={{ 
+                            backgroundColor: `rgba(${activity.colorTheme}, 0.1)`, 
+                            color: `rgb(${activity.colorTheme})` 
+                          }}
+                        >
+                          {getAppIcon(activity.appName)}
+                        </div>
+                        <span className="activity-app-name">
+                          {activity.appName}
+                        </span>
                       </div>
-                      <span className="activity-app-name">
-                        {activity.appName}
-                      </span>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Activity */}
-                  <td className="activity-td" style={{ minWidth: '140px' }}>
-                    <span className="activity-td-desc">{getActivityLabel(parsed.activity)}</span>
-                  </td>
+                    {/* Activity */}
+                    <td className="activity-td" style={{ minWidth: '140px' }}>
+                      <span className="activity-td-desc">{getActivityLabel(parsed.activity)}</span>
+                    </td>
 
-                  {/* File / Details */}
-                  <td className="activity-td" style={{ minWidth: '180px' }}>
-                    <span className="activity-td-file">{parsed.detail}</span>
-                  </td>
+                    {/* File / Details */}
+                    <td className="activity-td" style={{ minWidth: '180px' }}>
+                      <span className="activity-td-file">{parsed.detail}</span>
+                    </td>
 
-                  {/* Change */}
-                  <td className="activity-td activity-td-diff" style={{ color: diffColor, width: '100px' }}>
-                    {activity.diff}
-                  </td>
+                    {/* Change */}
+                    <td className="activity-td activity-td-diff" style={{ color: diffColor, width: '100px' }}>
+                      {activity.diff}
+                    </td>
 
-                  {/* Time */}
-                  <td className="activity-td activity-td-time" style={{ width: '90px' }}>
-                    {activity.time}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    {/* Time */}
+                    <td className="activity-td activity-td-time" style={{ width: '90px' }}>
+                      {activity.time}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border-light)', paddingTop: '1rem', marginTop: '1rem' }}>
-        <button 
-          onClick={onViewActivity}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--accent-blue)',
-            fontFamily: 'var(--font-sans)',
-            fontSize: '0.85rem',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.25rem'
-          }}
-          className="app-card-link"
-        >
-          {t('activity.viewAll')} <ArrowRight size={14} />
-        </button>
-      </div>
+      {activities.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border-light)', paddingTop: '1rem', marginTop: '1rem' }}>
+          <button 
+            onClick={onViewActivity}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--accent-blue)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.85rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem'
+            }}
+            className="app-card-link"
+          >
+            {t('activity.viewAll')} <ArrowRight size={14} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

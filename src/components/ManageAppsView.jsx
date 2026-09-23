@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Server, Mail, Layers, Briefcase, Save, RefreshCw, ExternalLink } from 'lucide-react';
+import { Mail, Layers, Briefcase, Save, RefreshCw, ExternalLink } from 'lucide-react';
 
 export default function ManageAppsView({
   totalPoolMB = 5120,
@@ -85,65 +85,6 @@ export default function ManageAppsView({
         )}
       </div>
 
-      {/* CAPACITY POOL CARD */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: 'rgba(248, 250, 252, 0.95)',
-        border: '1px solid #e2e8f0',
-        borderRadius: '16px',
-        padding: '1.25rem 1.75rem',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <div style={{
-            width: '46px',
-            height: '46px',
-            borderRadius: '12px',
-            border: '1px solid #cbd5e1',
-            backgroundColor: '#ffffff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#2563eb'
-          }}>
-            <Server size={22} />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <label style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600 }}>
-              Total Capacity Pool Size (GB)
-            </label>
-            <input
-              type="number"
-              min={Math.max(1, Math.ceil(totalAllocatedGB))}
-              value={poolGB}
-              onChange={(e) => setPoolGB(Math.max(1, parseInt(e.target.value) || 1))}
-              style={{
-                width: '120px',
-                padding: '0.45rem 0.75rem',
-                fontSize: '1rem',
-                fontWeight: 700,
-                color: '#1e293b',
-                backgroundColor: '#ffffff',
-                border: '1px solid #cbd5e1',
-                borderRadius: '8px',
-                outline: 'none'
-              }}
-            />
-          </div>
-        </div>
-
-        <div style={{ textAlign: 'right' }}>
-          <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600, display: 'block' }}>
-            Unallocated Space:
-          </span>
-          <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#10b981', marginTop: '0.1rem', display: 'block' }}>
-            {unallocatedGB} GB
-          </span>
-        </div>
-      </div>
 
       {/* CONNECTED APP ALLOCATION LIMITS SECTION */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '0.5rem' }}>

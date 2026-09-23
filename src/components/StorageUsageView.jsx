@@ -12,9 +12,9 @@ export default function StorageUsageView({ totalPoolMB, apps, onBack, onTriggerC
   const cliksBusiness = apps.find(a => a.id === 'cliks-business');
 
   // Compute used space for each app
-  const bnxUsedMB = bnxMail ? bnxMail.files.reduce((sum, f) => sum + f.size, 0) : 0;
-  const cliksUsedMB = cliks ? cliks.files.reduce((sum, f) => sum + f.size, 0) : 0;
-  const cliksBusinessUsedMB = cliksBusiness ? cliksBusiness.files.reduce((sum, f) => sum + f.size, 0) : 0;
+  const bnxUsedMB = bnxMail ? (bnxMail.usedBytes !== undefined ? (bnxMail.usedBytes / (1024 * 1024)) : bnxMail.files.reduce((sum, f) => sum + f.size, 0)) : 0;
+  const cliksUsedMB = cliks ? (cliks.usedBytes !== undefined ? (cliks.usedBytes / (1024 * 1024)) : cliks.files.reduce((sum, f) => sum + f.size, 0)) : 0;
+  const cliksBusinessUsedMB = cliksBusiness ? (cliksBusiness.usedBytes !== undefined ? (cliksBusiness.usedBytes / (1024 * 1024)) : cliksBusiness.files.reduce((sum, f) => sum + f.size, 0)) : 0;
 
   const totalUsedMB = bnxUsedMB + cliksUsedMB + cliksBusinessUsedMB;
   const availableMB = Math.max(0, totalPoolMB - totalUsedMB);

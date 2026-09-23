@@ -1,17 +1,28 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, LayoutGrid, Briefcase, HelpCircle, ArrowRight } from 'lucide-react';
+import { formatBytes } from '../utils/storage';
 
 export default function AppCard({ app, onManage, decimalPrecision = 2, showUsagePercent = true, showAppStatus = true }) {
   const { t } = useTranslation();
-  const { id, name, category, allocatedMB, files, colorTheme } = app;
+  const { id, name, category, allocatedMB, files, colorTheme, usedBytes, allocatedBytes, storagePercentage } = app;
 
-  // Calculate sizes
-  const usedMB = files.reduce((acc, f) => acc + f.size, 0);
-  const usedPercent = allocatedMB > 0 ? Math.round((usedMB / allocatedMB) * 100) : 0;
-  const freeMB = Math.max(0, allocatedMB - usedMB);
+  // Calculate sizes (prioritizing backend bytes if provided, otherwise file sum)
+  const filesUsedMB = files ? files.reduce((acc, f) => acc + f.size, 0) : 0;
+  const totalAllocatedBytes = allocatedBytes !== undefined ? allocatedBytes : allocatedMB * 1024 * 1024;
+  const totalUsedBytes = usedBytes !== undefined ? usedBytes : filesUsedMB * 1024 * 1024;
+  const freeBytes = Math.max(0, totalAllocatedBytes - totalUsedBytes);
 
-  // App icon selection matching image
+  const usedDisplay = formatBytes(totalUsedBytes, decimalPrecision);
+  const freeDisplay = formatBytes(freeBytes, decimalPrecision);
+  const limitDisplay = formatBytes(totalAllocatedBytes, decimalPrecision);
+
+  // Use storagePercentage directly from backend when available, or calculate fallback
+  const usedPercent = storagePercentage !== undefined
+    ? storagePercentage
+    : (allocatedMB > 0 ? Math.round((filesUsedMB / allocatedMB) * 100) : 0);
+
+  // App icon selection
   const getIcon = () => {
     switch (id) {
       case 'bnx-mail':
@@ -50,15 +61,28 @@ export default function AppCard({ app, onManage, decimalPrecision = 2, showUsage
           </div>
         </div>
         <span className="app-card-badge">
-          {t('settings.manageApps.appLimitLabel', { appLimit: (allocatedMB / 1024).toFixed(decimalPrecision) })}
+          {limitDisplay}
         </span>
       </div>
 
       {/* Progress & Value stats */}
       <div style={{ marginTop: '0.5rem' }}>
         <div className="app-card-numbers">
-          <span style={{ color: `rgb(${colorTheme})` }}>{usedMB.toFixed(decimalPrecision)} MB {t('dashboard.used')}</span>
-          <span style={{ color: 'var(--text-muted)' }}>{freeMB.toFixed(decimalPrecision)} MB {t('storageUsage.free')}</span>
+          <span style={{ color: `rgb(${colorTheme})` }}>{usedDisplay} {t('dashboard.used')}</span>
+          <span style={{ color: 'var(--text-muted)' }}>{freeDisplay} {t('storageUsage.free')}</span>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="progress-container" style={{ height: '6px', borderRadius: '3px', backgroundColor: '#f1f5f9', margin: '0.6rem 0' }}>
+          <div
+            className="progress-bar"
+            style={{
+              width: `${Math.min(100, Math.max(usedPercent, usedPercent > 0 ? 1 : 0))}%`,
+              backgroundColor: `rgb(${colorTheme})`,
+              borderRadius: '3px',
+              transition: 'width 0.3s ease'
+            }}
+          />
         </div>
 
         {/* Status indicator row */}
@@ -66,7 +90,7 @@ export default function AppCard({ app, onManage, decimalPrecision = 2, showUsage
           {showUsagePercent ? (
             <span style={{ color: `rgb(${colorTheme})` }}>{usedPercent}% {t('dashboard.used')}</span>
           ) : (
-            <span /> // layout balance placeholder
+            <span />
           )}
           {showAppStatus && (
             <span className="app-card-health" style={{ color: healthColor }}>

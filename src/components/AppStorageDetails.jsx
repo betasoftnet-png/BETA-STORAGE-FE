@@ -3,26 +3,28 @@ import { useTranslation } from 'react-i18next';
 import {
   ChevronRight, RefreshCw, Mail, Paperclip, Trash2,
   Send, FileText, Folder, Info, ChevronLeft, HelpCircle,
-  LayoutGrid, Briefcase, Scale, Receipt, CreditCard, Users, Image
+  LayoutGrid, Briefcase, Scale, Receipt, CreditCard, Users, Image, Upload
 } from 'lucide-react';
+import { formatBytes } from '../utils/storage';
 
 export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, isRefreshing, onRefresh, decimalPrecision = 2, showUsagePercent = true, showAppStatus = true }) {
   const { t } = useTranslation();
-  const { id, name, category, allocatedMB, files, colorTheme } = app;
+  const { id, name, category, allocatedMB, files, colorTheme, usedBytes, allocatedBytes, storagePercentage } = app;
 
-  // Calculate used storage
-  const usedMB = files.reduce((acc, f) => acc + f.size, 0);
-  const usedPercent = allocatedMB > 0 ? Math.min(100, Math.round((usedMB / allocatedMB) * 100)) : 0;
-  const freeMB = Math.max(0, allocatedMB - usedMB);
+  // Calculate used storage (prioritizing backend bytes when provided)
+  const filesUsedMB = files ? files.reduce((acc, f) => acc + f.size, 0) : 0;
+  const totalAllocatedBytes = allocatedBytes !== undefined ? allocatedBytes : allocatedMB * 1024 * 1024;
+  const totalUsedBytes = usedBytes !== undefined ? usedBytes : filesUsedMB * 1024 * 1024;
+  const freeBytes = Math.max(0, totalAllocatedBytes - totalUsedBytes);
 
-  // Dynamic formatting helpers
-  const formatSize = (mb) => {
-    return mb >= 1024 ? `${(mb / 1024).toFixed(decimalPrecision)} GB` : `${mb.toFixed(decimalPrecision)} MB`;
-  };
+  const usedText = formatBytes(totalUsedBytes, decimalPrecision);
+  const freeText = formatBytes(freeBytes, decimalPrecision);
+  const allocatedText = formatBytes(totalAllocatedBytes, decimalPrecision);
 
-  const usedText = formatSize(usedMB);
-  const freeText = formatSize(freeMB);
-  const allocatedText = allocatedMB >= 1024 ? `${(allocatedMB / 1024).toFixed(decimalPrecision)} GB` : `${allocatedMB} MB`;
+  // Use backend percentage directly if available, otherwise compute fallback
+  const usedPercent = storagePercentage !== undefined
+    ? storagePercentage
+    : (allocatedMB > 0 ? Math.round((filesUsedMB / allocatedMB) * 100) : 0);
 
   // Health evaluations
   const isCritical = usedPercent >= 90;
@@ -46,24 +48,26 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
         Drafts: { size: 0, color: '#f59e0b', icon: <FileText size={16} />, desc: 'Unsent drafts' },
         Other: { size: 0, color: '#94a3b8', icon: <Folder size={16} />, desc: 'Miscellaneous application files' }
       };
-      files.forEach(f => {
-        const name = f.name.toLowerCase();
-        const type = f.type ? f.type.toLowerCase() : '';
+      if (files) {
+        files.forEach(f => {
+          const name = f.name.toLowerCase();
+          const type = f.type ? f.type.toLowerCase() : '';
 
-        if (type === 'database' || type === 'email' || name.endsWith('.db')) {
-          catMap.Emails.size += f.size;
-        } else if (type === 'attachment' || name.endsWith('.pdf') || name.endsWith('.zip') || name.endsWith('.xlsx') || type === 'documents') {
-          catMap.Attachments.size += f.size;
-        } else if (type === 'trash' || name.includes('trash') || name.includes('deleted')) {
-          catMap.Trash.size += f.size;
-        } else if (type === 'sent' || name.includes('sent')) {
-          catMap.Sent.size += f.size;
-        } else if (type === 'draft' || name.includes('draft') || name.includes('voice') || name.endsWith('.wav') || name.endsWith('.mp3')) {
-          catMap.Drafts.size += f.size;
-        } else {
-          catMap.Other.size += f.size;
-        }
-      });
+          if (type === 'database' || type === 'email' || name.endsWith('.db')) {
+            catMap.Emails.size += f.size;
+          } else if (type === 'attachment' || name.endsWith('.pdf') || name.endsWith('.zip') || name.endsWith('.xlsx') || type === 'documents') {
+            catMap.Attachments.size += f.size;
+          } else if (type === 'trash' || name.includes('trash') || name.includes('deleted')) {
+            catMap.Trash.size += f.size;
+          } else if (type === 'sent' || name.includes('sent')) {
+            catMap.Sent.size += f.size;
+          } else if (type === 'draft' || name.includes('draft') || name.includes('voice') || name.endsWith('.wav') || name.endsWith('.mp3')) {
+            catMap.Drafts.size += f.size;
+          } else {
+            catMap.Other.size += f.size;
+          }
+        });
+      }
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     } else if (id === 'cliks') {
       const catMap = {
@@ -73,20 +77,22 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
         'People & Reminders': { size: 0, color: '#f59e0b', icon: <Users size={16} />, share: '10%', types: 'Contact Records, Reminders, Debt Statements', desc: 'Contact Records, Reminders, Debt Statements' },
         'Social & Media': { size: 0, color: '#0ea5e9', icon: <Image size={16} />, share: '10%', types: 'Profile Photos, Media Posts, Trading Attachments', desc: 'Profile Photos, Media Posts, Trading Attachments' }
       };
-      files.forEach(f => {
-        const type = f.type ? f.type.toLowerCase() : '';
-        if (type === 'images') {
-          catMap['Books & Accounting'].size += f.size;
-        } else if (type === 'logs') {
-          catMap['Finance & Investments'].size += f.size;
-        } else if (type === 'database') {
-          catMap['Tax & Deductions'].size += f.size;
-        } else if (type === 'attachment' || type === 'document') {
-          catMap['People & Reminders'].size += f.size;
-        } else {
-          catMap['Social & Media'].size += f.size;
-        }
-      });
+      if (files) {
+        files.forEach(f => {
+          const type = f.type ? f.type.toLowerCase() : '';
+          if (type === 'images') {
+            catMap['Books & Accounting'].size += f.size;
+          } else if (type === 'logs') {
+            catMap['Finance & Investments'].size += f.size;
+          } else if (type === 'database') {
+            catMap['Tax & Deductions'].size += f.size;
+          } else if (type === 'attachment' || type === 'document') {
+            catMap['People & Reminders'].size += f.size;
+          } else {
+            catMap['Social & Media'].size += f.size;
+          }
+        });
+      }
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     } else {
       // cliks-business
@@ -97,13 +103,15 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
         'HR & Payroll': { size: 0, color: '#f59e0b', icon: <Users size={16} />, desc: 'ID Documents, Payslip PDFs' },
         'Inventory & Media': { size: 0, color: '#0ea5e9', icon: <Image size={16} />, desc: 'Product Photos, Barcodes' }
       };
-      files.forEach(f => {
-        if (f.type === 'Audit & Tax (FIN-PRO)') catMap['Audit & Tax (FIN-PRO)'].size += f.size;
-        else if (f.type === 'Sales & Purchases') catMap['Sales & Purchases'].size += f.size;
-        else if (f.type === 'Expenses') catMap['Expenses'].size += f.size;
-        else if (f.type === 'HR & Payroll') catMap['HR & Payroll'].size += f.size;
-        else if (f.type === 'Inventory & Media') catMap['Inventory & Media'].size += f.size;
-      });
+      if (files) {
+        files.forEach(f => {
+          if (f.type === 'Audit & Tax (FIN-PRO)') catMap['Audit & Tax (FIN-PRO)'].size += f.size;
+          else if (f.type === 'Sales & Purchases') catMap['Sales & Purchases'].size += f.size;
+          else if (f.type === 'Expenses') catMap['Expenses'].size += f.size;
+          else if (f.type === 'HR & Payroll') catMap['HR & Payroll'].size += f.size;
+          else if (f.type === 'Inventory & Media') catMap['Inventory & Media'].size += f.size;
+        });
+      }
       return Object.keys(catMap).map(name => ({ name, ...catMap[name] }));
     }
   };
@@ -153,7 +161,22 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
           <h2>{t('appStorageDetails.appStorageTitle', { name })}</h2>
           <p>{t('appStorageDetails.subtitle', { name, allocated: allocatedText })}</p>
         </div>
-        <div className="details-header-controls">
+        <div className="details-header-controls" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            className="btn-primary"
+            onClick={onManage}
+            style={{
+              padding: '0.45rem 1rem',
+              fontSize: '0.82rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              borderRadius: '8px'
+            }}
+          >
+            <Upload size={14} />
+            <span>Upload & Manage Files</span>
+          </button>
           <div className="header-update-tag" onClick={onRefresh} style={{ cursor: 'pointer' }}>
             <span>{t('appStorageDetails.lastUpdated')}: {lastUpdated}</span>
             <RefreshCw size={12} className={isRefreshing ? 'spin' : ''} />
@@ -175,7 +198,7 @@ export default function AppStorageDetails({ app, onBack, onManage, lastUpdated, 
                 stroke={`rgb(${colorTheme})`}
                 strokeWidth="8"
                 strokeDasharray={251.2}
-                strokeDashoffset={251.2 - (usedPercent / 100) * 251.2}
+                strokeDashoffset={251.2 - (Math.min(100, usedPercent) / 100) * 251.2}
                 strokeLinecap="round"
                 style={{ transition: 'stroke-dashoffset 0.5s ease-in-out' }}
               />

@@ -41,14 +41,15 @@ export default function Login({ onLoginSuccess }) {
     setTimeout(() => {
       // Frontend-only validation check (permits any valid email format)
       localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('currentUserEmail', email);
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', email);
       } else {
         localStorage.removeItem('rememberedEmail');
       }
+      // Pass authenticated email and generated/received session token in-memory (no token stored in localStorage/sessionStorage)
       setIsLoading(false);
-      onLoginSuccess(email);
+      const sessionToken = `bnx_token_${btoa(email)}`;
+      onLoginSuccess(email, sessionToken);
     }, 1000); // 1s simulation delay for a premium feel
   };
 

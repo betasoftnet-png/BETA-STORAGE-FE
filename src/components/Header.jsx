@@ -19,9 +19,9 @@ export default function Header({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const email = currentUserEmail || 'rahulram042@bnxmail.com';
+  const email = currentUserEmail || 'user@bnxmail.com';
   const username = email.split('@')[0];
-  const avatarChar = username.charAt(0).toUpperCase();
+  const avatarChar = (username || 'U').charAt(0).toUpperCase();
 
   // Close dropdown when clicking outside
   useEffect(() => {

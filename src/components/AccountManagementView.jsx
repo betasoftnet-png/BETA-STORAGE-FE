@@ -17,12 +17,36 @@ export default function AccountManagementView({
   const [activeTab, setActiveTab] = useState('home');
   
   // User Profile details
-  const email = currentUserEmail || 'rahulram042@bnxmail.com';
+  const email = currentUserEmail || 'user@bnxmail.com';
   const defaultUsername = email.split('@')[0];
-  const defaultFullName = defaultUsername.toLowerCase().includes('rahul') 
-    ? 'Rahul Ram' 
-    : (defaultUsername.charAt(0).toUpperCase() + defaultUsername.slice(1));
+  const defaultFullName = defaultUsername
+    .split(/[._-]/)
+    .filter(Boolean)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ') || defaultUsername;
   
+  // Detect current client device and browser dynamically
+  const detectClient = () => {
+    if (typeof navigator === 'undefined') return { device: 'Web Device', browser: 'Browser' };
+    const ua = navigator.userAgent;
+    let device = 'Computer';
+    if (/iPad|iPhone|iPod/.test(ua)) device = 'iOS Device';
+    else if (/Android/.test(ua)) device = 'Android Device';
+    else if (/Macintosh|Mac OS X/.test(ua)) device = 'MacBook / macOS';
+    else if (/Windows/.test(ua)) device = 'Windows PC';
+    else if (/Linux/.test(ua)) device = 'Linux PC';
+
+    let browser = 'Web Browser';
+    if (/Edg\//.test(ua)) browser = 'Microsoft Edge';
+    else if (/Chrome\//.test(ua)) browser = 'Google Chrome';
+    else if (/Firefox\//.test(ua)) browser = 'Mozilla Firefox';
+    else if (/Safari\//.test(ua)) browser = 'Apple Safari';
+
+    return { device, browser };
+  };
+
+  const clientInfo = detectClient();
+
   const [profile, setProfile] = useState(() => {
     const saved = localStorage.getItem(`bnx_account_profile_${email}`);
     if (saved) {
@@ -31,10 +55,10 @@ export default function AccountManagementView({
     return {
       fullName: defaultFullName,
       username: defaultUsername,
-      gender: defaultUsername.toLowerCase().includes('rahul') ? 'Male' : 'Rather not say',
-      birthday: defaultUsername.toLowerCase().includes('rahul') ? '1995-04-12' : '',
-      phone: defaultUsername.toLowerCase().includes('rahul') ? '+1 (555) 019-2834' : '',
-      secondaryEmails: defaultUsername.toLowerCase().includes('rahul') ? ['rahul.backup@bnxmail.com'] : []
+      gender: 'Rather not say',
+      birthday: '',
+      phone: '',
+      secondaryEmails: []
     };
   });
 
@@ -43,7 +67,7 @@ export default function AccountManagementView({
     localStorage.setItem(`bnx_account_profile_${email}`, JSON.stringify(profile));
   }, [profile, email]);
 
-  // Security info state
+  // Security info state with dynamic current session
   const [securitySettings, setSecuritySettings] = useState(() => {
     const saved = localStorage.getItem(`bnx_account_security_${email}`);
     if (saved) {
@@ -53,8 +77,13 @@ export default function AccountManagementView({
       twoStepEnabled: true,
       publicAccount: true,
       sessions: [
-        { id: 'sess-1', device: 'Windows PC', browser: 'Chrome', location: 'New York, USA', active: true },
-        { id: 'sess-2', device: 'iPhone 15 Pro', browser: 'BNX Mail App', location: 'California, USA', active: false }
+        { 
+          id: 'sess-current', 
+          device: clientInfo.device, 
+          browser: clientInfo.browser, 
+          location: 'Current Active Session', 
+          active: true 
+        }
       ]
     };
   });

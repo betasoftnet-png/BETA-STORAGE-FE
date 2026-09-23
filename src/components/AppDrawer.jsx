@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Search, Trash2, Upload, AlertCircle, Sparkles, FolderArchive, Eraser } from 'lucide-react';
+import { X, Search, Trash2, Upload, AlertCircle, Sparkles, FolderArchive, Eraser, FileText, CheckCircle2, UploadCloud } from 'lucide-react';
 
 export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, onTriggerCleanup, onCompressLogs, decimalPrecision = 2, showUsagePercent = true }) {
   const { t } = useTranslation();
   const { id, name, category, allocatedMB, files, colorTheme } = app;
   const [searchTerm, setSearchTerm] = useState('');
   const [fileName, setFileName] = useState('');
-  const [fileSize, setFileSize] = useState(15);
+  const [fileSize, setFileSize] = useState('');
   const [fileType, setFileType] = useState(id === 'cliks-business' ? 'Audit & Tax (FIN-PRO)' : 'Document');
   const [uploadError, setUploadError] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Calculate used storage
   const usedMB = files.reduce((acc, f) => acc + f.size, 0);
@@ -22,12 +25,86 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
 
   const filteredFiles = files.filter(f => 
     f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    f.type.toLowerCase().includes(searchTerm.toLowerCase())
+    (f.type && f.type.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Auto detect category from file name / mime
+  const detectFileType = (fName) => {
+    const lower = fName.toLowerCase();
+    if (id === 'cliks-business') {
+      if (lower.endsWith('.xlsx') || lower.endsWith('.csv') || lower.endsWith('.pdf')) {
+        return 'Sales & Purchases';
+      }
+      if (lower.endsWith('.sql') || lower.endsWith('.db') || lower.includes('tax') || lower.includes('audit')) {
+        return 'Audit & Tax (FIN-PRO)';
+      }
+      if (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg')) {
+        return 'Inventory & Media';
+      }
+      if (lower.includes('receipt') || lower.includes('expense') || lower.endsWith('.zip')) {
+        return 'Expenses';
+      }
+      return 'HR & Payroll';
+    }
+
+    if (lower.endsWith('.pdf')) return 'Attachment';
+    if (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.gif') || lower.endsWith('.svg')) return 'Images';
+    if (lower.endsWith('.mp4') || lower.endsWith('.mov') || lower.endsWith('.avi')) return 'Videos';
+    if (lower.endsWith('.mp3') || lower.endsWith('.wav')) return 'Audio';
+    if (lower.endsWith('.db') || lower.endsWith('.sql')) return 'Database';
+    if (lower.endsWith('.log')) return 'Logs';
+    return 'Document';
+  };
+
+  const handleNativeFileSelect = (selectedFile) => {
+    if (!selectedFile) return;
+    setUploadError('');
+    setUploadSuccess('');
+
+    const sizeInMB = Math.max(0.01, parseFloat((selectedFile.size / (1024 * 1024)).toFixed(3)));
+    const detectedType = detectFileType(selectedFile.name);
+
+    if (usedMB + sizeInMB > allocatedMB) {
+      setUploadError(t('drawer.errorExceedLimit', { limit: formatSize(allocatedMB) }));
+      return;
+    }
+
+    onUploadFile(id, selectedFile.name, sizeInMB, detectedType);
+    setUploadSuccess(`Uploaded "${selectedFile.name}" (${sizeInMB >= 1 ? sizeInMB.toFixed(2) + ' MB' : (selectedFile.size / 1024).toFixed(1) + ' KB'}) successfully.`);
+    setTimeout(() => setUploadSuccess(''), 4000);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      handleNativeFileSelect(file);
+      e.target.value = '';
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) {
+      handleNativeFileSelect(file);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
 
   const handleUploadSubmit = (e) => {
     e.preventDefault();
     setUploadError('');
+    setUploadSuccess('');
 
     if (!fileName.trim()) {
       setUploadError(t('drawer.errorName'));
@@ -46,23 +123,11 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
     }
 
     onUploadFile(id, fileName.trim(), size, fileType);
+    setUploadSuccess(`Added "${fileName.trim()}" (${size} MB) successfully.`);
     setFileName('');
+    setFileSize('');
     setUploadError('');
-  };
-
-  const handlePresetUpload = (presetName, presetSize, presetType) => {
-    setUploadError('');
-    if (usedMB + presetSize > allocatedMB) {
-      setUploadError(t('drawer.errorExceedLimit', { limit: formatSize(allocatedMB) }));
-      return;
-    }
-    let finalType = presetType;
-    if (id === 'cliks-business') {
-      if (presetType === 'Logs') finalType = 'Expenses';
-      else if (presetType === 'Database') finalType = 'Audit & Tax (FIN-PRO)';
-      else if (presetType === 'Attachment') finalType = 'Sales & Purchases';
-    }
-    onUploadFile(id, presetName, presetSize, finalType);
+    setTimeout(() => setUploadSuccess(''), 4000);
   };
 
   return (
@@ -98,44 +163,94 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
               {formatSize(usedMB)} / {formatSize(allocatedMB)}{showUsagePercent && ` (${usedPercent}%)`}
             </span>
           </div>
+          <div className="progress-container" style={{ height: '6px', borderRadius: '3px', backgroundColor: '#f1f5f9' }}>
+            <div
+              className="progress-bar"
+              style={{
+                width: `${Math.min(100, usedPercent)}%`,
+                backgroundColor: `rgb(${colorTheme})`,
+                borderRadius: '3px',
+                transition: 'width 0.3s ease'
+              }}
+            />
+          </div>
         </div>
 
-        {/* Simulated upload section */}
+        {/* Real-time File Upload Section */}
         <div className="glass-card" style={{ marginBottom: '1.5rem' }}>
           <h3 className="card-title" style={{ fontSize: '0.95rem', marginBottom: '1rem' }}>
-            <Upload size={16} style={{ color: 'var(--accent-cyan)' }} />
-            {t('drawer.simulateUpload')}
+            <Upload size={16} style={{ color: 'var(--accent-blue)' }} />
+            {t('appStorageDetails.uploadNewFile')}
           </h3>
 
-          <form onSubmit={handleUploadSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Native Drag & Drop Zone */}
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            style={{
+              border: `2px dashed ${isDragging ? `rgb(${colorTheme})` : 'var(--border-color)'}`,
+              borderRadius: '10px',
+              padding: '1.25rem',
+              textAlign: 'center',
+              backgroundColor: isDragging ? `rgba(${colorTheme}, 0.05)` : 'rgba(248, 250, 252, 0.6)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              marginBottom: '1rem'
+            }}
+          >
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            <UploadCloud size={28} style={{ color: `rgb(${colorTheme})`, margin: '0 auto 0.5rem auto' }} />
+            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>
+              Choose a file from your computer
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+              or drag and drop here (auto-calculates real size & category)
+            </div>
+          </div>
+
+          {/* Manual Entry Form */}
+          <form onSubmit={handleUploadSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+              <span>Or enter file details manually:</span>
+            </div>
+
             <div className="form-group" style={{ margin: 0 }}>
-              <label>{t('appStorageDetails.fileName')}</label>
               <input 
                 type="text" 
-                placeholder="e.g. backup_db_v2.sql, attachment_image.png" 
+                placeholder="File name (e.g. document_archive.pdf)" 
                 className="form-control"
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}
+                style={{ fontSize: '0.85rem' }}
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div className="form-group" style={{ margin: 0 }}>
-                <label>{t('drawer.fileSizeMb')}</label>
                 <input 
                   type="number" 
                   className="form-control"
+                  placeholder="Size in MB (e.g. 25)"
                   value={fileSize}
                   onChange={(e) => setFileSize(e.target.value)}
-                  min="1"
+                  min="0.1"
+                  step="any"
+                  style={{ fontSize: '0.85rem' }}
                 />
               </div>
               <div className="form-group" style={{ margin: 0 }}>
-                <label>{t('appStorageDetails.type')}</label>
-                 <select 
+                <select 
                   className="form-control"
                   value={fileType}
                   onChange={(e) => setFileType(e.target.value)}
+                  style={{ fontSize: '0.85rem' }}
                 >
                   {id === 'cliks-business' ? (
                     <>
@@ -149,9 +264,11 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
                     <>
                       <option value="Document">{t('drawer.document', 'Document')}</option>
                       <option value="Database">{t('drawer.dbBackup', 'Database Backup')}</option>
-                      <option value="Logs">{t('drawer.logsRecords', 'Logs / System Records')}</option>
+                      <option value="Logs">{t('drawer.logsRecords', 'Logs / Records')}</option>
                       <option value="Attachment">{t('drawer.attachmentFile', 'Attachment File')}</option>
-                      <option value="Media">{t('drawer.mediaContent', 'Media Content')}</option>
+                      <option value="Images">Images</option>
+                      <option value="Videos">Videos</option>
+                      <option value="Audio">Audio</option>
                     </>
                   )}
                 </select>
@@ -174,40 +291,26 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
               </div>
             )}
 
-            <button type="submit" className="btn-primary">
-              {t('appStorageDetails.uploadNewFile')}
+            {uploadSuccess && (
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                color: '#10b981', 
+                fontSize: '0.75rem', 
+                background: 'rgba(16, 185, 129, 0.1)', 
+                padding: '0.5rem', 
+                borderRadius: '6px' 
+              }}>
+                <CheckCircle2 size={14} style={{ flexShrink: 0 }} />
+                <span>{uploadSuccess}</span>
+              </div>
+            )}
+
+            <button type="submit" className="btn-primary" style={{ marginTop: '0.25rem' }}>
+              Add File
             </button>
           </form>
-
-          {/* Preset Buttons */}
-          <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
-              {t('drawer.quickPresets')}
-            </span>
-            <div className="quick-simulator-grid">
-              <button 
-                type="button" 
-                className="btn-quick"
-                onClick={() => handlePresetUpload(`logs_${Date.now().toString().slice(-4)}.log`, 12, 'Logs')}
-              >
-                +12 MB Log
-              </button>
-              <button 
-                type="button" 
-                className="btn-quick"
-                onClick={() => handlePresetUpload(`db_dump_${Date.now().toString().slice(-4)}.sql`, 150, 'Database')}
-              >
-                +150 MB DB
-              </button>
-              <button 
-                type="button" 
-                className="btn-quick"
-                onClick={() => handlePresetUpload(`attachment_${Date.now().toString().slice(-4)}.pdf`, 35, 'Attachment')}
-              >
-                +35 MB Attach
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Maintenance Actions */}
@@ -243,9 +346,14 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
 
         {/* File inventory list */}
         <div className="glass-card">
-          <h3 className="card-title" style={{ fontSize: '0.95rem', marginBottom: '0.75rem' }}>
-            {t('drawer.storageInventory')}
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <h3 className="card-title" style={{ fontSize: '0.95rem', margin: 0 }}>
+              {t('drawer.storageInventory')}
+            </h3>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+              {files.length} {files.length === 1 ? 'file' : 'files'}
+            </span>
+          </div>
 
           <div style={{ position: 'relative', marginBottom: '1rem' }}>
             <input 
@@ -271,7 +379,11 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
           <div className="file-list">
             {filteredFiles.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '2rem 0', fontSize: '0.8rem' }}>
-                {t('drawer.noFilesFound')}
+                <FileText size={32} style={{ opacity: 0.5, margin: '0 auto 0.5rem auto' }} />
+                <div>{searchTerm ? t('drawer.noFilesFound') : 'No files stored in this app yet.'}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                  Upload a file above to add storage usage in real time.
+                </div>
               </div>
             ) : (
               filteredFiles.map((file) => (
@@ -279,13 +391,13 @@ export default function AppDrawer({ app, onClose, onUploadFile, onDeleteFile, on
                   <div className="file-item-info">
                     <span className="file-name">{file.name}</span>
                     <span className="file-meta">
-                      {t('drawer.fileMeta', { type: file.type, size: formatSize(file.size), time: file.time })}
+                      {t('drawer.fileMeta', { type: file.type || 'File', size: formatSize(file.size), time: file.time || 'Just now' })}
                     </span>
                   </div>
                   <button 
                     className="btn-danger-outline"
                     onClick={() => onDeleteFile(id, file.id, file.name, file.size)}
-                    title="Delete file"
+                    title="Move to Recycle Bin"
                     style={{ padding: '0.35rem' }}
                   >
                     <Trash2 size={13} />

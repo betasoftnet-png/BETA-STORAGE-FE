@@ -19,24 +19,34 @@ import SettingsView from './components/SettingsView';
 import Login from './components/Login';
 import AccountManagementView from './components/AccountManagementView';
 import ManageAppsView from './components/ManageAppsView';
+import { getStorageQuota } from './services/storageService';
+import { formatBytes } from './utils/storage';
 
-// Load or return reference default state
+// Load or return real-time storage state
 const getInitialState = () => {
-  const localData = localStorage.getItem('beta_storage_state_v5');
+  // Purge legacy dummy state from older versions
+  localStorage.removeItem('beta_storage_state_v5');
+
+  const localData = localStorage.getItem('beta_storage_state_v6');
   if (localData) {
     try {
-      return JSON.parse(localData);
+      const parsed = JSON.parse(localData);
+      if (parsed && Array.isArray(parsed.apps)) {
+        // Ensure no BNX Mail backend storage quota is restored from localStorage
+        parsed.apps = parsed.apps.map(app => {
+          if (app.id === 'bnx-mail') {
+            const { usedBytes, allocatedBytes, storagePercentage, usedMB, ...rest } = app;
+            return rest;
+          }
+          return app;
+        });
+      }
+      return parsed;
     } catch (e) {
       console.error('Failed to parse state, using defaults.', e);
     }
   }
 
-  // File structure tailored to match Category values exactly:
-  // Documents (Database, Document) = 120 + 100 + 400 = 620 MB
-  // Images (Images) = 50 + 430 = 480 MB
-  // Attachments (Attachment) = 250 + 30 + 80 = 360 MB
-  // Videos (Videos) = 220 MB
-  // Others (Logs, Others) = 120 MB
   return {
     totalPoolMB: 5120, // 5.0 GB
     apps: [
@@ -46,14 +56,7 @@ const getInitialState = () => {
         category: 'Mail & Communication',
         allocatedMB: 1024,
         colorTheme: '37, 99, 235', // Blue rgb
-        files: [
-          { id: 'bnx-f1', name: 'Inbox_Archive.db', size: 420, type: 'Database', time: '5h ago' },
-          { id: 'bnx-f2', name: 'Project_Brief.pdf', size: 350, type: 'Attachment', time: '2h ago' },
-          { id: 'bnx-f3', name: 'header_background.jpg', size: 180, type: 'Images', time: '1d ago' },
-          { id: 'bnx-f4', name: 'intro_tutorial.mp4', size: 20, type: 'Videos', time: '4h ago' },
-          { id: 'bnx-f5', name: 'voicemail_clip.mp3', size: 30, type: 'Audio', time: '3d ago' },
-          { id: 'bnx-f6', name: 'sent_invoice_archive.zip', size: 350, type: 'Sent', time: '1h ago' }
-        ]
+        files: []
       },
       {
         id: 'cliks',
@@ -61,14 +64,7 @@ const getInitialState = () => {
         category: 'Workplace Collaboration',
         allocatedMB: 1024,
         colorTheme: '13, 148, 136', // Teal rgb
-        files: [
-          { id: 'cl-f1', name: 'notes.txt', size: 140, type: 'Attachment', time: '3d ago' },
-          { id: 'cl-f2', name: 'meeting_pdf.pdf', size: 70, type: 'Attachment', time: '2d ago' },
-          { id: 'cl-f3', name: 'cliks_logo.png', size: 140, type: 'Images', time: '12m ago' },
-          { id: 'cl-f4', name: 'presentation_recording.mp4', size: 50, type: 'Videos', time: '1h ago' },
-          { id: 'cl-f5', name: 'meeting_audio.mp3', size: 25, type: 'Audio', time: '5h ago' },
-          { id: 'cl-f6', name: 'logs_archive.zip', size: 145, type: 'Logs', time: '4h ago' }
-        ]
+        files: []
       },
       {
         id: 'cliks-business',
@@ -76,79 +72,13 @@ const getInitialState = () => {
         category: 'Business Management',
         allocatedMB: 1024,
         colorTheme: '139, 92, 246', // Purple rgb
-        files: [
-          { id: 'clb-f1', name: 'Vendor_Invoices_Q3.xlsx', size: 256, type: 'Sales & Purchases', time: '1h ago' },
-          { id: 'clb-f2', name: 'FIN_PRO_Audit_Report.pdf', size: 92, type: 'Audit & Tax (FIN-PRO)', time: '10m ago' },
-          { id: 'clb-f3', name: 'product_photo_1.jpg', size: 300, type: 'Inventory & Media', time: '1d ago' },
-          { id: 'clb-f4', name: 'barcodes_metadata.json', size: 130, type: 'Inventory & Media', time: '2d ago' },
-          { id: 'clb-f5', name: 'Receipt_Scans_Archive.zip', size: 143, type: 'Expenses', time: '3h ago' }
-        ]
+        files: []
       }
     ],
-    activities: [
-      { appName: 'BNX Mail', description: 'Attachment uploaded: Project_Proposal.pdf', diff: '+12 MB', colorTheme: '37, 99, 235', time: '2m ago' },
-      { appName: 'Cliks', description: 'File uploaded: Design_System.fig', diff: '+8 MB', colorTheme: '13, 148, 136', time: '12m ago' },
-      { appName: 'Cliks Business', description: 'Document uploaded: Quarterly_Report.xlsx', diff: '+15 MB', colorTheme: '139, 92, 246', time: '24m ago' },
-      { appName: 'BNX Mail', description: 'Deleted files from Trash', diff: '-32 MB', colorTheme: '37, 99, 235', time: '1h ago' }
-    ],
+    activities: [],
     notifications: [],
     lastUpdatedTime: 'Just now',
-    deletedFiles: [
-      // BNX Mail: 14 deleted items, totaling 82 MB
-      { id: 'del-1', name: 'invoice.pdf', size: 4.2, app: 'bnx-mail', appName: 'BNX Mail', type: 'PDF', icon: '📄', deletedTime: 'Deleted today', daysRemaining: 29, color: '#2563eb' },
-      { id: 'del-2', name: 'customer_feedback_call.mp3', size: 12.0, app: 'bnx-mail', appName: 'BNX Mail', type: 'Audio', icon: '🎵', deletedTime: 'Deleted Aug 20', daysRemaining: 24, color: '#2563eb' },
-      { id: 'del-3', name: 'notes_todo.txt', size: 1.5, app: 'bnx-mail', appName: 'BNX Mail', type: 'Text', icon: '📄', deletedTime: 'Deleted Aug 10', daysRemaining: 14, color: '#2563eb' },
-      { id: 'del-4', name: 'contract_draft_final.docx', size: 14.0, app: 'bnx-mail', appName: 'BNX Mail', type: 'Document', icon: '📄', deletedTime: 'Deleted Aug 05', daysRemaining: 9, color: '#2563eb' },
-      { id: 'del-5', name: 'annual_audit_draft.pdf', size: 50.3, app: 'bnx-mail', appName: 'BNX Mail', type: 'PDF', icon: '📄', deletedTime: 'Deleted Jul 28', daysRemaining: 2, color: '#2563eb' },
-      ...Array.from({ length: 9 }, (_, i) => ({
-        id: `del-bnx-gen-${i}`,
-        name: `archive_part_${i + 1}.zip`,
-        size: 0.0,
-        app: 'bnx-mail',
-        appName: 'BNX Mail',
-        type: 'Archive',
-        icon: '📦',
-        deletedTime: 'Deleted Jul 25',
-        daysRemaining: 5,
-        color: '#2563eb'
-      })),
-
-      // Cliks Business: 16 deleted items, totaling 113 MB
-      { id: 'del-6', name: 'sales.xlsx', size: 18.6, app: 'cliks-business', appName: 'Cliks Business', type: 'Spreadsheet', icon: '📊', deletedTime: 'Deleted yesterday', daysRemaining: 28, color: '#8b5cf6' },
-      { id: 'del-7', name: 'Q2_Marketing_Plan.pptx', size: 14.5, app: 'cliks-business', appName: 'Cliks Business', type: 'Presentation', icon: '📊', deletedTime: 'Deleted Aug 21', daysRemaining: 25, color: '#8b5cf6' },
-      { id: 'del-8', name: 'product_demo_v2.mp4', size: 42.0, app: 'cliks-business', appName: 'Cliks Business', type: 'Video', icon: '🎬', deletedTime: 'Deleted Aug 18', daysRemaining: 22, color: '#8b5cf6' },
-      { id: 'del-9', name: 'database_backup.sql', size: 35.8, app: 'cliks-business', appName: 'Cliks Business', type: 'Database', icon: '📄', deletedTime: 'Deleted Aug 16', daysRemaining: 20, color: '#8b5cf6' },
-      ...Array.from({ length: 12 }, (_, i) => ({
-        id: `del-clb-gen-${i}`,
-        name: `invoice_scan_${i + 1}.png`,
-        size: 0.175,
-        app: 'cliks-business',
-        appName: 'Cliks Business',
-        type: 'Image',
-        icon: '🖼',
-        deletedTime: 'Deleted Jul 20',
-        daysRemaining: 15,
-        color: '#8b5cf6'
-      })),
-
-      // Cliks: 8 deleted items, totaling 50 MB
-      { id: 'del-10', name: 'project.png', size: 8.4, app: 'cliks', appName: 'Cliks', type: 'Image', icon: '🖼', deletedTime: 'Deleted Aug 22', daysRemaining: 26, color: '#0d9488' },
-      { id: 'del-11', name: 'index_layout.fig', size: 8.0, app: 'cliks', appName: 'Cliks', type: 'Design', icon: '🖼', deletedTime: 'Deleted Aug 12', daysRemaining: 16, color: '#0d9488' },
-      { id: 'del-12', name: 'audio_attachment.wav', size: 6.4, app: 'cliks', appName: 'Cliks', type: 'Audio', icon: '🎵', deletedTime: 'Deleted Aug 02', daysRemaining: 6, color: '#0d9488' },
-      { id: 'del-13', name: 'brand_colors.png', size: 23.6, app: 'cliks', appName: 'Cliks', type: 'Image', icon: '🖼', deletedTime: 'Deleted Jul 27', daysRemaining: 1, color: '#0d9488' },
-      ...Array.from({ length: 4 }, (_, i) => ({
-        id: `del-cl-gen-${i}`,
-        name: `temp_file_${i + 1}.log`,
-        size: 0.9,
-        app: 'cliks',
-        appName: 'Cliks',
-        type: 'Text',
-        icon: '📄',
-        deletedTime: 'Deleted Jul 15',
-        daysRemaining: 12,
-        color: '#0d9488'
-      }))
-    ]
+    deletedFiles: []
   };
 };
 
@@ -194,7 +124,10 @@ function AppContent() {
     }
   }, [location.pathname]);
 
-  const handleLoginSuccess = (email) => {
+  const handleLoginSuccess = (email, token) => {
+    if (token) {
+      setBnxToken(token);
+    }
     setCurrentUserEmail(email);
     setIsAuthenticated(true);
     
@@ -317,9 +250,19 @@ function AppContent() {
     }
   };
 
-  // Sync to local storage
+  // Sync UI state to local storage (strictly exclude BNX Mail storage values to keep backend as source of truth)
   useEffect(() => {
-    localStorage.setItem('beta_storage_state_v5', JSON.stringify(state));
+    const sanitizedState = {
+      ...state,
+      apps: state.apps.map(app => {
+        if (app.id === 'bnx-mail') {
+          const { usedBytes, allocatedBytes, storagePercentage, usedMB, ...rest } = app;
+          return rest;
+        }
+        return app;
+      })
+    };
+    localStorage.setItem('beta_storage_state_v6', JSON.stringify(sanitizedState));
   }, [state]);
 
   // Initialize theme from localStorage on load
@@ -349,20 +292,101 @@ function AppContent() {
     }
   }, [location.pathname, navigate]);
 
+  // In-memory secure BNX Mail access token (never stored in localStorage/sessionStorage)
+  const [bnxToken, setBnxToken] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get('token') || params.get('access_token') || params.get('bnx_token');
+      if (urlToken) {
+        const cleanUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+        return urlToken;
+      }
+    } catch (_) {}
+    return '';
+  });
+
+  // Listen to secure postMessage token transfers from BNX Mail / ecosystem shell
+  useEffect(() => {
+    const handleTokenMessage = (event) => {
+      if (event.data && typeof event.data === 'object' && event.data.type === 'BNX_AUTH_TOKEN' && event.data.token) {
+        setBnxToken(event.data.token);
+      }
+    };
+    window.addEventListener('message', handleTokenMessage);
+    return () => window.removeEventListener('message', handleTokenMessage);
+  }, []);
+
+  // BNX Mail API Quota State
+  const [isLoadingQuota, setIsLoadingQuota] = useState(false);
+  const [quotaError, setQuotaError] = useState(null);
+
+  const fetchQuota = async (tokenToUse = bnxToken) => {
+    if (!tokenToUse) {
+      setQuotaError('BNX Mail access token is required to fetch storage quota');
+      return;
+    }
+    setIsLoadingQuota(true);
+    setQuotaError(null);
+    try {
+      const data = await getStorageQuota(tokenToUse);
+      if (data) {
+        if (data.email) {
+          setCurrentUserEmail(data.email);
+        }
+        setState(prev => {
+          const updatedApps = prev.apps.map(app => {
+            if (app.id === 'bnx-mail') {
+              return {
+                ...app,
+                usedBytes: data.storageUsed,
+                allocatedBytes: data.storageLimit,
+                storagePercentage: data.storagePercentage,
+                allocatedMB: data.storageLimit / (1024 * 1024),
+                usedMB: data.storageUsed / (1024 * 1024)
+              };
+            }
+            return app;
+          });
+          return {
+            ...prev,
+            apps: updatedApps,
+            lastUpdatedTime: 'Just now'
+          };
+        });
+      }
+    } catch (err) {
+      console.warn('Could not fetch storage quota:', err.message);
+      setQuotaError(err.message || 'Failed to fetch storage quota');
+    } finally {
+      setIsLoadingQuota(false);
+    }
+  };
+
+  // Fetch storage quota when authenticated and token is available
+  useEffect(() => {
+    if (isAuthenticated && bnxToken) {
+      fetchQuota(bnxToken);
+    }
+  }, [isAuthenticated, bnxToken]);
+
   const handleRefreshState = () => {
     setIsRefreshing(true);
-    setTimeout(() => {
+    fetchQuota(bnxToken).finally(() => {
       setIsRefreshing(false);
       setState(prev => ({
         ...prev,
         lastUpdatedTime: 'Just now'
       }));
-    }, 800);
+    });
   };
 
   // derived variables
   const totalUsedStorageMB = state.apps.reduce((acc, app) => {
-    return acc + app.files.reduce((sum, f) => sum + f.size, 0);
+    if (app.usedBytes !== undefined) {
+      return acc + (app.usedBytes / (1024 * 1024));
+    }
+    return acc + (app.files ? app.files.reduce((sum, f) => sum + f.size, 0) : 0);
   }, 0);
 
   // System Health
@@ -691,7 +715,7 @@ function AppContent() {
       <div className="navbar-wrapper">
         <Header
           lastUpdated={state.lastUpdatedTime}
-          isRefreshing={isRefreshing}
+          isRefreshing={isRefreshing || isLoadingQuota}
           onRefresh={handleRefreshState}
           currentUserEmail={currentUserEmail}
           signedInAccounts={signedInAccounts}
@@ -906,11 +930,48 @@ function AppContent() {
               }}
               onManage={() => setIsDrawerOpen(true)}
               lastUpdated={state.lastUpdatedTime}
-              isRefreshing={isRefreshing}
+              isRefreshing={isRefreshing || isLoadingQuota}
               onRefresh={handleRefreshState}
             />
           ) : (
             <>
+              {/* Storage API Error Notice */}
+              {quotaError && (
+                <div style={{
+                  padding: '0.85rem 1.25rem',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  color: '#991b1b',
+                  marginBottom: '1.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  fontSize: '0.84rem',
+                  fontWeight: '600'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <AlertCircle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
+                    <span>Storage Quota API Notice: {quotaError}</span>
+                  </div>
+                  <button
+                    onClick={fetchQuota}
+                    style={{
+                      background: '#ffffff',
+                      border: '1px solid #fca5a5',
+                      borderRadius: '6px',
+                      padding: '0.3rem 0.75rem',
+                      fontSize: '0.78rem',
+                      fontWeight: '700',
+                      color: '#b91c1c',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
               {/* Storage Alert Banner */}
               {showStorageAlerts && systemHealth !== 'healthy' && (
                 <div style={{
