@@ -185,13 +185,26 @@ body {
   transition: var(--transition-smooth);
 }
 
+.menu-item img {
+  background-color: #ffffff;
+  border-radius: 4px;
+  padding: 3px;
+  box-sizing: content-box;
+}
+
 .menu-item:hover {
   color: var(--text-main);
   background-color: #f1f5f9;
 }
 
 .menu-item.active {
-  background-color: var(--accent-blue);
+  background-color: #3b82f6;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.menu-item.active:hover {
+  background-color: #2563eb;
   color: #ffffff;
 }
 
