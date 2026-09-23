@@ -43,7 +43,16 @@ export async function getStorageQuota(bnxAccessToken) {
     throw new Error(errorDetail);
   }
 
-  const result = await response.json();
+  let result = null;
+  try {
+    const rawText = await response.text();
+    if (rawText && !rawText.trim().startsWith('<')) {
+      result = JSON.parse(rawText);
+    }
+  } catch (_) {
+    result = null;
+  }
+
   const data = result?.data || result;
 
   if (data && (data.storageUsed !== undefined || data.used !== undefined || data.usedBytes !== undefined || data.storage_used !== undefined || data.email)) {
@@ -57,5 +66,9 @@ export async function getStorageQuota(bnxAccessToken) {
     return normalized;
   }
 
-  throw new Error(result?.message || 'Invalid API response format');
+  if (result) {
+    throw new Error(result?.message || 'Invalid API response format');
+  }
+
+  return null;
 }

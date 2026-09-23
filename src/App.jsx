@@ -1033,43 +1033,6 @@ function AppContent() {
             />
           ) : (
             <>
-              {/* Storage API Error Notice */}
-              {quotaError && (
-                <div style={{
-                  padding: '0.85rem 1.25rem',
-                  borderRadius: '12px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                  border: '1px solid rgba(239, 68, 68, 0.25)',
-                  color: '#991b1b',
-                  marginBottom: '1.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  fontSize: '0.84rem',
-                  fontWeight: '600'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <AlertCircle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
-                    <span>Storage Quota API Notice: {quotaError}</span>
-                  </div>
-                  <button
-                    onClick={fetchQuota}
-                    style={{
-                      background: '#ffffff',
-                      border: '1px solid #fca5a5',
-                      borderRadius: '6px',
-                      padding: '0.3rem 0.75rem',
-                      fontSize: '0.78rem',
-                      fontWeight: '700',
-                      color: '#b91c1c',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Retry
-                  </button>
-                </div>
-              )}
-
               {/* Storage Alert Banner */}
               {showStorageAlerts && systemHealth !== 'healthy' && (
                 <div style={{
