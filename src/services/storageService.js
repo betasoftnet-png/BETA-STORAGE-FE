@@ -68,7 +68,7 @@ export async function getStorageQuota(bnxAccessToken) {
       storageLimit: Number(data.storageLimit ?? data.limit ?? data.limitBytes ?? data.storage_limit ?? 5368709120),
       storagePercentage: Number(data.storagePercentage ?? data.percentage ?? data.storage_percentage ?? data.usedPercentage ?? 0)
     };
-    console.log('[BNX Storage API] Successfully received storage quota:', normalized);
+    // console.log('[BNX Storage API] Successfully received storage quota:', normalized);
     return normalized;
   }
 

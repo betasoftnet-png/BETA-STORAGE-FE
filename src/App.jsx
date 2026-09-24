@@ -107,7 +107,7 @@ function AppContent() {
   });
   const [isAddingAccount, setIsAddingAccount] = useState(false);
 
-  // Handle OAuth callback
+  // Handle OAuth callback and direct token in URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const codeParam = params.get('code');
@@ -121,8 +121,23 @@ function AppContent() {
           console.error("Failed to exchange OAuth code", err);
           navigate('/', { replace: true });
         });
+      return;
     }
-  }, [location.search, navigate]);
+
+    // Check if the pathname itself is a raw JWT token (e.g. storage.beta-softnet.com/eyJhbG...)
+    const path = location.pathname.substring(1); // remove leading '/'
+    if (path && path.length > 50 && path.split('.').length === 3 && !path.includes('/')) {
+      try {
+        const payload = JSON.parse(atob(path.split('.')[1]));
+        const email = payload.sub || payload.email || 'user@bnxmail.com';
+        handleLoginSuccess(email, path, '');
+        navigate('/', { replace: true });
+      } catch (err) {
+        console.error("Failed to parse token from URL", err);
+        navigate('/', { replace: true });
+      }
+    }
+  }, [location.search, location.pathname, navigate]);
 
   // Route guarding and redirection checking
   useEffect(() => {
