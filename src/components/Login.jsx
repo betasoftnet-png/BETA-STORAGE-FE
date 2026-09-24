@@ -16,10 +16,10 @@ export default function Login() {
   };
 
   useEffect(() => {
-    // Check if we are already handling a callback (tokens in URL)
+    // Check if we are already handling a callback (OAuth code in URL)
     const params = new URLSearchParams(window.location.search);
-    if (params.get('token') && params.get('email')) {
-      // Don't redirect, let App.jsx handle the tokens
+    if (params.get('code') || (params.get('token') && params.get('email'))) {
+      // Don't redirect, let App.jsx handle the callback
       return;
     }
     

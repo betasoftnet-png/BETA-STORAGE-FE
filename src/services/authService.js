@@ -98,10 +98,39 @@ export async function refreshAccessToken(refreshToken) {
     throw new Error(resJson?.message || `Token refresh failed (HTTP ${response.status})`);
   }
   const tokenData = resJson?.data || resJson;
-  const accessToken = tokenData.accessToken || tokenData.token;
-  const newRefreshToken = tokenData.refreshToken || refreshToken;
-  if (!accessToken) {
-    throw new Error(resJson?.message || 'New access token not provided in refresh response');
+  return { accessToken: tokenData.accessToken || tokenData.token, refreshToken: tokenData.refreshToken || refreshToken };
+}
+
+export async function exchangeOAuthCode(code) {
+  const API_BASE_URL = getApiBaseUrl();
+  const response = await fetch(`${API_BASE_URL}/api/oauth/token`, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      grantType: 'authorization_code',
+      code: code,
+      clientId: 'beta-storage',
+      clientSecret: 'secure-storage-secret-2026'
+    })
+  });
+  
+  const resJson = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(resJson?.message || `Failed to exchange OAuth code (HTTP ${response.status})`);
   }
-  return { accessToken, refreshToken: newRefreshToken };
+  
+  const data = resJson?.data || resJson;
+  return {
+    accessToken: data.access_token,
+    // We can decode the JWT locally to extract the email, or the backend might return it.
+    // For now, let's decode the JWT payload to get the user's email.
+    email: (() => {
+      try {
+        const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+        return payload.sub || payload.email || 'user@beta-softnet.com';
+      } catch (e) {
+        return 'user@beta-softnet.com';
+      }
+    })()
+  };
 }

@@ -20,7 +20,7 @@ import Login from './components/Login';
 import AccountManagementView from './components/AccountManagementView';
 import ManageAppsView from './components/ManageAppsView';
 import { getStorageQuota } from './services/storageService';
-import { refreshAccessToken } from './services/authService';
+import { refreshAccessToken, exchangeOAuthCode } from './services/authService';
 import { formatBytes } from './utils/storage';
 
 // Load or return real-time storage state
@@ -110,12 +110,17 @@ function AppContent() {
   // Handle OAuth callback
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const tokenParam = params.get('token');
-    const emailParam = params.get('email');
-    if (tokenParam && emailParam) {
-      handleLoginSuccess(decodeURIComponent(emailParam), decodeURIComponent(tokenParam), '');
-      // Clean up the URL
-      navigate('/', { replace: true });
+    const codeParam = params.get('code');
+    if (codeParam) {
+      exchangeOAuthCode(codeParam)
+        .then(res => {
+          handleLoginSuccess(res.email, res.accessToken, '');
+          navigate('/', { replace: true });
+        })
+        .catch(err => {
+          console.error("Failed to exchange OAuth code", err);
+          navigate('/', { replace: true });
+        });
     }
   }, [location.search, navigate]);
 
