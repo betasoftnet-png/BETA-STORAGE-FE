@@ -12,7 +12,7 @@ export default function Login() {
     const authUrl = import.meta.env.VITE_AUTH_URL || 'https://b2auth.com';
     
     // Redirect to the auth app with the required OAuth query parameters
-    window.location.href = `${authUrl}/login?client_id=beta-storage&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    window.location.href = `${authUrl}/?client_id=beta-storage&redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 
   useEffect(() => {
