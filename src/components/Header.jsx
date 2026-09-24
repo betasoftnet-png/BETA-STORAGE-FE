@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, ChevronDown, Camera, UserPlus, LogOut, User } from 'lucide-react';
 
+import { handleSSORedirect } from '../services/authService';
+
 export default function Header({ 
   lastUpdated, 
   isRefreshing, 
@@ -43,10 +45,10 @@ export default function Header({
 
       <div className="navbar-controls" ref={dropdownRef}>
         {!currentUserEmail ? (
-          <a href="/login" className="navbar-login-btn text-white no-underline" style={{ backgroundColor: '#2563eb', padding: '0.5rem 1rem', borderRadius: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button onClick={handleSSORedirect} className="navbar-login-btn text-white no-underline" style={{ backgroundColor: '#2563eb', padding: '0.5rem 1rem', borderRadius: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.5rem', border: 'none', cursor: 'pointer' }}>
             <User size={16} />
             <span>Login</span>
-          </a>
+          </button>
         ) : (
           <>
             <button 

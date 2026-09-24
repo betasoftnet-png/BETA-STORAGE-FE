@@ -134,3 +134,9 @@ export async function exchangeOAuthCode(code) {
     })()
   };
 }
+
+export function handleSSORedirect() {
+  const redirectUri = window.location.origin;
+  const authUrl = import.meta.env.VITE_AUTH_URL || 'https://b2auth.com';
+  window.location.href = `${authUrl}/?client_id=beta-storage&redirect_uri=${encodeURIComponent(redirectUri)}`;
+}

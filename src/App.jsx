@@ -20,7 +20,7 @@ import Login from './components/Login';
 import AccountManagementView from './components/AccountManagementView';
 import ManageAppsView from './components/ManageAppsView';
 import { getStorageQuota } from './services/storageService';
-import { refreshAccessToken, exchangeOAuthCode } from './services/authService';
+import { refreshAccessToken, exchangeOAuthCode, handleSSORedirect } from './services/authService';
 import { formatBytes } from './utils/storage';
 
 // Load or return real-time storage state
@@ -199,7 +199,7 @@ function AppContent() {
 
   const handleAddAccount = () => {
     setIsAddingAccount(true);
-    navigate('/login');
+    handleSSORedirect();
   };
 
   const handleSignOutThis = () => {
