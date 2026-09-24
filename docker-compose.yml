@@ -1,0 +1,7 @@
+services:
+  beta-storage-fe:
+    image: ghcr.io/betasoftnet-png/beta-storage-fe:latest
+    container_name: beta-storage-fe
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3106:80"

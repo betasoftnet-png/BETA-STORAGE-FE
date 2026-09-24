@@ -1,28 +1,62 @@
-name: Deploy to Server
+name: Build and Deploy BETA Storage FE
 
 on:
   push:
     branches:
-      - main   # change to master if needed
+      - main
+
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ghcr.io/betasoftnet-png/beta-storage-fe
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.0
+    permissions:
+      contents: read
+      packages: write
 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: 204.168.244.118
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
+
             cd /var/www/BETA-STORAGE-FE
-            git fetch origin
-            git reset --hard origin/main
-            npm install
-            npm run build
-            rm -rf /var/www/beta-storage/*
-            cp -r dist/* /var/www/beta-storage/
-            systemctl restart nginx
+
+            echo "Logging in to GHCR..."
+            echo "${{ secrets.GHCR_READ_TOKEN }}" | docker login ghcr.io -u betasoftnet-png --password-stdin
+
+            echo "Pulling latest Docker image..."
+            docker compose pull
+
+            echo "Starting Docker container..."
+            docker compose up -d --force-recreate
+
+            echo "Deployment completed."
+            docker ps --filter name=beta-storage-fe
