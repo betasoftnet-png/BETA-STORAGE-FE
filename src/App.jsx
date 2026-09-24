@@ -371,7 +371,7 @@ function AppContent() {
     }
   }, [location.pathname, navigate]);
 
-  // In-memory secure BNX Mail tokens (never stored in localStorage/sessionStorage)
+  // Tokens stored in localStorage as requested by user
   const [bnxToken, setBnxToken] = useState(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -379,16 +379,30 @@ function AppContent() {
       if (urlToken) {
         const cleanUrl = window.location.pathname + window.location.hash;
         window.history.replaceState({}, document.title, cleanUrl);
+        localStorage.setItem('bnxToken', urlToken);
         return urlToken;
       }
     } catch (_) {}
-    const savedEmail = localStorage.getItem('currentUserEmail');
-    if (savedEmail) {
-      return `bnx_token_${btoa(savedEmail.trim())}`;
-    }
-    return '';
+    return localStorage.getItem('bnxToken') || '';
   });
-  const [bnxRefreshToken, setBnxRefreshToken] = useState('');
+  const [bnxRefreshToken, setBnxRefreshToken] = useState(() => localStorage.getItem('bnxRefreshToken') || '');
+
+  // Keep localStorage in sync with token state
+  useEffect(() => {
+    if (bnxToken) {
+      localStorage.setItem('bnxToken', bnxToken);
+    } else {
+      localStorage.removeItem('bnxToken');
+    }
+  }, [bnxToken]);
+
+  useEffect(() => {
+    if (bnxRefreshToken) {
+      localStorage.setItem('bnxRefreshToken', bnxRefreshToken);
+    } else {
+      localStorage.removeItem('bnxRefreshToken');
+    }
+  }, [bnxRefreshToken]);
 
   // Listen to secure postMessage token transfers from BNX Mail / ecosystem shell
   useEffect(() => {
