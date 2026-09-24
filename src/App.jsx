@@ -107,6 +107,18 @@ function AppContent() {
   });
   const [isAddingAccount, setIsAddingAccount] = useState(false);
 
+  // Handle OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tokenParam = params.get('token');
+    const emailParam = params.get('email');
+    if (tokenParam && emailParam) {
+      handleLoginSuccess(decodeURIComponent(emailParam), decodeURIComponent(tokenParam), '');
+      // Clean up the URL
+      navigate('/', { replace: true });
+    }
+  }, [location.search, navigate]);
+
   // Route guarding and redirection checking
   useEffect(() => {
     if (!isAuthenticated && location.pathname !== '/login') {
