@@ -42,46 +42,53 @@ export default function Header({
       </div>
 
       <div className="navbar-controls" ref={dropdownRef}>
-        <button 
-          className="navbar-login-btn" 
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        >
-          <User size={16} />
-          <span>{t('header.login')}</span>
-        </button>
+        {!currentUserEmail ? (
+          <a href="/login" className="navbar-login-btn text-white no-underline" style={{ backgroundColor: '#2563eb', padding: '0.5rem 1rem', borderRadius: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <User size={16} />
+            <span>Login</span>
+          </a>
+        ) : (
+          <>
+            <button 
+              className="navbar-login-btn" 
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <User size={16} />
+              <span>{username}</span>
+            </button>
 
-        {/* Dropdown Card matching screenshot layout */}
-        {isDropdownOpen && (
-          <div className="profile-dropdown-card">
-            <div className="profile-card-header">
-              
-              <div className="profile-card-avatar-wrapper">
-                <div className="profile-card-avatar">{avatarChar}</div>
-                <button className="profile-card-camera-btn" title="Change profile picture">
-                  <Camera size={12} />
-                </button>
-              </div>
+            {/* Dropdown Card matching screenshot layout */}
+            {isDropdownOpen && (
+              <div className="profile-dropdown-card">
+                <div className="profile-card-header">
+                  
+                  <div className="profile-card-avatar-wrapper">
+                    <div className="profile-card-avatar">{avatarChar}</div>
+                    <button className="profile-card-camera-btn" title="Change profile picture">
+                      <Camera size={12} />
+                    </button>
+                  </div>
 
-              <h3 className="profile-card-username">{username}</h3>
-              <p className="profile-card-email">{email}</p>
+                  <h3 className="profile-card-username">{username}</h3>
+                  <p className="profile-card-email">{email}</p>
 
-              <button 
-                type="button" 
-                className="profile-manage-btn" 
-                onClick={() => {
-                  setIsDropdownOpen(false);
-                  if (onManageAccount) onManageAccount();
-                }}
-              >
-                <User size={14} />
-                <span>{t('header.manageAccount')}</span>
-              </button>
-            </div>
+                  <button 
+                    type="button" 
+                    className="profile-manage-btn" 
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      if (onManageAccount) onManageAccount();
+                    }}
+                  >
+                    <User size={14} />
+                    <span>{t('header.manageAccount')}</span>
+                  </button>
+                </div>
 
-            <hr className="profile-card-divider" />
+                <hr className="profile-card-divider" />
 
-            {/* Other signed-in accounts switcher */}
-            {signedInAccounts.filter(acc => acc !== email).length > 0 && (
+                {/* Other signed-in accounts switcher */}
+                {signedInAccounts.filter(acc => acc !== email).length > 0 && (
               <>
                 <div className="profile-switch-accounts">
                   <div className="switch-accounts-title">{t('header.switchAccount', 'Switch Account')}</div>
@@ -149,7 +156,8 @@ export default function Header({
 
           </div>
         )}
-
+        </>
+        )}
       </div>
     </header>
   );

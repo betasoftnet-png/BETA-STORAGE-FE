@@ -121,9 +121,7 @@ function AppContent() {
 
   // Route guarding and redirection checking
   useEffect(() => {
-    if (!isAuthenticated && location.pathname !== '/login') {
-      navigate('/login');
-    } else if (isAuthenticated && location.pathname === '/login' && !isAddingAccount) {
+    if (isAuthenticated && location.pathname === '/login' && !isAddingAccount) {
       navigate('/');
     } else if (isAuthenticated && location.pathname === '/dashboard') {
       navigate('/');
