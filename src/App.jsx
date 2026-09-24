@@ -800,7 +800,7 @@ function AppContent() {
     ? t('dashboard.allocationEach', { size: (state.apps[0].allocatedMB / 1024).toFixed(0) })
     : t('dashboard.allocationTrack');
 
-  if (location.pathname === '/login' || !isAuthenticated) {
+  if (location.pathname === '/login') {
     return <Login onLoginSuccess={handleLoginSuccess} />;
   }
 
